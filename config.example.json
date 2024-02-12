@@ -1,0 +1,10 @@
+{
+  "backend": {
+    "accessToken": "jwt secret-token"
+  },
+  "account": {
+    "authority": "authority account secret key",
+    "action": "action account secret key",
+    "tokenReceiver": "token receiver account secret key"
+  }
+}
