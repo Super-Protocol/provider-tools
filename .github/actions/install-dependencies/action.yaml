@@ -1,0 +1,30 @@
+name: Install nodejs dependencies
+description: Checkout, install dependencies and cached node_modules folder
+
+runs:
+  using: 'composite'
+
+  steps:
+    - name: Setup Node.js 🛠️
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'npm'
+    - name: Cache node modules 📦
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+    - name: Check for cached node modules ✔️
+      id: cached-node-modules
+      shell: bash
+      run: |
+        if [[ -d "node_modules" ]]; then
+          echo "restored-cache=true" >> $GITHUB_OUTPUT
+        else
+          echo "restored-cache=false" >> $GITHUB_OUTPUT
+        fi
+    - name: Install node modules 🧩
+      if: steps.cached-node-modules.outputs.restored-cache != 'true'
+      shell: bash
+      run: npm ci

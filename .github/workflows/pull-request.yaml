@@ -1,0 +1,62 @@
+name: Run all necessary checks for pull request
+
+on:
+    pull_request:
+        branches:
+            - main
+    workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+jobs:
+  circular_dependency:
+    runs-on: ubuntu-latest
+    name: circular dependency
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Install dependencies 🧩
+        uses: ./.github/actions/install-dependencies
+      - name: Check circular dependencies 🔗
+        run: npm run madge
+
+  lint:
+    name: eslint
+    runs-on: ubuntu-latest
+    needs: circular_dependency
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Install dependencies 🧩
+        uses: ./.github/actions/install-dependencies
+      - name: Run eslint 👕
+        run: npm run lint
+
+  tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    needs: circular_dependency
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Install dependencies 🧩
+        uses: ./.github/actions/install-dependencies
+      - name: Run tests 🧪
+        run: npm run test:ci
+      - name: Test report ✅
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: JEST Tests
+          path: /tmp/jest-*.xml
+          reporter: jest-junit
+          fail-on-error: 'false'
