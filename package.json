@@ -23,6 +23,7 @@
     "lint:fix": "npm run lint -- --fix",
     "dev": "ts-node --transpileOnly ./src/index.ts",
     "test": "jest --detectOpenHandles --forceExit",
+    "test:ci": "npm run test -- --reporters=jest-junit",
     "premadge": "npm run compile",
     "madge": "madge -c ./build"
   },
@@ -40,6 +41,7 @@
     "@types/inquirer": "^9.0.7",
     "@types/jest": "^29.5.12",
     "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
     "madge": "^6.1.0",
     "pkg": "^5.8.1",
     "ts-jest": "^29.1.2",
@@ -69,11 +71,15 @@
       "json",
       "ts"
     ],
-    "roots": ["src", "tests"],
+    "roots": [
+      "src",
+      "tests"
+    ],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "coverageDirectory": "./coverage",
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
