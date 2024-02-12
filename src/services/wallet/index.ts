@@ -1,7 +1,5 @@
-import { Wallet } from 'ethers';
+import { HDNodeWallet, Wallet } from 'ethers';
 
-export const create = () => {
-  const account = Wallet.createRandom();
-
-  return account;
+export const create = (): HDNodeWallet => {
+  return Wallet.createRandom();
 };

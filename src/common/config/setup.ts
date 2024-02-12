@@ -62,7 +62,7 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
 export const setup = async (config?: Config): Promise<Config> => {
   const questions = getQuestionsObj(config);
   const answers = (await inquirer.prompt(questions)) as Answers;
-  const getAccount = (answers: Answers, accountType: AccountType) =>
+  const getAccount = (answers: Answers, accountType: AccountType): string =>
     answers.account.isAutoGenerationNeeded[accountType]
       ? create().privateKey
       : answers.account[accountType];

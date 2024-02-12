@@ -9,6 +9,6 @@ export const RegisterCommand = new Command()
   .name('register')
   .description('register tee-provider')
   .requiredOption('--path <filepath>', 'path to the provider info json file', './providerInfo.json')
-  .action((options: CommandParams) => {
-    console.log(`path: ${options.path}`);
+  .action((_options: CommandParams) => {
+    throw Error('Not implemented yet');
   });
