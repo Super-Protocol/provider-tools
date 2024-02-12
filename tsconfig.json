@@ -1,0 +1,7 @@
+{
+  "extends": "@super-protocol/eslint-config-typescript/tsconfig.json",
+    "compilerOptions": {
+      "allowJs": true,
+      "outDir": "build",
+    }
+}

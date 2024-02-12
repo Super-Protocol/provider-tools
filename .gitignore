@@ -1,0 +1,30 @@
+# IDE/Code editors
+.vscode
+.idea
+
+# Dependency directories
+node_modules
+
+# Optional npm cache directory
+.npm
+.npm-cache
+
+# Optional eslint cache
+.eslintcache
+
+# OS
+.DS_Store
+
+# dotenv environment variables file
+.env
+
+# build output
+build
+dist
+tool
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Temporally directory
+tmp

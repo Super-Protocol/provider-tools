@@ -1,0 +1,3 @@
+{
+    "extends": "@super-protocol/eslint-config-typescript/eslint-config.js"
+}
