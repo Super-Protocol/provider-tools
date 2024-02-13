@@ -1,11 +1,23 @@
 import inquirer, { QuestionCollection } from 'inquirer';
 import { AccountConfig, Config } from './types';
-import { JWT_CHECK_REGEX, PRIVATE_KEY_CHECK_REGEX } from '../constant';
+import {
+  JWT_CHECK_REGEX,
+  PRIVATE_KEY_CHECK_REGEX,
+  SPCTL_BACKEND_URL_DEFAULT,
+  SPCTL_BLOCKCHAIN_URL_DEFAULT,
+  SPCTL_CRYPTO_ALGO_DEFAULT,
+  SPCTL_ENCODING_DEFAULT,
+  SPCTL_PCCS_SERVICE_DEFAULT,
+  SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT,
+  SPCTL_STORAGE_TYPE_DEFAULT,
+} from '../constant';
 import { create } from '../../services/wallet';
 
 interface Answers {
-  backend: {
-    accessToken: string;
+  spctl: {
+    backend: {
+      accessToken: string;
+    };
   };
   account: AccountConfig & { isAutoGenerationNeeded: { [K in keyof AccountConfig]: boolean } };
 }
@@ -44,9 +56,9 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
   return [
     {
       type: 'input',
-      name: 'backend.accessToken',
+      name: 'spctl.backend.accessToken',
       message: 'Enter Access token: ',
-      default: config?.backend?.accessToken,
+      default: config?.spctl.backend?.accessToken,
       validate: (token: string): string | boolean => {
         if (JWT_CHECK_REGEX.test(token)) {
           return true;
@@ -68,8 +80,35 @@ export const setup = async (config?: Config): Promise<Config> => {
       : answers.account[accountType];
 
   return {
-    backend: {
-      accessToken: answers.backend.accessToken,
+    spctl: {
+      backend: {
+        url: config?.spctl.backend.url ?? SPCTL_BACKEND_URL_DEFAULT,
+        accessToken: answers.spctl.backend.accessToken,
+      },
+      blockchain: {
+        rpcUrl: config?.spctl.blockchain?.rpcUrl ?? SPCTL_BLOCKCHAIN_URL_DEFAULT,
+        smartContractAddress:
+          config?.spctl.blockchain?.smartContractAddress ?? SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT,
+        accountPrivateKey: getAccount(answers, 'action'),
+        authorityAccountPrivateKey: getAccount(answers, 'authority'),
+      },
+      storage: {
+        type: config?.spctl.storage?.type ?? SPCTL_STORAGE_TYPE_DEFAULT,
+        bucket: '',
+        prefix: '',
+        readAccessToken: '',
+        writeAccessToken: '',
+      },
+      workflow: {
+        resultEncryption: {
+          algo: config?.spctl.workflow.resultEncryption.algo ?? SPCTL_CRYPTO_ALGO_DEFAULT,
+          key: '',
+          encoding: config?.spctl.workflow.resultEncryption.encoding ?? SPCTL_ENCODING_DEFAULT,
+        },
+      },
+      tii: {
+        pccsServiceApiUrl: config?.spctl.tii.pccsServiceApiUrl ?? SPCTL_PCCS_SERVICE_DEFAULT,
+      },
     },
     account: {
       authority: getAccount(answers, 'authority'),
