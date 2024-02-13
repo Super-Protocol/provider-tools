@@ -1,10 +1,16 @@
 import { Command } from 'commander';
 import { processSubCommands, RegisterCommand, SetupCommand } from './commands';
-import { APP_DESCRIPTION, APP_NAME, APP_VERSION, CONFIG_DEFAULT_FILENAME } from './common/constant';
+import {
+  APP_DESCRIPTION,
+  APP_NAME,
+  APP_VERSION,
+  CONFIG_DEFAULT_FILENAME,
+  SPCTL_LOCATION_PATH,
+} from './common/constant';
 import { createLogger } from './common/logger';
 import { ConfigLoader } from './common/loader.config';
 import { getConfigPath, getRawConfig } from './common/config';
-import { checkAndDownloadSPCTL } from './services/download';
+import { checkAndDownloadSpctl } from './services/download';
 
 const logger = createLogger({
   options: {
@@ -22,11 +28,14 @@ const main = async (): Promise<void> => {
       return;
     }
 
-    // const configPath = actionCommand.opts().config;
+    const configPath = actionCommand.opts().config;
 
-    // await checkForUpdates(configPath).catch(() => undefined);
     try {
-      await checkAndDownloadSPCTL(logger);
+      await checkAndDownloadSpctl({
+        logger,
+        destination: SPCTL_LOCATION_PATH,
+        configLoader: new ConfigLoader(configPath),
+      });
     } catch (err) {
       logger.error(err, 'download spctl has been failed');
       throw err;

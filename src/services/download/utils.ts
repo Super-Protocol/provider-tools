@@ -1,10 +1,6 @@
-import * as process from 'process';
-
 export const supportedPlatform: NodeJS.Platform[] = ['darwin', 'linux'];
 export const supportedArch: NodeJS.Architecture[] = ['arm64', 'x64'];
 export const getOSAndArch = (): string => {
-  // return 'macos-x64';
-
   const os = process.platform;
   if (!supportedPlatform.includes(os)) {
     throw new Error(`Unsupported OS: ${os}`);
