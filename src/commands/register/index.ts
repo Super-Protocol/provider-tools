@@ -7,7 +7,9 @@ import { registerTeeProvider } from '../../services/register';
 
 type CommandParams = ConfigCommandParam & {
   tee: boolean;
-  url: string;
+  backendUrl: string;
+  blockchainUrl: string;
+  contractAddress: string;
 };
 
 const COMMAND_NAME = 'register';
@@ -17,7 +19,9 @@ export const RegisterCommand = new Command()
   .name(COMMAND_NAME)
   .description('register tee-provider')
   .requiredOption('--tee', 'specified type of provider', false)
-  .requiredOption('--url <url>', 'backend url')
+  .option('--backend-url <url>', 'backend url')
+  .option('--blockchain-url <url>', 'blockchain url')
+  .option('--contract-address <address>', 'contract address')
   .action(async (options: CommandParams) => {
     if (!options.tee) {
       return logger.error(
@@ -28,7 +32,9 @@ export const RegisterCommand = new Command()
     const service = await createSpctlService({
       logger,
       config,
-      backendUrl: options.url,
+      backendUrl: options.backendUrl,
+      blockchainUrl: options.blockchainUrl,
+      contractAddress: options.contractAddress,
     });
 
     await registerTeeProvider({
