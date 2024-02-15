@@ -37,9 +37,13 @@ export const RegisterCommand = new Command()
       contractAddress: options.contractAddress,
     });
 
-    await registerTeeProvider({
+    const response = await registerTeeProvider({
       accounts: config.loadSection('account'),
       service,
       logger,
     });
+
+    response.success
+      ? logger.info(`Congratulations!!! ${response.details}`)
+      : logger.warn(`Upss... ${response.details}`);
   });

@@ -41,14 +41,22 @@ const createProvider = async (params: RegisterTeeProviderParams): Promise<void> 
   await params.service.createProvider(fileName, provider);
 };
 
-export const registerTeeProvider = async (params: RegisterTeeProviderParams): Promise<void> => {
+export type RegisterTeeProviderResultType = {
+  success: boolean;
+  details?: string;
+};
+export const registerTeeProvider = async (
+  params: RegisterTeeProviderParams,
+): Promise<RegisterTeeProviderResultType> => {
   const { service } = params;
 
   const address = createWallet(params.accounts.authority).address;
   const fileName = await service.getProviderByAddress(address, `${Date.now()}.tee-provider.json`);
   if (fileName) {
-    params.logger?.info(`Provider ${address} has already existed.`);
-    return;
+    return {
+      success: false,
+      details: `Provider ${address} has already existed.`,
+    };
   }
   const replenishAccountBalance = async (pk: string): Promise<void> => {
     const needs = await needReplenish(service, pk);
@@ -64,4 +72,8 @@ export const registerTeeProvider = async (params: RegisterTeeProviderParams): Pr
   ]);
 
   await createProvider(params);
+  return {
+    success: true,
+    details: `Provider ${address} has been created successfully.`,
+  };
 };
