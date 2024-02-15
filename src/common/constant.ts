@@ -16,8 +16,8 @@ export const SPCTL_PCCS_SERVICE_DEFAULT = 'https://pccs.superprotocol.io';
 export const SPCTL_STORAGE_TYPE_DEFAULT = 'STORJ';
 export const TOOL_DIRECTORY_PATH = Path.join(__dirname, '../..', 'tool');
 export const SPCTL_LOCATION_PATH = Path.join(TOOL_DIRECTORY_PATH, 'spctl');
-export const MIN_TEE_SUM_FOR_PROVIDER_ACCOUNT = '100000000000000000000';
-export const MIN_MATIC_SUM_FOR_PROVIDER_ACCOUNT = '100000000000000000000';
 export const SPCTL_LATEST_RELEASE_URL =
   'https://api.github.com/repos/Super-Protocol/ctl/releases/latest';
 export const SPCTL_MIN_COMPATIBLE_VERSION = `0.8.8-beta.0`;
+export const MIN_TEE_SUM_FOR_PROVIDER_ACCOUNT = '9000000000000000000';
+export const MIN_MATIC_SUM_FOR_PROVIDER_ACCOUNT = '200000000000000000';

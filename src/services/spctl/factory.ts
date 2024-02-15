@@ -1,15 +1,16 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { removeFileIfExist } from './utils';
+import { removeFileIfExist } from './file.utils';
 import { createLogger, ILogger } from '../../common/logger';
 import { ConfigLoader } from '../../common/loader.config';
-import { TOOL_DIRECTORY_PATH } from '../../common/constant';
+import { SPCTL_BACKEND_URL_DEFAULT, TOOL_DIRECTORY_PATH } from '../../common/constant';
 import { SpctlConfig } from '../../common/config';
 import { ISpctlService, SpctlService, SpctlServiceParams } from './service';
 
 export interface CreateSpctlServiceOptions {
   logger?: ILogger;
   config: ConfigLoader;
+  backendUrl?: string;
 }
 export const createSpctlService = async (
   options: CreateSpctlServiceOptions,
@@ -23,7 +24,7 @@ export const createSpctlService = async (
   const buildSpctlConfig = (): SpctlConfig => {
     const spctlConfig = options.config.loadSection('spctl');
     const accountConfig = options.config.loadSection('account');
-
+    spctlConfig.backend.url = options.backendUrl ?? SPCTL_BACKEND_URL_DEFAULT;
     spctlConfig.blockchain.authorityAccountPrivateKey = accountConfig.authority;
     spctlConfig.blockchain.accountPrivateKey = accountConfig.action;
 

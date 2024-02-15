@@ -1,5 +1,5 @@
 import { Wallet } from 'ethers';
 
-export const create = (): Wallet => {
-  return Wallet.createRandom();
+export const createWallet = (privateKey?: string): Wallet => {
+  return privateKey ? new Wallet(privateKey) : Wallet.createRandom();
 };
