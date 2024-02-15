@@ -68,45 +68,37 @@ export type CheckAndDownloadSpctlParams = {
 
 export const checkAndDownloadSpctl = async (params: CheckAndDownloadSpctlParams): Promise<void> => {
   const { logger, destination } = params;
-  try {
-    let currentVersion = '';
-    if (fs.existsSync(destination)) {
-      logger?.trace(
-        `spctl already exists at ${destination}. Making comparison with latest version...`,
-      );
-      const service = await createSpctlService({
-        logger,
-        config: params.configLoader,
-      });
-      currentVersion = (await service.getVersion()).replace('\n', '');
-    }
-    const updateInfo = await hasNewVersion(currentVersion);
-    if (updateInfo.hasNewVersion && updateInfo.version && isCompatible(updateInfo.version)) {
-      logger?.debug(`Downloading spctl v.${updateInfo.version} to ${destination}`);
-      await downloadSPCTL({
-        logger: params.logger,
-        destination: params.destination,
-        version: updateInfo.version,
-      }).catch((err) => {
-        logger?.error({ err }, 'Failed to check or download spctl');
-      });
+  let currentVersion = '';
+  if (fs.existsSync(destination)) {
+    logger?.trace(
+      `spctl already exists at ${destination}. Making comparison with latest version...`,
+    );
+    const service = await createSpctlService({
+      logger,
+      config: params.configLoader,
+    });
+    currentVersion = (await service.getVersion()).replace('\n', '');
+  }
+  const updateInfo = await hasNewVersion(currentVersion);
+  if (updateInfo.hasNewVersion && updateInfo.version && isCompatible(updateInfo.version)) {
+    logger?.debug(`Downloading spctl v.${updateInfo.version} to ${destination}`);
+    await downloadSPCTL({
+      logger: params.logger,
+      destination: params.destination,
+      version: updateInfo.version,
+    }).catch((err) => {
+      logger?.error({ err }, 'Failed to check or download spctl');
+    });
 
-      logger?.debug(`Successfully downloaded spctl to ${destination}`);
-    } else if (!currentVersion) {
-      logger?.error(
-        'Resource for downloading was not found and you do not have any downloaded spctl-tool version yet. The program will be closed.',
-      );
-      process.exit(0);
-    } else if (!isCompatible(currentVersion)) {
-      logger?.error(
-        `Installed spctl v${currentVersion}is not compatible with v${SPCTL_MIN_COMPATIBLE_VERSION}`,
-      );
-      process.exit(0);
-    }
-  } catch (err) {
-    logger?.error({ err }, 'Failed to check or download spctl');
-
-    throw err;
+    logger?.debug(`Successfully downloaded spctl to ${destination}`);
+  } else if (!currentVersion) {
+    throw Error(
+      'Resource for downloading was not found and you do not have any downloaded spctl-tool version yet. The program will be closed.',
+    );
+  } else if (!isCompatible(currentVersion)) {
+    throw Error(
+      `Installed spctl v${currentVersion}is not compatible with v${SPCTL_MIN_COMPATIBLE_VERSION}`,
+    );
   }
 };
 
