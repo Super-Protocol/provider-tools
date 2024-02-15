@@ -12,9 +12,10 @@ import { ConfigLoader } from './common/loader.config';
 import { getConfigPath, getRawConfig } from './common/config';
 import { checkAndDownloadSpctl } from './services/download';
 
+const options = getRawConfig(getConfigPath(), false)?.logger;
 const logger = createLogger({
   options: {
-    ...getRawConfig(getConfigPath(), false)?.logger,
+    ...options,
     name: APP_NAME,
   },
 });

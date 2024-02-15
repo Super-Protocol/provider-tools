@@ -19,7 +19,7 @@ export class ConfigLoader {
       config = Config.getRawConfig(configPath);
       ConfigLoader.validatedConfig = Config.validate(config);
     } catch (err: unknown) {
-      this.logger?.error({ err }, `Get config by path "${configPath}" was failed`);
+      this.logger?.debug({ err }, `Configuration file ${configPath} was not read successfully`);
     }
 
     if (!ConfigLoader.validatedConfig) {

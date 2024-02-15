@@ -18,15 +18,21 @@ export const getConfigPath = (): string => {
 
 export const getRawConfig = (configPath: string, throwError = true): Config | undefined => {
   if (!fs.existsSync(configPath)) {
-    if (!throwError) return;
+    if (!throwError) {
+      return;
+    }
 
     throw Error('Config file was not found');
   }
 
   try {
-    return JSON.parse(fs.readFileSync(configPath).toString());
+    const bufferConfig = fs.readFileSync(configPath);
+    const strConfig = bufferConfig.toString();
+    return JSON.parse(strConfig);
   } catch (err) {
-    if (!throwError) return;
+    if (!throwError) {
+      return;
+    }
 
     throw Error(`Config is not valid JSON. Error: ${(err as Error).message}`);
   }

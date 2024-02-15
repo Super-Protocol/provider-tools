@@ -11,7 +11,7 @@ import {
   SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT,
   SPCTL_STORAGE_TYPE_DEFAULT,
 } from '../constant';
-import { create } from '../../services/wallet';
+import { createWallet } from '../../services/wallet';
 
 interface Answers {
   spctl: {
@@ -76,9 +76,12 @@ export const setup = async (config?: Config): Promise<Config> => {
   const answers = (await inquirer.prompt(questions)) as Answers;
   const getAccount = (answers: Answers, accountType: AccountType): string =>
     answers.account.isAutoGenerationNeeded[accountType]
-      ? create().privateKey
+      ? createWallet().privateKey
       : answers.account[accountType];
 
+  const actionAccount = getAccount(answers, 'action');
+  const authorityAccount = getAccount(answers, 'authority');
+  const tokenReceiverAccount = getAccount(answers, 'tokenReceiver');
   return {
     spctl: {
       backend: {
@@ -89,8 +92,8 @@ export const setup = async (config?: Config): Promise<Config> => {
         rpcUrl: config?.spctl.blockchain?.rpcUrl ?? SPCTL_BLOCKCHAIN_URL_DEFAULT,
         smartContractAddress:
           config?.spctl.blockchain?.smartContractAddress ?? SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT,
-        accountPrivateKey: getAccount(answers, 'action'),
-        authorityAccountPrivateKey: getAccount(answers, 'authority'),
+        accountPrivateKey: actionAccount,
+        authorityAccountPrivateKey: authorityAccount,
       },
       storage: {
         type: config?.spctl.storage?.type ?? SPCTL_STORAGE_TYPE_DEFAULT,
@@ -111,9 +114,9 @@ export const setup = async (config?: Config): Promise<Config> => {
       },
     },
     account: {
-      authority: getAccount(answers, 'authority'),
-      action: getAccount(answers, 'action'),
-      tokenReceiver: getAccount(answers, 'tokenReceiver'),
+      authority: authorityAccount,
+      action: actionAccount,
+      tokenReceiver: tokenReceiverAccount,
     },
     ...(config?.logger && { logger: config.logger }),
   };
