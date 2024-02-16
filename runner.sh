@@ -1,3 +1,5 @@
+ARTIFACTS_DIR=runner-artifacts
+
 function get_offers_json() {
   grep PROVIDER_OFFERS_JSON .env | cut -d '=' -f 2-
 }
@@ -16,7 +18,7 @@ function count_elements() {
 function get_order_ids() {
   local offer_id=$1
   local status=$2
-  local save_to="./list.json"
+  local save_to="$ARTIFACTS_DIR/list.json"
 
   output=$(./tool/spctl orders list --config ./tool/config.json --limit 1000 --offers $offer_id --status $status --fields id --save-to $save_to)
 
@@ -27,7 +29,7 @@ function complete_order() {
   local order_id=$1
   local offer_id=$2
 
-  ./tool/spctl orders complete --config ./tool/config.json --status done --result ./resources/$offer_id.json $order_id
+  ./tool/spctl orders complete --config ./tool/config.json --status done --result $ARTIFACTS_DIR/resources/$offer_id.json $order_id
 }
 
 function get_field() {
@@ -39,14 +41,18 @@ function get_field() {
 function create_resource_file_content() {
   local encryption=$1
   local resource=$2
+
   jq -n --argjson encryption "$encryption" --argjson resource "$resource" '{encryption: $encryption, resource: $resource}'
 }
 
 function write_to_file() {
   local id=$1
   local value=$2
-  mkdir -p resources
-  echo "$value" > "resources/$id.json"
+  local resources_dir="$ARTIFACTS_DIR/resources"
+
+  mkdir -p $resources_dir
+
+  echo "$value" > "$resources_dir/$id.json"
 }
 
 function create_resource_files() {
@@ -61,6 +67,10 @@ function create_resource_files() {
 
     write_to_file "$offerId" "$resource_file_content"
   done
+}
+
+function remove_artifacts {
+  rm -rf $ARTIFACTS_DIR
 }
 
 function complete_orders() {
@@ -92,6 +102,7 @@ function main() {
   create_resource_files "$offers_json"
   while true; do
     complete_orders "$offers_json"
+    remove_artifacts
     echo "Waiting 5 minutes"
     sleep "$((60 * 5))"
   done
