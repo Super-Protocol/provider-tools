@@ -3,7 +3,7 @@ import { ILogger } from '../../common/logger';
 import { spawnCommand } from './spawnCommand';
 import { SpctlConfig } from '../../common/config';
 import * as Path from 'path';
-import { fileExist, removeFileIfExist, writeToFile } from './file.utils';
+import { fileExist, readJsonFile, removeFileIfExist, writeToFile } from '../utils/file.utils';
 import { IProvider } from './types';
 
 export type SpctlServiceParams = {
@@ -89,7 +89,7 @@ export class SpctlService implements ISpctlService {
     }
   }
 
-  async getProviderByAddress(address: string, saveFileName: string): Promise<string> {
+  async getProviderByAddress(address: string, saveFileName: string): Promise<IProvider | null> {
     const providerFields = ['name', 'address'];
     const args = [
       'providers',
@@ -104,9 +104,15 @@ export class SpctlService implements ISpctlService {
     const response = await this.exec(args);
     this.logger.trace({ response }, 'providers get response');
     const fileName = Path.join(this.locationPath, saveFileName);
-    const providerExist = await fileExist(fileName);
+    if (await fileExist(fileName)) {
+      const provider = await readJsonFile(fileName);
 
-    return providerExist ? fileName : '';
+      await removeFileIfExist(fileName);
+
+      return provider as IProvider;
+    }
+
+    return null;
   }
 
   async createProvider(fileName: string, data: IProvider): Promise<void> {

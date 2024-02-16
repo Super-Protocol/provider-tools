@@ -1,6 +1,5 @@
-import * as fs from 'fs-extra';
 import * as path from 'path';
-import { removeFileIfExist } from './file.utils';
+import { removeFileIfExist, writeToFile } from '../utils/file.utils';
 import { createLogger, ILogger } from '../../common/logger';
 import { ConfigLoader } from '../../common/loader.config';
 import {
@@ -25,7 +24,7 @@ export const createSpctlService = async (
   const prepareSpctl = async (config: SpctlConfig): Promise<void> => {
     const configPath = path.join(TOOL_DIRECTORY_PATH, 'config.json');
     await removeFileIfExist(configPath);
-    await fs.outputFile(configPath, JSON.stringify(config));
+    await writeToFile(configPath, config);
   };
 
   const buildSpctlConfig = (): SpctlConfig => {

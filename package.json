@@ -57,6 +57,7 @@
     ]
   },
   "dependencies": {
+    "@types/jsonfile": "^6.1.4",
     "axios": "^1.6.7",
     "cli-progress": "^3.12.0",
     "colors": "^1.4.0",
@@ -64,7 +65,9 @@
     "ethers": "^5.7.2",
     "fs-extra": "^11.2.0",
     "inquirer": "^8.2.6",
+    "jsonfile": "^6.1.0",
     "pino": "^8.18.0",
+    "save-dev": "^0.0.1-security",
     "semver": "^7.6.0",
     "zod": "^3.22.4"
   },

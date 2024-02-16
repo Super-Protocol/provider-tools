@@ -4,7 +4,7 @@ import {
   MIN_MATIC_SUM_FOR_PROVIDER_ACCOUNT,
   MIN_TEE_SUM_FOR_PROVIDER_ACCOUNT,
 } from '../../common/constant';
-import { createWallet } from '../wallet';
+import { createWallet } from '../utils/wallet.utils';
 import { AccountConfig } from '../../common/config';
 import { ILogger } from '../../common/logger';
 import { IProvider } from '../spctl/types';
@@ -27,7 +27,7 @@ const needReplenish = async (
   };
 };
 
-const createProvider = async (params: RegisterTeeProviderParams): Promise<void> => {
+const createProvider = async (params: RegisterTeeProviderParams): Promise<IProvider> => {
   const providerName = generateShortHash(createWallet(params.accounts.authority).address);
   const provider: IProvider = {
     name: `${providerName} - auto generated provider by ${APP_NAME}`,
@@ -39,24 +39,19 @@ const createProvider = async (params: RegisterTeeProviderParams): Promise<void> 
 
   const fileName = `provider_${providerName}.json`;
   await params.service.createProvider(fileName, provider);
+
+  return provider;
 };
 
-export type RegisterTeeProviderResultType = {
-  success: boolean;
-  details?: string;
-};
 export const registerTeeProvider = async (
   params: RegisterTeeProviderParams,
-): Promise<RegisterTeeProviderResultType> => {
+): Promise<IProvider> => {
   const { service } = params;
 
   const address = createWallet(params.accounts.authority).address;
-  const fileName = await service.getProviderByAddress(address, `${Date.now()}.tee-provider.json`);
-  if (fileName) {
-    return {
-      success: false,
-      details: `Provider ${address} has already existed.`,
-    };
+  const provider = await service.getProviderByAddress(address, `${Date.now()}.tee-provider.json`);
+  if (provider) {
+    return provider;
   }
   const replenishAccountBalance = async (pk: string): Promise<void> => {
     const needs = await needReplenish(service, pk);
@@ -71,9 +66,5 @@ export const registerTeeProvider = async (
     replenishAccountBalance(params.accounts.action),
   ]);
 
-  await createProvider(params);
-  return {
-    success: true,
-    details: `Provider ${address} has been created successfully.`,
-  };
+  return createProvider(params);
 };

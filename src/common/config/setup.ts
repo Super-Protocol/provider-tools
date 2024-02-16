@@ -11,7 +11,7 @@ import {
   SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT,
   SPCTL_STORAGE_TYPE_DEFAULT,
 } from '../constant';
-import { createWallet } from '../../services/wallet';
+import { createWallet } from '../../services/utils/wallet.utils';
 
 interface Answers {
   spctl: {

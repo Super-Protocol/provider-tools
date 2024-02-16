@@ -1,9 +1,12 @@
 import { Command } from 'commander';
+import inquirer from 'inquirer';
+
 import { ConfigCommandParam } from '../types';
-import { createSpctlService } from '../../services/spctl';
+import { createSpctlService, writeToFile } from '../../services/spctl';
 import { createLogger } from '../../common/logger';
 import { ConfigLoader } from '../../common/loader.config';
 import { registerTeeProvider } from '../../services/register';
+import { ProviderRegisterQuestions, IProviderRegisterAnswers } from './questions';
 
 type CommandParams = ConfigCommandParam & {
   tee: boolean;
@@ -37,13 +40,18 @@ export const RegisterCommand = new Command()
       contractAddress: options.contractAddress,
     });
 
-    const response = await registerTeeProvider({
+    const provider = await registerTeeProvider({
       accounts: config.loadSection('account'),
       service,
       logger,
     });
 
-    response.success
-      ? logger.info(`Congratulations!!! ${response.details}`)
-      : logger.warn(`Upss... ${response.details}`);
+    logger.info({ provider }, 'here is your provider');
+
+    const answers = (await inquirer.prompt(
+      ProviderRegisterQuestions.doYouWantToSaveProvider,
+    )) as IProviderRegisterAnswers;
+    if (answers.doYouWantToSaveProvider.shouldBeSaved) {
+      await writeToFile(answers.doYouWantToSaveProvider.fileName, provider);
+    }
   });
