@@ -58,10 +58,18 @@ export const MetadataConfigSchema = z.object({
     })
     .optional(),
 });
+
+export const ProviderInfoSchema = z.object({
+  name: z.coerce.string(),
+  description: z.coerce.string().optional(),
+});
+export type ProviderInfoConfig = z.infer<typeof ProviderInfoSchema>;
+
 export const ConfigSchema = z.object({
   logger: LoggerConfigSchema.optional(),
   spctl: SpctlConfigSchema,
   account: AccountConfigSchema,
   metadata: MetadataConfigSchema.optional(),
+  providerInfo: ProviderInfoSchema.optional(),
 });
 export type Config = z.infer<typeof ConfigSchema>;

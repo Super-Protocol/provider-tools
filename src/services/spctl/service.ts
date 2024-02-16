@@ -89,7 +89,8 @@ export class SpctlService implements ISpctlService {
     }
   }
 
-  async getProviderByAddress(address: string, saveFileName: string): Promise<IProvider | null> {
+  async getProviderByAddress(address: string): Promise<IProvider | null> {
+    const saveFileName = `${Date.now()}.tee-provider.json`;
     const providerFields = ['name', 'address'];
     const args = [
       'providers',

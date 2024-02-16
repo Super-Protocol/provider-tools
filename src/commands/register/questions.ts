@@ -1,12 +1,19 @@
 import { Answers, Question } from 'inquirer';
 import Path from 'path';
 import fs from 'fs';
+import { ProviderInfoConfig } from '../../common/config';
+import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 
 export interface IProviderRegisterQuestions {
+  getProviderMetaData: (config?: ProviderInfoConfig) => Question[];
   doYouWantToSaveProvider: Question[];
 }
 
 export interface IProviderRegisterAnswers {
+  getProviderMetaData: {
+    providerName: string;
+    providerDescription?: string;
+  };
   doYouWantToSaveProvider: {
     shouldBeSaved: boolean;
     fileName: string;
@@ -14,6 +21,32 @@ export interface IProviderRegisterAnswers {
 }
 
 export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
+  getProviderMetaData: (config?: ProviderInfoConfig): Question[] => {
+    const timestamp = new Date().valueOf();
+
+    return [
+      {
+        type: 'input',
+        name: 'getProviderMetaData.providerName',
+        message: 'Please enter provider name: ',
+        default: `${timestamp} - ${DEFAULT_PROVIDER_NAME}`,
+        validate: (value: string): string | boolean => {
+          if (!value) {
+            return 'Please specify provider name: ';
+          }
+
+          return true;
+        },
+        when: () => !config?.name,
+      },
+      {
+        type: 'input',
+        name: 'getProviderMetaData.providerDescription',
+        message: 'Please enter provider description: ',
+        when: () => config?.description === undefined,
+      },
+    ];
+  },
   doYouWantToSaveProvider: [
     {
       type: 'confirm',

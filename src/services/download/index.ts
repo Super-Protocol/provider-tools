@@ -113,11 +113,11 @@ const isCompatible = (version: string): boolean => {
   return semver.gte(checked, compatible);
 };
 
-type GasNewVersionReturnType = {
+type HasNewVersionReturnType = {
   hasNewVersion: boolean;
   version?: string;
 };
-export const hasNewVersion = async (currentVersion?: string): Promise<GasNewVersionReturnType> => {
+export const hasNewVersion = async (currentVersion?: string): Promise<HasNewVersionReturnType> => {
   try {
     const response = await axios.get(SPCTL_LATEST_RELEASE_URL);
     const latestVersion = semver.clean(response.data.tag_name);
