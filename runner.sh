@@ -99,8 +99,8 @@ function complete_orders() {
 function main() {
   offers_json=$(get_offers_json)
 
-  create_resource_files "$offers_json"
   while true; do
+    create_resource_files "$offers_json"
     complete_orders "$offers_json"
     remove_artifacts
     echo "Waiting 5 minutes"
