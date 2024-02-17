@@ -118,6 +118,7 @@ export const setup = async (config?: Config): Promise<Config> => {
       action: actionAccount,
       tokenReceiver: tokenReceiverAccount,
     },
+    providerOffers: config?.providerOffers ?? [],
     ...(config?.logger && { logger: config.logger }),
   };
 };

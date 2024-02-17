@@ -22,3 +22,5 @@ export const SPCTL_MIN_COMPATIBLE_VERSION = `0.8.8-beta.0`;
 export const MIN_TEE_SUM_FOR_PROVIDER_ACCOUNT = '9000000000000000000';
 export const MIN_MATIC_SUM_FOR_PROVIDER_ACCOUNT = '200000000000000000';
 export const DEFAULT_PROVIDER_NAME = `auto generated provider by ${APP_NAME}`;
+export const DEFAULT_DEPLOY_CONFIG_FILE_NAME = 'deploy_config.yaml';
+export const DEPLOY_CONFIG_PROVIDER_OFFER_DEVICE_ID = '{{ device-id }}';
