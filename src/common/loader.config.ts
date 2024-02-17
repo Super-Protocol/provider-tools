@@ -55,10 +55,14 @@ export class ConfigLoader {
       throw new Error(`Config is missing! Please run 'spctl setup' command`);
     }
 
-    ConfigLoader.validatedConfig[sectionName] = {
-      ...ConfigLoader.validatedConfig[sectionName],
-      ...newValues,
-    };
+    if (Array.isArray(ConfigLoader.validatedConfig[sectionName])) {
+      ConfigLoader.validatedConfig[sectionName] = newValues as never;
+    } else {
+      ConfigLoader.validatedConfig[sectionName] = {
+        ...ConfigLoader.validatedConfig[sectionName],
+        ...newValues,
+      };
+    }
 
     fs.writeFileSync(this.configPath, JSON.stringify(ConfigLoader.validatedConfig, null, 4));
   }
