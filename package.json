@@ -25,7 +25,15 @@
     "test": "jest --detectOpenHandles --forceExit",
     "test:ci": "npm run test -- --reporters=jest-junit",
     "premadge": "npm run compile",
-    "madge": "madge -c ./build"
+    "madge": "madge -c ./build",
+    "bump": "npm version prerelease --preid=beta && npm run tag:publish",
+    "patch:beta": "npm version prepatch --preid=beta && npm run tag:publish",
+    "minor:beta": "npm version preminor --preid=beta && npm run tag:publish",
+    "major:beta": "npm version premajor --preid=beta && npm run tag:publish",
+    "patch": "npm version patch && npm run tag:publish",
+    "minor": "npm version minor && npm run tag:publish",
+    "major": "npm version major && npm run tag:publish",
+    "tag:publish": "git push origin && git push origin $(git tag --points-at HEAD)"
   },
   "repository": {
     "type": "git",
