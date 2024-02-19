@@ -82,6 +82,7 @@ export const setup = async (config?: Config): Promise<Config> => {
   const actionAccount = getAccount(answers, 'action');
   const authorityAccount = getAccount(answers, 'authority');
   const tokenReceiverAccount = getAccount(answers, 'tokenReceiver');
+
   return {
     spctl: {
       backend: {

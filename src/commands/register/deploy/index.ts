@@ -30,7 +30,21 @@ export default async (params: DeployConfigBuilderParams): Promise<string> => {
       deviceId: DEPLOY_CONFIG_PROVIDER_OFFER_DEVICE_ID,
     }));
 
-  await writeToFile(saveTo, deployConfig, (data) => stringify(data));
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
+  await writeToFile(saveTo, deployConfig, (data: any): string => {
+    const { data: rawData, ...rest } = data;
+
+    return stringify(
+      {
+        ...rest,
+        data: {
+          ...rawData,
+          PROVIDER_OFFERS_JSON: JSON.stringify(rawData.PROVIDER_OFFERS_JSON, null, 2),
+        },
+      },
+      { blockQuote: 'literal' },
+    );
+  });
 
   return saveTo;
 };
