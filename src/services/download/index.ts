@@ -1,29 +1,22 @@
 import * as fs from 'fs';
 import semver from 'semver';
 import axios from 'axios';
-import { getOSAndArch } from './utils';
 import { ILogger } from '../../common/logger';
 import * as Progress from '../../common/progress';
-import { SPCTL_LATEST_RELEASE_URL, SPCTL_MIN_COMPATIBLE_VERSION } from '../../common/constant';
+import { SPCTL_MIN_COMPATIBLE_VERSION, SPCTL_TOOL_NAME } from '../../common/constant';
 import { PathLike } from 'fs-extra';
 import { createSpctlService } from '../spctl';
 import { ConfigLoader } from '../../common/loader.config';
+import { getDownloadUrl, hasUpdates } from '../checkReleaseVersion';
+import { KnownTool } from '../../common/config';
 
 const DOWNLOADING_PROGRESS = 'Downloading spctl';
 
-const VERSION_MATCH = '{{version}}';
-const OS_MATCH = '{{os}}';
-const ARCH_MATCH = '{{arch}}';
-
-const SPCTL_DOWNLOAD_URL_TEMPLATE = `https://github.com/Super-Protocol/ctl/releases/download/v${VERSION_MATCH}/spctl-${OS_MATCH}-${ARCH_MATCH}`;
-
 type DownloadSpctlParams = Omit<CheckAndDownloadSpctlParams, 'configLoader'> & { version: string };
+
 const downloadSPCTL = async (params: DownloadSpctlParams): Promise<void> => {
   const { logger, destination } = params;
-  const osAndArch = getOSAndArch();
-  const url = SPCTL_DOWNLOAD_URL_TEMPLATE.replace(VERSION_MATCH, params.version)
-    .replace(OS_MATCH, osAndArch.platform)
-    .replace(ARCH_MATCH, osAndArch.arch);
+  const url = getDownloadUrl(params.version, KnownTool.SPCTL, SPCTL_TOOL_NAME);
   const file = fs.createWriteStream(destination);
 
   try {
@@ -79,7 +72,7 @@ export const checkAndDownloadSpctl = async (params: CheckAndDownloadSpctlParams)
     });
     currentVersion = (await service.getVersion()).replace('\n', '');
   }
-  const updateInfo = await hasNewVersion(currentVersion);
+  const updateInfo = await hasUpdates(params.configLoader, KnownTool.SPCTL, currentVersion);
   if (updateInfo.hasNewVersion && updateInfo.version && isCompatible(updateInfo.version)) {
     logger?.debug(`Downloading spctl v.${updateInfo.version} to ${destination}`);
     await downloadSPCTL({
@@ -111,32 +104,4 @@ const isCompatible = (version: string): boolean => {
   }
 
   return semver.gte(checked, compatible);
-};
-
-type HasNewVersionReturnType = {
-  hasNewVersion: boolean;
-  version?: string;
-};
-export const hasNewVersion = async (currentVersion?: string): Promise<HasNewVersionReturnType> => {
-  try {
-    const response = await axios.get(SPCTL_LATEST_RELEASE_URL);
-    const latestVersion = semver.clean(response.data.tag_name);
-
-    if (!latestVersion) {
-      return {
-        hasNewVersion: false,
-        version: currentVersion,
-      };
-    }
-
-    return {
-      hasNewVersion: !currentVersion || semver.gt(latestVersion, currentVersion),
-      version: latestVersion,
-    };
-  } catch (error) {
-    return {
-      hasNewVersion: false,
-      version: currentVersion,
-    };
-  }
 };
