@@ -1,10 +1,13 @@
 import { name, description, version } from '../../package.json';
-import * as Path from 'path';
+import path from 'path';
+import os from 'os';
 
+const execDir = (): string =>
+  process.env.NODE_ENV === 'development' ? process.cwd() : path.dirname(process.execPath);
 export const APP_DESCRIPTION = description;
 export const APP_NAME = name;
 export const APP_VERSION = version;
-export const CONFIG_DEFAULT_FILENAME = Path.join(__dirname, '../..', 'config.json');
+export const CONFIG_DEFAULT_FILENAME = path.resolve(execDir(), 'config.json');
 export const JWT_CHECK_REGEX = /(^[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*$)/;
 export const PRIVATE_KEY_CHECK_REGEX = /\b(?:0x)?[0-9a-fA-F]{64}\b/g;
 export const SPCTL_BACKEND_URL_DEFAULT = 'https://bff.testnet.superprotocol.com/graphql';
@@ -14,8 +17,9 @@ export const SPCTL_CRYPTO_ALGO_DEFAULT = 'ECIES';
 export const SPCTL_ENCODING_DEFAULT: BufferEncoding = 'base64';
 export const SPCTL_PCCS_SERVICE_DEFAULT = 'https://pccs.superprotocol.io';
 export const SPCTL_STORAGE_TYPE_DEFAULT = 'STORJ';
-export const TOOL_DIRECTORY_PATH = Path.join(__dirname, '../..', 'tool');
-export const SPCTL_LOCATION_PATH = Path.join(TOOL_DIRECTORY_PATH, 'spctl');
+export const TOOL_DIRECTORY_PATH = path.resolve(execDir(), 'tool');
+const SPCTL_SUFFIX = os.platform() === 'win32' ? '.exe' : '';
+export const SPCTL_LOCATION_PATH = path.resolve(TOOL_DIRECTORY_PATH, `spctl${SPCTL_SUFFIX}`);
 export const SPCTL_LATEST_RELEASE_URL =
   'https://api.github.com/repos/Super-Protocol/ctl/releases/latest';
 export const SPCTL_MIN_COMPATIBLE_VERSION = `0.8.8-beta.0`;

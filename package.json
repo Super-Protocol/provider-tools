@@ -21,7 +21,7 @@
     "build:mac:arm64": "npm run build -- --target macos-arm64",
     "lint": "eslint --ext .ts .",
     "lint:fix": "npm run lint -- --fix",
-    "dev": "ts-node --transpileOnly ./src/index.ts",
+    "dev": "export NODE_ENV=development && ts-node --transpileOnly ./src/index.ts",
     "test": "jest --detectOpenHandles --forceExit",
     "test:ci": "npm run test -- --reporters=jest-junit",
     "premadge": "npm run compile",
