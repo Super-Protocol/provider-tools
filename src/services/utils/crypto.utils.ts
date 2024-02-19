@@ -1,23 +1,33 @@
-import { PrivateKey } from 'eciesjs';
-import { BinaryToTextEncoding } from 'crypto';
+import crypto, { BinaryToTextEncoding } from 'crypto';
 
 export const generatePair = (
   encoding: BinaryToTextEncoding = 'base64',
 ): { privateKey: string; publicKey: string } => {
-  const sk = new PrivateKey();
+  const ecdh = crypto.createECDH('secp256k1');
+  const publicKey = ecdh.generateKeys(encoding, `compressed`);
 
   return {
-    publicKey: sk.publicKey.compressed.toString(encoding),
-    privateKey: sk.secret.toString(encoding),
+    publicKey,
+    privateKey: ecdh.getPrivateKey(encoding),
   };
+};
+
+const generatePublicKey = (
+  privateKey: string,
+  encoding: BinaryToTextEncoding = 'base64',
+): string => {
+  try {
+    const ecdh = crypto.createECDH('secp256k1');
+    ecdh.setPrivateKey(Buffer.from(privateKey, encoding));
+
+    return ecdh.getPublicKey(encoding, 'compressed');
+  } catch (error) {
+    throw Error(`Invalid private key provided. Error: ${(error as Error).message}`);
+  }
 };
 
 export const matchKeys = (
   publicKey: string,
   privateKey: string,
   encoding: BinaryToTextEncoding = 'base64',
-): boolean => {
-  const pk = new PrivateKey(Buffer.from(privateKey, encoding));
-
-  return pk.publicKey.compressed.toString('base64') === publicKey;
-};
+): boolean => generatePublicKey(privateKey, encoding) === publicKey;

@@ -3,7 +3,6 @@ import Path from 'path';
 import fs from 'fs';
 import { ProviderInfoConfig } from '../../common/config';
 import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
-import { isValidPrivateKey } from 'eciesjs/dist/utils';
 import { ISpctlService } from '../../services/spctl';
 import util from 'util';
 import { matchKeys } from '../../services/utils/crypto.utils';
@@ -246,9 +245,6 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
         answers.createOffer.offerId &&
         !ids.find((id) => id === answers.createOffer.offerId),
       validate(pk: string, answers?: Answers): boolean | string {
-        if (!isValidPrivateKey(Buffer.from(pk, 'base64'))) {
-          return 'Invalid private key format. Please specify the valid private key: ';
-        }
         if (answers?.createOffer.publicKey && !matchKeys(answers.createOffer.publicKey, pk)) {
           return 'Private does not match with offer args public key. Please specify the valid private key: ';
         }
