@@ -30,7 +30,7 @@ export default async (params: DeployConfigBuilderParams): Promise<string> => {
       deviceId: DEPLOY_CONFIG_PROVIDER_OFFER_DEVICE_ID,
     }));
 
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   await writeToFile(saveTo, deployConfig, (data: any): string => {
     const { data: rawData, ...rest } = data;
 
