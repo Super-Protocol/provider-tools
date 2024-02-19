@@ -15,13 +15,18 @@ node_modules
 # OS
 .DS_Store
 
-# dotenv environment variables file
+# dotenv environment variables file/
 .env
+
+config.json
+deploy_config.yaml
 
 # build output
 build
 dist
 tool
+coverage
+configs
 
 # TypeScript cache
 *.tsbuildinfo
