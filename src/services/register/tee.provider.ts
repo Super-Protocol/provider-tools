@@ -8,12 +8,13 @@ import { createWallet } from '../utils/wallet.utils';
 import { AccountConfig } from '../../common/config';
 import { ILogger } from '../../common/logger';
 import { IProvider } from '../spctl/types';
-import { generateShortHash } from './utils';
 
 export type RegisterTeeProviderParams = {
   logger?: ILogger;
   service: ISpctlService;
   accounts: AccountConfig;
+  providerName: string;
+  providerDescription?: string;
 };
 
 const needReplenish = async (
@@ -28,31 +29,34 @@ const needReplenish = async (
 };
 
 const createProvider = async (params: RegisterTeeProviderParams): Promise<IProvider> => {
-  const providerName = generateShortHash(createWallet(params.accounts.authority).address);
+  const timestamp = new Date().toISOString();
   const provider: IProvider = {
-    name: `${providerName} - auto generated provider by ${APP_NAME}`,
-    description: `It was created at ${new Date().toISOString()}`,
+    name: params.providerName ?? `${timestamp} - auto generated provider by ${APP_NAME}`,
+    description: params.providerDescription ?? '',
     tokenReceiver: createWallet(params.accounts.tokenReceiver).address,
     actionAccount: createWallet(params.accounts.action).address,
     metadata: '',
   };
 
-  const fileName = `provider_${providerName}.json`;
+  const fileName = `provider_${timestamp}.json`;
   await params.service.createProvider(fileName, provider);
 
   return provider;
+};
+
+export const getProvider = async (
+  service: ISpctlService,
+  authorityPrivateKey: string,
+): Promise<IProvider | null> => {
+  const address = createWallet(authorityPrivateKey).address;
+
+  return service.getProviderByAddress(address);
 };
 
 export const registerTeeProvider = async (
   params: RegisterTeeProviderParams,
 ): Promise<IProvider> => {
   const { service } = params;
-
-  const address = createWallet(params.accounts.authority).address;
-  const provider = await service.getProviderByAddress(address, `${Date.now()}.tee-provider.json`);
-  if (provider) {
-    return provider;
-  }
   const replenishAccountBalance = async (pk: string): Promise<void> => {
     const needs = await needReplenish(service, pk);
     await service.requestTokens({

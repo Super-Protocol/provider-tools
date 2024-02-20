@@ -4,7 +4,7 @@ import { spawnCommand } from './spawnCommand';
 import { SpctlConfig } from '../../common/config';
 import * as Path from 'path';
 import { fileExist, readJsonFile, removeFileIfExist, writeToFile } from '../utils/file.utils';
-import { IProvider } from './types';
+import { IOfferInfo, IProvider } from './types';
 
 export type SpctlServiceParams = {
   locationPath: string;
@@ -89,7 +89,8 @@ export class SpctlService implements ISpctlService {
     }
   }
 
-  async getProviderByAddress(address: string, saveFileName: string): Promise<IProvider | null> {
+  async getProviderByAddress(address: string): Promise<IProvider | null> {
+    const saveFileName = `${Date.now()}.tee-provider.json`;
     const providerFields = ['name', 'address'];
     const args = [
       'providers',
@@ -109,7 +110,7 @@ export class SpctlService implements ISpctlService {
 
       await removeFileIfExist(fileName);
 
-      return provider as IProvider;
+      return provider as unknown as IProvider;
     }
 
     return null;
@@ -125,5 +126,72 @@ export class SpctlService implements ISpctlService {
     } finally {
       await removeFileIfExist(filePath);
     }
+  }
+
+  private parse(regex: RegExp, text: string): string {
+    let match;
+    const ids: string[] = [];
+
+    while ((match = regex.exec(text)) !== null) {
+      ids.push(match[1]);
+    }
+
+    return ids.length ? ids[0] : '';
+  }
+
+  async createTeeOffer(fileName: string): Promise<string> {
+    const absolutePath = Path.resolve(fileName);
+    const args = ['offers', 'create', 'tee', '--yes', '--path', absolutePath];
+    const response = await this.exec(args);
+    const id = this.parse(/Offer was created with id (\d+)/g, response);
+
+    if (!id) {
+      throw Error('Offer creating was failed');
+    }
+
+    return id;
+  }
+
+  async getOfferInfo(offerId: string): Promise<IOfferInfo | null> {
+    const saveFileName = `offer-info-${offerId}.json`;
+    const args = ['offers', 'get-info', 'tee', offerId, '--save-to', saveFileName];
+    const response = await this.exec(args);
+    this.logger.trace({ response }, 'offer-info response');
+    const fileName = Path.join(this.locationPath, saveFileName);
+    if (await fileExist(fileName)) {
+      const obj = await readJsonFile(fileName);
+
+      await removeFileIfExist(fileName);
+
+      return obj as unknown as IOfferInfo;
+    }
+
+    return null;
+  }
+
+  async addTeeOfferSlot(fileName: string, offerId: string): Promise<string> {
+    const absolutePath = Path.resolve(fileName);
+    const args = ['offers', 'add-slot', 'tee', '--offer', offerId, '--path', absolutePath];
+    const response = await this.exec(args);
+    const id = this.parse(/Slot was created with id (\d+)/g, response);
+
+    if (!id) {
+      throw Error('Slot creating was failed');
+    }
+
+    return id;
+  }
+
+  async addTeeOfferOption(fileName: string, offerId: string): Promise<string> {
+    const absolutePath = Path.resolve(fileName);
+    const args = ['offers', 'add-option', 'tee', '--offer', offerId, '--path', absolutePath];
+    const response = await this.exec(args);
+    const id = this.parse(/Option\s(\d+)\swas\sadded\sto\soffer\s(\d+)/g, response);
+
+    if (!id) {
+      throw Error('Option creating was failed');
+    }
+
+    return id;
   }
 }

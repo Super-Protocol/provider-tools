@@ -30,7 +30,7 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
     {
       type: 'confirm',
       name: `account.isAutoGenerationNeeded.${accountType}`,
-      message: `Do you need to generate new ${accountType} account? If you choose "yes" the ${accountType} account will be auto generated for you and else you will asked later to enter the key from existed account`,
+      message: `Do you need to generate new ${accountType} account? If you choose "yes" the ${accountType} account will be auto generated for you. Otherwise, you will be asked to enter private key from existing account`,
       default: false,
     },
     {
@@ -82,6 +82,7 @@ export const setup = async (config?: Config): Promise<Config> => {
   const actionAccount = getAccount(answers, 'action');
   const authorityAccount = getAccount(answers, 'authority');
   const tokenReceiverAccount = getAccount(answers, 'tokenReceiver');
+
   return {
     spctl: {
       backend: {
@@ -118,6 +119,7 @@ export const setup = async (config?: Config): Promise<Config> => {
       action: actionAccount,
       tokenReceiver: tokenReceiverAccount,
     },
+    providerOffers: config?.providerOffers ?? [],
     ...(config?.logger && { logger: config.logger }),
   };
 };

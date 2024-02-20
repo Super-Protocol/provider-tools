@@ -1,12 +1,12 @@
 import { Command } from 'commander';
-import inquirer from 'inquirer';
 
 import { ConfigCommandParam } from '../types';
-import { createSpctlService, writeToFile } from '../../services/spctl';
+import { createSpctlService } from '../../services/spctl';
 import { createLogger } from '../../common/logger';
 import { ConfigLoader } from '../../common/loader.config';
-import { registerTeeProvider } from '../../services/register';
-import { ProviderRegisterQuestions, IProviderRegisterAnswers } from './questions';
+import processOffer from './tee.offer.process';
+import processProvider from './provider.process';
+import deployProcess from './deploy';
 
 type CommandParams = ConfigCommandParam & {
   tee: boolean;
@@ -25,7 +25,7 @@ export const RegisterCommand = new Command()
   .option('--backend-url <url>', 'backend url')
   .option('--blockchain-url <url>', 'blockchain url')
   .option('--contract-address <address>', 'contract address')
-  .action(async (options: CommandParams) => {
+  .action(async (options: CommandParams): Promise<void> => {
     if (!options.tee) {
       return logger.error(
         'At least one of supported provider types should be specified. Please try to run command again and have specified the "--tee" param.',
@@ -40,18 +40,12 @@ export const RegisterCommand = new Command()
       contractAddress: options.contractAddress,
     });
 
-    const provider = await registerTeeProvider({
-      accounts: config.loadSection('account'),
-      service,
-      logger,
-    });
-
-    logger.info({ provider }, 'here is your provider');
-
-    const answers = (await inquirer.prompt(
-      ProviderRegisterQuestions.doYouWantToSaveProvider,
-    )) as IProviderRegisterAnswers;
-    if (answers.doYouWantToSaveProvider.shouldBeSaved) {
-      await writeToFile(answers.doYouWantToSaveProvider.fileName, provider);
+    await processProvider(config, service, logger);
+    const offerId = await processOffer(config, service, logger);
+    if (!offerId) {
+      return logger.info('Upss...Something went wrong. Offer was not created well.');
     }
+
+    const deployConfigPath = await deployProcess({ config });
+    logger.info(`deploy-config was saved to ${deployConfigPath}`);
   });

@@ -24,6 +24,9 @@ export const fileExist = async (filePath: PathLike): Promise<boolean> => {
   }
 };
 
-export const readJsonFile = async (filePath: PathLike, throws = true): Promise<unknown> => {
+export const readJsonFile = async (
+  filePath: PathLike,
+  throws = true,
+): Promise<Record<string, unknown>> => {
   return jsonfile.readFile(filePath, { throws });
 };

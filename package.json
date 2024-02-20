@@ -1,6 +1,6 @@
 {
   "name": "provider-tools",
-  "version": "0.0.1",
+  "version": "0.0.2-beta.0",
   "description": "A tool for provider registration in super protocol by secure and reliable way.",
   "main": "./build/index.js",
   "author": "SuperProtocol",
@@ -21,11 +21,19 @@
     "build:mac:arm64": "npm run build -- --target macos-arm64",
     "lint": "eslint --ext .ts .",
     "lint:fix": "npm run lint -- --fix",
-    "dev": "ts-node --transpileOnly ./src/index.ts",
+    "dev": "export NODE_ENV=development && ts-node --transpileOnly ./src/index.ts",
     "test": "jest --detectOpenHandles --forceExit",
     "test:ci": "npm run test -- --reporters=jest-junit",
     "premadge": "npm run compile",
-    "madge": "madge -c ./build"
+    "madge": "madge -c ./build",
+    "bump": "npm version prerelease --preid=beta && npm run tag:publish",
+    "patch:beta": "npm version prepatch --preid=beta && npm run tag:publish",
+    "minor:beta": "npm version preminor --preid=beta && npm run tag:publish",
+    "major:beta": "npm version premajor --preid=beta && npm run tag:publish",
+    "patch": "npm version patch && npm run tag:publish",
+    "minor": "npm version minor && npm run tag:publish",
+    "major": "npm version major && npm run tag:publish",
+    "tag:publish": "git push origin && git push origin $(git tag --points-at HEAD)"
   },
   "repository": {
     "type": "git",
@@ -69,6 +77,7 @@
     "pino": "^8.18.0",
     "save-dev": "^0.0.1-security",
     "semver": "^7.6.0",
+    "yaml": "^2.3.4",
     "zod": "^3.22.4"
   },
   "jest": {

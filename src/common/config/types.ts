@@ -58,10 +58,27 @@ export const MetadataConfigSchema = z.object({
     })
     .optional(),
 });
+
+export const ProviderInfoSchema = z.object({
+  name: z.coerce.string(),
+  description: z.coerce.string().optional(),
+});
+export type ProviderInfoConfig = z.infer<typeof ProviderInfoSchema>;
+
+export const ProviderOfferSchema = z.object({
+  id: z.coerce.string(),
+  argsPrivateKey: z.coerce.string(),
+});
+export type ProviderOffer = z.infer<typeof ProviderOfferSchema>;
+
+export const ProviderOffersSchema = z.array(ProviderOfferSchema).default([]);
+
 export const ConfigSchema = z.object({
   logger: LoggerConfigSchema.optional(),
   spctl: SpctlConfigSchema,
   account: AccountConfigSchema,
   metadata: MetadataConfigSchema.optional(),
+  providerInfo: ProviderInfoSchema.optional(),
+  providerOffers: ProviderOffersSchema,
 });
 export type Config = z.infer<typeof ConfigSchema>;
