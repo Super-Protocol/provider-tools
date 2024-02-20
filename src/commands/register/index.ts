@@ -29,7 +29,7 @@ export const RegisterCommand = new Command()
   .option('--blockchain-url <url>', 'blockchain url')
   .option('--contract-address <address>', 'contract address')
   .action(async (options: CommandParams): Promise<void> => {
-    if (!options.tee || !options.value) {
+    if (!options.tee && !options.value) {
       return logger.error(
         'Please specify at least one of the supported provider types by including either the --tee or --value option when you run the command again.',
       );
