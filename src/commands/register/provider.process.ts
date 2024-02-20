@@ -7,13 +7,11 @@ import { IRegisterProviderAnswers, ProviderRegisterQuestions } from './questions
 import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ILogger } from '../../common/logger';
 import { writeToFile } from '../../services/utils/file.utils';
-import { ProviderType } from './types';
 
 interface ProviderProcessParams {
   config: ConfigLoader;
   service: ISpctlService;
   logger: ILogger;
-  providerType: ProviderType;
 }
 
 export default async (params: ProviderProcessParams): Promise<void> => {
