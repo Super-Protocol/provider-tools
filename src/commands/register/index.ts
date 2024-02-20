@@ -6,7 +6,7 @@ import { createLogger } from '../../common/logger';
 import { ConfigLoader } from '../../common/loader.config';
 import processOffer from './tee.offer.process';
 import processProvider from './provider.process';
-import deployProcess from './deploy';
+import buildDeployConfig from './buildDeployConfig';
 
 type CommandParams = ConfigCommandParam & {
   tee: boolean;
@@ -46,6 +46,8 @@ export const RegisterCommand = new Command()
       return logger.info('Upss...Something went wrong. Offer was not created well.');
     }
 
-    const deployConfigPath = await deployProcess({ config });
-    logger.info(`deploy-config was saved to ${deployConfigPath}`);
+    const deployConfigPath = await buildDeployConfig({ config });
+    logger.info(
+      `deploy-config was saved to ${deployConfigPath}. You can edit it manually before run "deploy" command if it's needed.`,
+    );
   });

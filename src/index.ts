@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { processSubCommands, RegisterCommand, SetupCommand } from './commands';
+import { DeployCommand, processSubCommands, RegisterCommand, SetupCommand } from './commands';
 import {
   APP_DESCRIPTION,
   APP_NAME,
@@ -67,6 +67,7 @@ const main = async (): Promise<void> => {
 
   program.addCommand(SetupCommand);
   program.addCommand(RegisterCommand);
+  program.addCommand(DeployCommand);
 
   processSubCommands(program, (command) => {
     command.helpCommand('--help -h', 'Display help for the command');
