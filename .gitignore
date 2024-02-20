@@ -15,7 +15,7 @@ node_modules
 # OS
 .DS_Store
 
-# dotenv environment variables file/
+# dotenv environment variables file
 .env
 
 config.json
@@ -33,3 +33,5 @@ configs
 
 # Temporally directory
 tmp
+
+runner-artifacts
