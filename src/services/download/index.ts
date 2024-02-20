@@ -3,20 +3,20 @@ import semver from 'semver';
 import axios from 'axios';
 import { ILogger } from '../../common/logger';
 import * as Progress from '../../common/progress';
-import { SPCTL_MIN_COMPATIBLE_VERSION, SPCTL_TOOL_NAME } from '../../common/constant';
+import { SPCTL_MIN_COMPATIBLE_VERSION } from '../../common/constant';
 import { PathLike } from 'fs-extra';
 import { createSpctlService } from '../spctl';
 import { ConfigLoader } from '../../common/loader.config';
 import { getDownloadUrl, hasUpdates } from '../checkReleaseVersion';
 import { KnownTool } from '../../common/config';
 
-const DOWNLOADING_PROGRESS = 'Downloading spctl';
+const DOWNLOADING_PROGRESS = `Downloading ${KnownTool.SPCTL}`;
 
 type DownloadSpctlParams = Omit<CheckAndDownloadSpctlParams, 'configLoader'> & { version: string };
 
 const downloadSPCTL = async (params: DownloadSpctlParams): Promise<void> => {
   const { logger, destination } = params;
-  const url = getDownloadUrl(params.version, KnownTool.SPCTL, SPCTL_TOOL_NAME);
+  const url = getDownloadUrl(params.version, KnownTool.SPCTL);
   const file = fs.createWriteStream(destination);
 
   try {
@@ -64,7 +64,7 @@ export const checkAndDownloadSpctl = async (params: CheckAndDownloadSpctlParams)
   let currentVersion = '';
   if (fs.existsSync(destination)) {
     logger?.trace(
-      `spctl already exists at ${destination}. Making comparison with latest version...`,
+      `${KnownTool.SPCTL} already exists at ${destination}. Making comparison with latest version...`,
     );
     const service = await createSpctlService({
       logger,
@@ -74,23 +74,23 @@ export const checkAndDownloadSpctl = async (params: CheckAndDownloadSpctlParams)
   }
   const updateInfo = await hasUpdates(params.configLoader, KnownTool.SPCTL, currentVersion);
   if (updateInfo.hasNewVersion && updateInfo.version && isCompatible(updateInfo.version)) {
-    logger?.debug(`Downloading spctl v.${updateInfo.version} to ${destination}`);
+    logger?.debug(`Downloading ${KnownTool.SPCTL} v.${updateInfo.version} to ${destination}`);
     await downloadSPCTL({
       logger: params.logger,
       destination: params.destination,
       version: updateInfo.version,
     }).catch((err) => {
-      logger?.error({ err }, 'Failed to check or download spctl');
+      logger?.error({ err }, `Failed to check or download ${KnownTool.SPCTL}`);
     });
 
-    logger?.debug(`Successfully downloaded spctl to ${destination}`);
+    logger?.debug(`Successfully downloaded ${KnownTool.SPCTL} to ${destination}`);
   } else if (!currentVersion) {
     throw Error(
-      'Resource for downloading was not found and you do not have any downloaded spctl-tool version yet. The program will be closed.',
+      `Resource for downloading was not found and you do not have any downloaded ${KnownTool.SPCTL} tool version yet. The program will be closed.`,
     );
   } else if (!isCompatible(currentVersion)) {
     throw Error(
-      `Installed spctl v${currentVersion}is not compatible with v${SPCTL_MIN_COMPATIBLE_VERSION}`,
+      `Installed ${KnownTool.SPCTL} v${currentVersion} is not compatible with v${SPCTL_MIN_COMPATIBLE_VERSION}`,
     );
   }
 };

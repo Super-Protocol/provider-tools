@@ -10,8 +10,8 @@ import {
 } from '../constant';
 
 export enum KnownTool {
-  SPCTL = 'ctl',
-  PROVIDER_TOOL = 'provider_tools',
+  SPCTL = 'spctl',
+  PROVIDER = 'provider_tools',
 }
 
 export const LoggerConfigSchema = z.object({
@@ -25,7 +25,7 @@ export const MetadataToolConfigSchema = z.object({
 export const MetadataConfigSchema = z
   .object({
     [KnownTool.SPCTL]: MetadataToolConfigSchema.optional(),
-    [KnownTool.PROVIDER_TOOL]: MetadataToolConfigSchema.optional(),
+    [KnownTool.PROVIDER]: MetadataToolConfigSchema.optional(),
   })
   .optional();
 

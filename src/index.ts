@@ -6,14 +6,15 @@ import {
   APP_VERSION,
   CONFIG_DEFAULT_FILENAME,
   NODE_ENV_DEV,
-  PROVIDER_TOOLS_NAME,
-  SPCTL_LOCATION_PATH,
+  SPCTL_SUFFIX,
+  TOOL_DIRECTORY_PATH,
 } from './common/constant';
 import { createLogger } from './common/logger';
 import { ConfigLoader } from './common/loader.config';
 import { getConfigPath, getRawConfig, KnownTool } from './common/config';
 import { checkAndDownloadSpctl } from './services/download';
 import { getDownloadUrl, hasUpdates } from './services/checkReleaseVersion';
+import path from 'path';
 
 const options = getRawConfig(getConfigPath(), false)?.logger;
 const logger = createLogger({
@@ -36,33 +37,30 @@ const main = async (): Promise<void> => {
     const configLoader = new ConfigLoader(configPath);
 
     if (process.env.NODE_ENV !== NODE_ENV_DEV) {
-      const updates = await hasUpdates(configLoader, KnownTool.PROVIDER_TOOL, APP_VERSION);
+      const updates = await hasUpdates(configLoader, KnownTool.PROVIDER, APP_VERSION);
       if (updates.hasNewVersion && updates.version) {
-        const downloadUrl = getDownloadUrl(
-          updates.version,
-          KnownTool.PROVIDER_TOOL,
-          PROVIDER_TOOLS_NAME,
-        );
+        const downloadUrl = getDownloadUrl(updates.version, KnownTool.PROVIDER);
 
         logger?.warn(
           [
-            `New provider-tools version available! ${APP_VERSION} -> ${updates.version}.`,
+            `New ${KnownTool.PROVIDER} version available! ${APP_VERSION} -> ${updates.version}.`,
             'To download the latest release use commands:',
-            `curl -L ${downloadUrl} -o provider-tools`,
-            'chmod +x ./provider-tools',
+            `curl -L ${downloadUrl} -o ${KnownTool.PROVIDER}`,
+            `chmod +x ./${KnownTool.PROVIDER}`,
           ].join(' '),
         );
       }
     }
 
     try {
+      const destination = path.resolve(TOOL_DIRECTORY_PATH, `${KnownTool.SPCTL}${SPCTL_SUFFIX}`);
       await checkAndDownloadSpctl({
         logger,
-        destination: SPCTL_LOCATION_PATH,
+        destination: destination,
         configLoader,
       });
     } catch (err) {
-      logger.error(err, 'download spctl has been failed');
+      logger.error(err, `download ${KnownTool.PROVIDER} has been failed`);
       throw err;
     }
   });

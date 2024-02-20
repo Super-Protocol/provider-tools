@@ -6,8 +6,10 @@ import {
   LATEST_RELEASE_URL_TEMPLATE,
   MILLISECONDS_IN_DAY,
   OS_MATCH,
+  PROVIDER_TOOLS_REPO_NAME,
   REPO_DOWNLOAD_URL_TEMPLATE,
   REPO_MATCH,
+  SPCTL_TOOL_REPO_NAME,
   TOOL_NAME_MATCH,
   VERSION_MATCH,
 } from '../common/constant';
@@ -15,18 +17,21 @@ import { ConfigLoader } from '../common/loader.config';
 import { getOSAndArch } from './download/utils';
 import { KnownTool } from '../common/config';
 
-export const getDownloadUrl = (version: string, repoName: string, toolName: string): string => {
+const toolRepoMap: Record<KnownTool, string> = {
+  [KnownTool.PROVIDER]: PROVIDER_TOOLS_REPO_NAME,
+  [KnownTool.SPCTL]: SPCTL_TOOL_REPO_NAME,
+};
+export const getDownloadUrl = (version: string, toolName: KnownTool): string => {
   const osAndArch = getOSAndArch();
 
-  return REPO_DOWNLOAD_URL_TEMPLATE.replace(REPO_MATCH, repoName)
+  return REPO_DOWNLOAD_URL_TEMPLATE.replace(REPO_MATCH, toolRepoMap[toolName])
     .replace(VERSION_MATCH, version)
     .replace(TOOL_NAME_MATCH, toolName)
     .replace(OS_MATCH, osAndArch.platform)
     .replace(ARCH_MATCH, osAndArch.arch);
 };
-
-export const getLatestReleaseUrl = (repoName: string): string =>
-  LATEST_RELEASE_URL_TEMPLATE.replace(REPO_MATCH, repoName);
+export const getLatestReleaseUrl = (tool: KnownTool): string =>
+  LATEST_RELEASE_URL_TEMPLATE.replace(REPO_MATCH, toolRepoMap[tool]);
 
 export type HasNewVersionReturnType = {
   hasNewVersion: boolean;
