@@ -17,6 +17,13 @@ export const createLogger = (params: Partial<ICreateLoggerParams> = {}): ILogger
     level: 'info',
     name: APP_NAME,
     mixin: () => ({ version: APP_VERSION }),
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        ignore: 'pid,hostname',
+        singleLine: true,
+      },
+    },
     ...options,
   });
 
