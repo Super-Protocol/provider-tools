@@ -21,6 +21,7 @@ export const createLogger = (params: Partial<ICreateLoggerParams> = {}): ILogger
       target: 'pino-pretty',
       options: {
         ignore: 'pid,hostname',
+        singleLine: true,
       },
     },
     ...options,
