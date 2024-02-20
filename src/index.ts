@@ -5,12 +5,16 @@ import {
   APP_NAME,
   APP_VERSION,
   CONFIG_DEFAULT_FILENAME,
-  SPCTL_LOCATION_PATH,
+  NODE_ENV_DEV,
+  SPCTL_SUFFIX,
+  TOOL_DIRECTORY_PATH,
 } from './common/constant';
 import { createLogger } from './common/logger';
 import { ConfigLoader } from './common/loader.config';
-import { getConfigPath, getRawConfig } from './common/config';
+import { getConfigPath, getRawConfig, KnownTool } from './common/config';
 import { checkAndDownloadSpctl } from './services/download';
+import { getDownloadUrl, hasUpdates } from './services/checkReleaseVersion';
+import path from 'path';
 
 const options = getRawConfig(getConfigPath(), false)?.logger;
 const logger = createLogger({
@@ -30,15 +34,33 @@ const main = async (): Promise<void> => {
     }
 
     const configPath = actionCommand.opts().config;
+    const configLoader = new ConfigLoader(configPath);
+
+    if (process.env.NODE_ENV !== NODE_ENV_DEV) {
+      const updates = await hasUpdates(configLoader, KnownTool.PROVIDER, APP_VERSION);
+      if (updates.hasNewVersion && updates.version) {
+        const downloadUrl = getDownloadUrl(updates.version, KnownTool.PROVIDER);
+
+        logger?.warn(
+          [
+            `New ${KnownTool.PROVIDER} version available! ${APP_VERSION} -> ${updates.version}.`,
+            'To download the latest release use commands:',
+            `curl -L ${downloadUrl} -o ${KnownTool.PROVIDER}`,
+            `chmod +x ./${KnownTool.PROVIDER}`,
+          ].join(' '),
+        );
+      }
+    }
 
     try {
+      const destination = path.resolve(TOOL_DIRECTORY_PATH, `${KnownTool.SPCTL}${SPCTL_SUFFIX}`);
       await checkAndDownloadSpctl({
         logger,
-        destination: SPCTL_LOCATION_PATH,
-        configLoader: new ConfigLoader(configPath),
+        destination: destination,
+        configLoader,
       });
     } catch (err) {
-      logger.error(err, 'download spctl has been failed');
+      logger.error(err, `download ${KnownTool.PROVIDER} has been failed`);
       throw err;
     }
   });

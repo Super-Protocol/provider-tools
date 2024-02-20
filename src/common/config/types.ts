@@ -9,9 +9,27 @@ import {
   SPCTL_STORAGE_TYPE_DEFAULT,
 } from '../constant';
 
+export enum KnownTool {
+  SPCTL = 'spctl',
+  PROVIDER = 'provider_tools',
+}
+
 export const LoggerConfigSchema = z.object({
   level: z.coerce.string().optional(),
 });
+
+export const MetadataToolConfigSchema = z.object({
+  lastCheckForUpdates: z.number(),
+});
+
+export const MetadataConfigSchema = z
+  .object({
+    [KnownTool.SPCTL]: MetadataToolConfigSchema.optional(),
+    [KnownTool.PROVIDER]: MetadataToolConfigSchema.optional(),
+  })
+  .optional();
+
+export type MetadataConfig = z.infer<typeof MetadataConfigSchema>;
 
 export const SpctlConfigSchema = z.object({
   backend: z.object({
@@ -50,14 +68,6 @@ export const AccountConfigSchema = z.object({
   tokenReceiver: z.string().regex(PRIVATE_KEY_CHECK_REGEX),
 });
 export type AccountConfig = z.infer<typeof AccountConfigSchema>;
-
-export const MetadataConfigSchema = z.object({
-  spctl: z
-    .object({
-      lastCheckForUpdates: z.number().optional(),
-    })
-    .optional(),
-});
 
 export const ProviderInfoSchema = z.object({
   name: z.coerce.string(),

@@ -4,6 +4,7 @@ import os from 'os';
 
 const execDir = (): string =>
   process.env.NODE_ENV === 'development' ? process.cwd() : path.dirname(process.execPath);
+export const NODE_ENV_DEV = 'development';
 export const APP_DESCRIPTION = description;
 export const APP_NAME = name;
 export const APP_VERSION = version;
@@ -18,13 +19,20 @@ export const SPCTL_ENCODING_DEFAULT: BufferEncoding = 'base64';
 export const SPCTL_PCCS_SERVICE_DEFAULT = 'https://pccs.superprotocol.io';
 export const SPCTL_STORAGE_TYPE_DEFAULT = 'STORJ';
 export const TOOL_DIRECTORY_PATH = path.resolve(execDir(), 'tool');
-const SPCTL_SUFFIX = os.platform() === 'win32' ? '.exe' : '';
-export const SPCTL_LOCATION_PATH = path.resolve(TOOL_DIRECTORY_PATH, `spctl${SPCTL_SUFFIX}`);
-export const SPCTL_LATEST_RELEASE_URL =
-  'https://api.github.com/repos/Super-Protocol/ctl/releases/latest';
-export const SPCTL_MIN_COMPATIBLE_VERSION = `0.8.8-beta.0`;
+export const SPCTL_SUFFIX = os.platform() === 'win32' ? '.exe' : '';
+export const VERSION_MATCH = '{{version}}';
+export const OS_MATCH = '{{os}}';
+export const ARCH_MATCH = '{{arch}}';
+export const REPO_MATCH = '{{repo}}';
+export const TOOL_NAME_MATCH = '{{tool}}';
+export const SPCTL_TOOL_REPO_NAME = 'ctl';
+export const PROVIDER_TOOLS_REPO_NAME = 'provider-tools';
+export const REPO_DOWNLOAD_URL_TEMPLATE = `https://github.com/Super-Protocol/${REPO_MATCH}/releases/download/v${VERSION_MATCH}/${TOOL_NAME_MATCH}-${OS_MATCH}-${ARCH_MATCH}`;
+export const LATEST_RELEASE_URL_TEMPLATE = `https://api.github.com/repos/Super-Protocol/${REPO_MATCH}/releases/latest`;
+export const SPCTL_MIN_COMPATIBLE_VERSION = `0.8.8-beta.1`;
 export const MIN_TEE_SUM_FOR_PROVIDER_ACCOUNT = '9000000000000000000';
 export const MIN_MATIC_SUM_FOR_PROVIDER_ACCOUNT = '200000000000000000';
 export const DEFAULT_PROVIDER_NAME = `auto generated provider by ${APP_NAME}`;
 export const DEFAULT_DEPLOY_CONFIG_FILE_NAME = 'deploy_config.yaml';
 export const DEPLOY_CONFIG_PROVIDER_OFFER_DEVICE_ID = '{{ device-id }}';
+export const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import * as Config from './config';
 import { createLogger, ILogger } from './logger';
+import { KnownTool } from './config';
 
 export class ConfigLoader {
   private static validatedConfig?: Config.Config;
@@ -41,7 +42,7 @@ export class ConfigLoader {
 
   loadSection<T extends keyof Config.Config>(sectionName: T): Config.Config[T] {
     if (!ConfigLoader.validatedConfig) {
-      throw new Error(`Config is missing! Please run 'spctl setup' command`);
+      throw new Error(`Config is missing! Please run '${KnownTool.PROVIDER} setup' command`);
     }
 
     return ConfigLoader.validatedConfig[sectionName];
@@ -52,7 +53,7 @@ export class ConfigLoader {
     newValues: Partial<Config.Config[T]>,
   ): void {
     if (!ConfigLoader.validatedConfig) {
-      throw new Error(`Config is missing! Please run 'spctl setup' command`);
+      throw new Error(`Config is missing! Please run '${KnownTool.PROVIDER} setup' command`);
     }
 
     if (Array.isArray(ConfigLoader.validatedConfig[sectionName])) {

@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from 'ethers';
 import { ILogger } from '../../common/logger';
 import { spawnCommand } from './spawnCommand';
-import { SpctlConfig } from '../../common/config';
+import { KnownTool, SpctlConfig } from '../../common/config';
 import * as Path from 'path';
 import { fileExist, readJsonFile, removeFileIfExist, writeToFile } from '../utils/file.utils';
 import { IOfferInfo, IProvider } from './types';
@@ -33,7 +33,7 @@ export class SpctlService implements ISpctlService {
   }
 
   protected async exec(args: string[]): Promise<string> {
-    const command = './spctl';
+    const command = `./${KnownTool.SPCTL}`;
     const response = await spawnCommand(command, args, this.locationPath, this.logger);
 
     if (response.code > 0) {
