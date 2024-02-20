@@ -2,17 +2,23 @@ import inquirer from 'inquirer';
 
 import { ConfigLoader } from '../../common/loader.config';
 import { ISpctlService } from '../../services/spctl';
-import { getProvider, registerTeeProvider } from '../../services/register/tee.provider';
+import { getProvider, registerProvider } from '../../services/register/provider';
 import { IRegisterProviderAnswers, ProviderRegisterQuestions } from './questions';
 import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ILogger } from '../../common/logger';
 import { writeToFile } from '../../services/utils/file.utils';
+import { ProviderType } from './types';
 
-export default async (
-  config: ConfigLoader,
-  service: ISpctlService,
-  logger: ILogger,
-): Promise<void> => {
+interface ProviderProcessParams {
+  config: ConfigLoader;
+  service: ISpctlService;
+  logger: ILogger;
+  providerType: ProviderType;
+}
+
+export default async (params: ProviderProcessParams): Promise<void> => {
+  const { config, service, logger } = params;
+
   const accounts = config.loadSection('account');
   const existedProvider = await getProvider(service, accounts.authority);
 
@@ -36,7 +42,7 @@ export default async (
   const providerInfoConfig = config.loadSection('providerInfo');
   const provider =
     existedProvider ||
-    (await registerTeeProvider({
+    (await registerProvider({
       accounts,
       service,
       logger,

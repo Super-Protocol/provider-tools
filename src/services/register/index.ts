@@ -1,1 +1,1 @@
-export { RegisterTeeProviderParams, registerTeeProvider } from './tee.provider';
+export { RegisterProviderParams, registerProvider } from './provider';

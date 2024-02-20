@@ -7,6 +7,7 @@ import { ConfigLoader } from '../../common/loader.config';
 import processOffer from './tee.offer.process';
 import processProvider from './provider.process';
 import buildDeployConfig from './buildDeployConfig';
+import { getProviderType } from './utils';
 
 type CommandParams = ConfigCommandParam & {
   tee: boolean;
@@ -41,8 +42,9 @@ export const RegisterCommand = new Command()
       blockchainUrl: options.blockchainUrl,
       contractAddress: options.contractAddress,
     });
+    const providerType = getProviderType(options);
 
-    await processProvider(config, service, logger);
+    await processProvider({ config, service, logger, providerType });
     const offerId = await processOffer(config, service, logger);
     if (!offerId) {
       return logger.info('Upss...Something went wrong. Offer was not created well.');
