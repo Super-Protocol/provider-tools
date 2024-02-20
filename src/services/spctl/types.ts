@@ -1,3 +1,5 @@
+export type OfferType = 'tee' | 'value';
+
 export interface IProvider {
   name: string;
   description?: string;

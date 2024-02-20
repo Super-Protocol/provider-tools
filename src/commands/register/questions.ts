@@ -6,11 +6,12 @@ import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ISpctlService } from '../../services/spctl';
 import util from 'util';
 import { matchKeys } from '../../services/utils/crypto.utils';
+import { OfferType } from '../../services/spctl/types';
 
 export interface IProviderRegisterQuestions {
   getProviderMetaData: (config?: ProviderInfoConfig) => Question[];
   doYouWantToSaveProvider: Question[];
-  createOffer: (ids: string[], service: ISpctlService) => Question[];
+  createOffer: (ids: string[], service: ISpctlService, offerType: OfferType) => Question[];
   addSlot: Question[];
   addOption: Question[];
 }
@@ -150,19 +151,19 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
       when: (answers: Answers) => answers.doYouWantToSaveProvider.shouldBeSaved,
     },
   ],
-  createOffer: (ids: string[] = [], service: ISpctlService) => [
+  createOffer: (ids: string[] = [], service: ISpctlService, offerType: OfferType) => [
     {
       type: 'confirm',
       name: 'createOffer.hasOffer',
-      message: 'Have you already created a TEE offer?',
+      message: `Have you already created a ${offerType.toUpperCase()} offer?`,
       default: false,
     },
     {
       type: 'confirm',
       name: 'createOffer.auto',
-      message: 'Do you want a TEE offer to be created automatically?',
+      message: `Do you want a ${offerType.toUpperCase()} offer to be created automatically?`,
       default: false,
-      when: (answers: Answers) => !answers.createOffer.hasOffer,
+      when: (answers: Answers) => !answers.createOffer.hasOffer && offerType === 'tee',
     },
     {
       type: 'input',

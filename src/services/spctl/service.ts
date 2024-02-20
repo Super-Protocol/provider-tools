@@ -4,7 +4,7 @@ import { spawnCommand } from './spawnCommand';
 import { KnownTool, SpctlConfig } from '../../common/config';
 import * as Path from 'path';
 import { fileExist, readJsonFile, removeFileIfExist, writeToFile } from '../utils/file.utils';
-import { IOfferInfo, IProvider } from './types';
+import { IOfferInfo, IProvider, OfferType } from './types';
 
 export type SpctlServiceParams = {
   locationPath: string;
@@ -139,9 +139,9 @@ export class SpctlService implements ISpctlService {
     return ids.length ? ids[0] : '';
   }
 
-  async createTeeOffer(fileName: string): Promise<string> {
+  async createOffer(fileName: string, offerType: OfferType): Promise<string> {
     const absolutePath = Path.resolve(fileName);
-    const args = ['offers', 'create', 'tee', '--yes', '--path', absolutePath];
+    const args = ['offers', 'create', offerType, '--yes', '--path', absolutePath];
     const response = await this.exec(args);
     const id = this.parse(/Offer was created with id (\d+)/g, response);
 
@@ -169,9 +169,9 @@ export class SpctlService implements ISpctlService {
     return null;
   }
 
-  async addTeeOfferSlot(fileName: string, offerId: string): Promise<string> {
+  async addOfferSlot(fileName: string, offerId: string, offerType: OfferType): Promise<string> {
     const absolutePath = Path.resolve(fileName);
-    const args = ['offers', 'add-slot', 'tee', '--offer', offerId, '--path', absolutePath];
+    const args = ['offers', 'add-slot', offerType, '--offer', offerId, '--path', absolutePath];
     const response = await this.exec(args);
     const id = this.parse(/Slot was created with id (\d+)/g, response);
 

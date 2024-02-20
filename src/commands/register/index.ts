@@ -4,8 +4,7 @@ import { ConfigCommandParam } from '../types';
 import { createSpctlService } from '../../services/spctl';
 import { createLogger } from '../../common/logger';
 import { ConfigLoader } from '../../common/loader.config';
-import processTeeOffer from './tee.offer.process';
-import processValueOffer from './value.offer.process';
+import processOffer from './offer.process';
 import processProvider from './provider.process';
 import buildDeployConfig from './buildDeployConfig';
 import { ProviderType } from './types';
@@ -37,16 +36,17 @@ export const RegisterCommand = new Command()
       blockchainUrl: options.blockchainUrl,
       contractAddress: options.contractAddress,
     });
-    const processOffer = providerType === 'value' ? processValueOffer : processTeeOffer;
 
     await processProvider({ config, service, logger });
-    const offerId = await processOffer(config, service, logger);
+    const offerId = await processOffer({ config, service, providerType, logger });
     if (!offerId) {
       return logger.info('Upss...Something went wrong. Offer was not created well.');
     }
 
-    const deployConfigPath = await buildDeployConfig({ config });
-    logger.info(
-      `deploy-config was saved to ${deployConfigPath}. You can edit it manually before run "deploy" command if it's needed.`,
-    );
+    if (providerType === 'tee') {
+      const deployConfigPath = await buildDeployConfig({ config });
+      logger.info(
+        `deploy-config was saved to ${deployConfigPath}. You can edit it manually before run "deploy" command if it's needed.`,
+      );
+    }
   });
