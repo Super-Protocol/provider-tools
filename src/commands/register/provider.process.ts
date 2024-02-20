@@ -21,11 +21,13 @@ export default async (
     const answers = (await inquirer.prompt(
       ProviderRegisterQuestions.getProviderMetaData(providerInfoConfig),
     )) as IRegisterProviderAnswers;
+    const name = answers.getProviderMetaData?.providerName || providerInfoConfig?.name;
+    const description =
+      answers.getProviderMetaData?.providerDescription || providerInfoConfig?.description;
+
     config.updateSection('providerInfo', {
-      name: answers.getProviderMetaData.providerName,
-      ...(answers.getProviderMetaData.providerDescription && {
-        description: answers.getProviderMetaData.providerDescription,
-      }),
+      name,
+      ...(description && { description }),
     });
   } else {
     logger.info('Existed provider was found');
