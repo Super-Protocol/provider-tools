@@ -1,4 +1,4 @@
-export type OfferType = 'tee' | 'value';
+export type SpctlOfferType = 'tee' | 'value';
 
 export interface IProvider {
   name: string;

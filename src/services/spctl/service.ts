@@ -4,7 +4,7 @@ import { spawnCommand } from './spawnCommand';
 import { KnownTool, SpctlConfig } from '../../common/config';
 import * as Path from 'path';
 import { fileExist, readJsonFile, removeFileIfExist, writeToFile } from '../utils/file.utils';
-import { IOfferInfo, IProvider, OfferType } from './types';
+import { IOfferInfo, IProvider, SpctlOfferType } from './types';
 
 export type SpctlServiceParams = {
   locationPath: string;
@@ -139,7 +139,7 @@ export class SpctlService implements ISpctlService {
     return ids.length ? ids[0] : '';
   }
 
-  async createOffer(fileName: string, offerType: OfferType): Promise<string> {
+  async createOffer(fileName: string, offerType: SpctlOfferType): Promise<string> {
     const absolutePath = Path.resolve(fileName);
     const args = ['offers', 'create', offerType, '--yes', '--path', absolutePath];
     const response = await this.exec(args);
@@ -152,7 +152,7 @@ export class SpctlService implements ISpctlService {
     return id;
   }
 
-  async getOfferInfo(offerId: string, offerType: OfferType): Promise<IOfferInfo | null> {
+  async getOfferInfo(offerId: string, offerType: SpctlOfferType): Promise<IOfferInfo | null> {
     const saveFileName = `offer-info-${offerId}.json`;
     const args = ['offers', 'get-info', offerType, offerId, '--save-to', saveFileName];
     const response = await this.exec(args);
@@ -169,7 +169,11 @@ export class SpctlService implements ISpctlService {
     return null;
   }
 
-  async addOfferSlot(fileName: string, offerId: string, offerType: OfferType): Promise<string> {
+  async addOfferSlot(
+    fileName: string,
+    offerId: string,
+    offerType: SpctlOfferType,
+  ): Promise<string> {
     const absolutePath = Path.resolve(fileName);
     const args = ['offers', 'add-slot', offerType, '--offer', offerId, '--path', absolutePath];
     const response = await this.exec(args);

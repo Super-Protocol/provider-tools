@@ -6,12 +6,12 @@ import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ISpctlService } from '../../services/spctl';
 import util from 'util';
 import { matchKeys } from '../../services/utils/crypto.utils';
-import { OfferType } from '../../services/spctl/types';
+import { SpctlOfferType } from '../../services/spctl/types';
 
 export interface IProviderRegisterQuestions {
   getProviderMetaData: (config?: ProviderInfoConfig) => Question[];
   doYouWantToSaveProvider: Question[];
-  createOffer: (ids: string[], service: ISpctlService, offerType: OfferType) => Question[];
+  createOffer: (ids: string[], service: ISpctlService, offerType: SpctlOfferType) => Question[];
   addSlot: Question[];
   addOption: Question[];
 }
@@ -151,7 +151,7 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
       when: (answers: Answers) => answers.doYouWantToSaveProvider.shouldBeSaved,
     },
   ],
-  createOffer: (ids: string[] = [], service: ISpctlService, offerType: OfferType) => [
+  createOffer: (ids: string[] = [], service: ISpctlService, offerType: SpctlOfferType) => [
     {
       type: 'confirm',
       name: 'createOffer.hasOffer',

@@ -7,7 +7,7 @@ import { ConfigLoader } from '../../common/loader.config';
 import processOffer from './offer.process';
 import processProvider from './provider.process';
 import buildDeployConfig from './buildDeployConfig';
-import { ProviderType } from './types';
+import { OfferType } from './types';
 
 type CommandParams = ConfigCommandParam & {
   backendUrl: string;
@@ -20,12 +20,12 @@ const logger = createLogger().child({ command: COMMAND_NAME });
 
 export const RegisterCommand = new Command()
   .name(COMMAND_NAME)
-  .description('register provider')
-  .addArgument(new Argument('providerType', 'provider type').choices(['tee', 'value']))
+  .description('register provider and offers')
+  .addArgument(new Argument('offerType', 'offer type').choices(['tee', 'data', 'solution']))
   .option('--backend-url <url>', 'backend url')
   .option('--blockchain-url <url>', 'blockchain url')
   .option('--contract-address <address>', 'contract address')
-  .action(async (providerType: ProviderType, options: CommandParams): Promise<void> => {
+  .action(async (offerType: OfferType, options: CommandParams): Promise<void> => {
     const config = new ConfigLoader(options.config);
     const service = await createSpctlService({
       logger,
@@ -36,12 +36,12 @@ export const RegisterCommand = new Command()
     });
 
     await processProvider({ config, service, logger });
-    const offerId = await processOffer({ config, service, providerType, logger });
+    const offerId = await processOffer({ config, service, offerType, logger });
     if (!offerId) {
       return logger.info('Upss...Something went wrong. Offer was not created well.');
     }
 
-    if (providerType === 'tee') {
+    if (offerType === 'tee') {
       const deployConfigPath = await buildDeployConfig({ config });
       logger.info(
         `deploy-config was saved to ${deployConfigPath}. You can edit it manually before run "deploy" command if it's needed.`,

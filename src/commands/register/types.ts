@@ -1,1 +1,1 @@
-export type ProviderType = 'value' | 'tee';
+export type OfferType = 'data' | 'solution' | 'tee';

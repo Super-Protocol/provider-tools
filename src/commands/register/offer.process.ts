@@ -8,12 +8,14 @@ import { ConfigLoader } from '../../common/loader.config';
 import Path from 'path';
 import * as os from 'os';
 import { ProviderOffer } from '../../common/config';
-import { ProviderType } from './types';
+import { OfferType } from './types';
+import { toSpctlOfferType } from './utils';
+import { SpctlOfferType } from '../../services/spctl/types';
 
 interface OfferProcessParams {
   config: ConfigLoader;
   service: ISpctlService;
-  providerType: ProviderType;
+  offerType: OfferType;
   logger: ILogger;
 }
 
@@ -44,7 +46,7 @@ const addSlots = async (
   offerId: string,
   service: ISpctlService,
   logger: ILogger,
-  providerType: ProviderType,
+  offerType: SpctlOfferType,
 ): Promise<void> => {
   const ask = async (): Promise<void> => {
     const createSlotAnswers = (await inquirer.prompt(
@@ -53,7 +55,7 @@ const addSlots = async (
     const slotId = await service.addOfferSlot(
       createSlotAnswers.addSlot.slotInfo,
       offerId,
-      providerType,
+      offerType,
     );
     logger.info(`Slot ${slotId} for offer ${offerId} has been created successfully`);
 
@@ -93,7 +95,7 @@ const createOffer = async (
   pathToOfferInfo: string,
   service: ISpctlService,
   logger: ILogger,
-  providerType: ProviderType,
+  offerType: SpctlOfferType,
 ): Promise<string> => {
   let offerId = '';
 
@@ -105,7 +107,7 @@ const createOffer = async (
   await writeToFile(tmpFileName, offerInfo);
 
   try {
-    offerId = await service.createOffer(tmpFileName, providerType);
+    offerId = await service.createOffer(tmpFileName, offerType);
   } finally {
     await removeFileIfExist(tmpFileName);
   }
@@ -115,10 +117,11 @@ const createOffer = async (
 };
 
 export default async (params: OfferProcessParams): Promise<string> => {
-  const { config, service, providerType, logger } = params;
+  const { config, service, logger } = params;
+  const offerType = toSpctlOfferType(params.offerType);
 
   const deployedOfferIds = config.loadSection('providerOffers').map((item) => item.id);
-  const questions = ProviderRegisterQuestions.createOffer(deployedOfferIds, service, providerType);
+  const questions = ProviderRegisterQuestions.createOffer(deployedOfferIds, service, offerType);
   const createOfferAnswers = (await inquirer.prompt(questions)) as IRegisterProviderAnswers;
   let offerId = '';
 
@@ -130,17 +133,18 @@ export default async (params: OfferProcessParams): Promise<string> => {
       createOfferAnswers.createOffer.offerInfo,
       service,
       logger,
-      providerType,
+      offerType,
     );
     updateProviderOffers(config, offerId, keys.privateKey);
-    await addSlots(offerId, service, logger, providerType);
+    await addSlots(offerId, service, logger, offerType);
 
-    if (providerType === 'tee') {
+    if (offerType === 'tee') {
       await addOptions(offerId, service, logger);
     }
   } else if (createOfferAnswers.createOffer.hasOffer && createOfferAnswers.createOffer.offerId) {
+    offerId = createOfferAnswers.createOffer.offerId;
+
     if (createOfferAnswers.createOffer.pk) {
-      offerId = createOfferAnswers.createOffer.offerId;
       updateProviderOffers(config, offerId, createOfferAnswers.createOffer.pk);
     }
   }
