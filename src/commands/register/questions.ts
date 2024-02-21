@@ -190,7 +190,7 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
           return 'Please specify valid order number (positive integer); ';
         }
         try {
-          const offer = await service.getOfferInfo(offerId);
+          const offer = await service.getOfferInfo(offerId, offerType);
           if (!offer) {
             return `Order ${offerId} was not found. Please try to specify another order number: `;
           }

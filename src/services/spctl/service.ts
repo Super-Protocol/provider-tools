@@ -152,9 +152,9 @@ export class SpctlService implements ISpctlService {
     return id;
   }
 
-  async getOfferInfo(offerId: string): Promise<IOfferInfo | null> {
+  async getOfferInfo(offerId: string, offerType: OfferType): Promise<IOfferInfo | null> {
     const saveFileName = `offer-info-${offerId}.json`;
-    const args = ['offers', 'get-info', 'tee', offerId, '--save-to', saveFileName];
+    const args = ['offers', 'get-info', offerType, offerId, '--save-to', saveFileName];
     const response = await this.exec(args);
     this.logger.trace({ response }, 'offer-info response');
     const fileName = Path.join(this.locationPath, saveFileName);
