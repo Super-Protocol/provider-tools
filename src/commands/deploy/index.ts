@@ -37,7 +37,7 @@ const updatedSshConfig = (
   };
 };
 
-const prepareSshConfig = async (config: ConfigLoader): Promise<void> => {
+export const prepareSshConfig = async (config: ConfigLoader): Promise<void> => {
   const sshConfig = config.loadSection('sshConfig');
   const answers = (await inquirer.prompt(
     DeployQuestions.giveUsSshConnectionInfo(sshConfig),

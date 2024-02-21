@@ -18,6 +18,9 @@ interface OfferProcessParams {
   offerType: OfferType;
   logger: ILogger;
 }
+import { prepareSshConfig } from '../deploy';
+import { build } from './offer-builder';
+import { createSshService } from '../../services/ssh';
 
 const buildResultPublicKey = (base64EncryptKey: string): { argsPublicKey: string } => {
   const encryption = {
@@ -116,19 +119,18 @@ const createOffer = async (
   return offerId;
 };
 
-export default async (params: OfferProcessParams): Promise<string> => {
+export default async (params: OfferProcessParams): Promise<string | null> => {
   const { config, service, logger } = params;
   const offerType = toSpctlOfferType(params.offerType);
 
   const deployedOfferIds = config.loadSection('providerOffers').map((item) => item.id);
   const questions = ProviderRegisterQuestions.createOffer(deployedOfferIds, service, offerType);
   const createOfferAnswers = (await inquirer.prompt(questions)) as IRegisterProviderAnswers;
-  let offerId = '';
 
   if (!createOfferAnswers.createOffer.auto && createOfferAnswers.createOffer.offerInfo) {
     const keys = generatePair();
 
-    offerId = await createOffer(
+    const offerId = await createOffer(
       keys.publicKey,
       createOfferAnswers.createOffer.offerInfo,
       service,
@@ -141,13 +143,26 @@ export default async (params: OfferProcessParams): Promise<string> => {
     if (offerType === 'tee') {
       await addOptions(offerId, service, logger);
     }
-  } else if (createOfferAnswers.createOffer.hasOffer && createOfferAnswers.createOffer.offerId) {
-    offerId = createOfferAnswers.createOffer.offerId;
 
-    if (createOfferAnswers.createOffer.pk) {
-      updateProviderOffers(config, offerId, createOfferAnswers.createOffer.pk);
-    }
+    return offerId;
   }
 
-  return offerId;
+  if (
+    createOfferAnswers.createOffer.hasOffer &&
+    createOfferAnswers.createOffer.offerId &&
+    createOfferAnswers.createOffer.pk
+  ) {
+    const offerId = createOfferAnswers.createOffer.offerId;
+    updateProviderOffers(config, offerId, createOfferAnswers.createOffer.pk);
+
+    return offerId;
+  }
+
+  if (!createOfferAnswers.createOffer.hasOffer && createOfferAnswers.createOffer.auto) {
+    await prepareSshConfig(config);
+
+    /*const offerInfo = */ await build({ service: await createSshService({ config }) });
+  }
+
+  return null;
 };
