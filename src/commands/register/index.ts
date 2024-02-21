@@ -10,8 +10,6 @@ import buildDeployConfig from './buildDeployConfig';
 import { ProviderType } from './types';
 
 type CommandParams = ConfigCommandParam & {
-  tee: boolean;
-  value: boolean;
   backendUrl: string;
   blockchainUrl: string;
   contractAddress: string;
