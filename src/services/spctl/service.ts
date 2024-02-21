@@ -4,7 +4,7 @@ import { spawnCommand } from './spawnCommand';
 import { KnownTool, SpctlConfig } from '../../common/config';
 import * as Path from 'path';
 import { fileExist, readJsonFile, removeFileIfExist, writeToFile } from '../utils/file.utils';
-import { IOfferInfo, IProvider } from './types';
+import { IOfferInfo, IProvider, SpctlOfferType } from './types';
 
 export type SpctlServiceParams = {
   locationPath: string;
@@ -139,9 +139,9 @@ export class SpctlService implements ISpctlService {
     return ids.length ? ids[0] : '';
   }
 
-  async createTeeOffer(fileName: string): Promise<string> {
+  async createOffer(fileName: string, offerType: SpctlOfferType): Promise<string> {
     const absolutePath = Path.resolve(fileName);
-    const args = ['offers', 'create', 'tee', '--yes', '--path', absolutePath];
+    const args = ['offers', 'create', offerType, '--yes', '--path', absolutePath];
     const response = await this.exec(args);
     const id = this.parse(/Offer was created with id (\d+)/g, response);
 
@@ -152,9 +152,9 @@ export class SpctlService implements ISpctlService {
     return id;
   }
 
-  async getOfferInfo(offerId: string): Promise<IOfferInfo | null> {
+  async getOfferInfo(offerId: string, offerType: SpctlOfferType): Promise<IOfferInfo | null> {
     const saveFileName = `offer-info-${offerId}.json`;
-    const args = ['offers', 'get-info', 'tee', offerId, '--save-to', saveFileName];
+    const args = ['offers', 'get-info', offerType, offerId, '--save-to', saveFileName];
     const response = await this.exec(args);
     this.logger.trace({ response }, 'offer-info response');
     const fileName = Path.join(this.locationPath, saveFileName);
@@ -169,9 +169,13 @@ export class SpctlService implements ISpctlService {
     return null;
   }
 
-  async addTeeOfferSlot(fileName: string, offerId: string): Promise<string> {
+  async addOfferSlot(
+    fileName: string,
+    offerId: string,
+    offerType: SpctlOfferType,
+  ): Promise<string> {
     const absolutePath = Path.resolve(fileName);
-    const args = ['offers', 'add-slot', 'tee', '--offer', offerId, '--path', absolutePath];
+    const args = ['offers', 'add-slot', offerType, '--offer', offerId, '--path', absolutePath];
     const response = await this.exec(args);
     const id = this.parse(/Slot was created with id (\d+)/g, response);
 

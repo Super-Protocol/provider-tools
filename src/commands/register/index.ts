@@ -1,15 +1,15 @@
-import { Command } from 'commander';
+import { Command, Argument } from 'commander';
 
 import { ConfigCommandParam } from '../types';
 import { createSpctlService } from '../../services/spctl';
 import { createLogger } from '../../common/logger';
 import { ConfigLoader } from '../../common/loader.config';
-import processOffer from './tee.offer.process';
+import processOffer from './offer.process';
 import processProvider from './provider.process';
 import buildDeployConfig from './buildDeployConfig';
+import { OfferType } from './types';
 
 type CommandParams = ConfigCommandParam & {
-  tee: boolean;
   backendUrl: string;
   blockchainUrl: string;
   contractAddress: string;
@@ -20,17 +20,12 @@ const logger = createLogger().child({ command: COMMAND_NAME });
 
 export const RegisterCommand = new Command()
   .name(COMMAND_NAME)
-  .description('register tee-provider')
-  .requiredOption('--tee', 'specified type of provider', false)
+  .description('register provider and offers')
+  .addArgument(new Argument('offerType', 'offer type').choices(['tee', 'data', 'solution']))
   .option('--backend-url <url>', 'backend url')
   .option('--blockchain-url <url>', 'blockchain url')
   .option('--contract-address <address>', 'contract address')
-  .action(async (options: CommandParams): Promise<void> => {
-    if (!options.tee) {
-      return logger.error(
-        'At least one of supported provider types should be specified. Please try to run command again and have specified the "--tee" param.',
-      );
-    }
+  .action(async (offerType: OfferType, options: CommandParams): Promise<void> => {
     const config = new ConfigLoader(options.config);
     const service = await createSpctlService({
       logger,
@@ -40,14 +35,16 @@ export const RegisterCommand = new Command()
       contractAddress: options.contractAddress,
     });
 
-    await processProvider(config, service, logger);
-    const offerId = await processOffer(config, service, logger);
+    await processProvider({ config, service, logger });
+    const offerId = await processOffer({ config, service, offerType, logger });
     if (!offerId) {
       return logger.info('Upss...Something went wrong. Offer was not created well.');
     }
 
-    const deployConfigPath = await buildDeployConfig({ config });
-    logger.info(
-      `deploy-config was saved to ${deployConfigPath}. You can edit it manually before run "deploy" command if it's needed.`,
-    );
+    if (offerType === 'tee') {
+      const deployConfigPath = await buildDeployConfig({ config });
+      logger.info(
+        `deploy-config was saved to ${deployConfigPath}. You can edit it manually before run "deploy" command if it's needed.`,
+      );
+    }
   });

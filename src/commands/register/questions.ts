@@ -6,11 +6,12 @@ import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ISpctlService } from '../../services/spctl';
 import util from 'util';
 import { matchKeys } from '../../services/utils/crypto.utils';
+import { SpctlOfferType } from '../../services/spctl/types';
 
 export interface IProviderRegisterQuestions {
   getProviderMetaData: (config?: ProviderInfoConfig) => Question[];
   doYouWantToSaveProvider: Question[];
-  createOffer: (ids: string[], service: ISpctlService) => Question[];
+  createOffer: (ids: string[], service: ISpctlService, offerType: SpctlOfferType) => Question[];
   addSlot: Question[];
   addOption: Question[];
 }
@@ -150,19 +151,19 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
       when: (answers: Answers) => answers.doYouWantToSaveProvider.shouldBeSaved,
     },
   ],
-  createOffer: (ids: string[] = [], service: ISpctlService) => [
+  createOffer: (ids: string[] = [], service: ISpctlService, offerType: SpctlOfferType) => [
     {
       type: 'confirm',
       name: 'createOffer.hasOffer',
-      message: 'Have you already created a TEE offer?',
+      message: `Have you already created a ${offerType.toUpperCase()} offer?`,
       default: false,
     },
     {
       type: 'confirm',
       name: 'createOffer.auto',
-      message: 'Do you want a TEE offer to be created automatically?',
+      message: `Do you want a ${offerType.toUpperCase()} offer to be created automatically?`,
       default: false,
-      when: (answers: Answers) => !answers.createOffer.hasOffer,
+      when: (answers: Answers) => !answers.createOffer.hasOffer && offerType === 'tee',
     },
     {
       type: 'input',
@@ -189,7 +190,7 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
           return 'Please specify valid order number (positive integer); ';
         }
         try {
-          const offer = await service.getOfferInfo(offerId);
+          const offer = await service.getOfferInfo(offerId, offerType);
           if (!offer) {
             return `Order ${offerId} was not found. Please try to specify another order number: `;
           }

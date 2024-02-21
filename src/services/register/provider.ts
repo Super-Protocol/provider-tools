@@ -9,7 +9,7 @@ import { AccountConfig } from '../../common/config';
 import { ILogger } from '../../common/logger';
 import { IProvider } from '../spctl/types';
 
-export type RegisterTeeProviderParams = {
+export type RegisterProviderParams = {
   logger?: ILogger;
   service: ISpctlService;
   accounts: AccountConfig;
@@ -28,7 +28,7 @@ const needReplenish = async (
   };
 };
 
-const createProvider = async (params: RegisterTeeProviderParams): Promise<IProvider> => {
+const createProvider = async (params: RegisterProviderParams): Promise<IProvider> => {
   const timestamp = new Date().toISOString();
   const provider: IProvider = {
     name: params.providerName ?? `${timestamp} - auto generated provider by ${APP_NAME}`,
@@ -53,9 +53,7 @@ export const getProvider = async (
   return service.getProviderByAddress(address);
 };
 
-export const registerTeeProvider = async (
-  params: RegisterTeeProviderParams,
-): Promise<IProvider> => {
+export const registerProvider = async (params: RegisterProviderParams): Promise<IProvider> => {
   const { service } = params;
   const replenishAccountBalance = async (pk: string): Promise<void> => {
     const needs = await needReplenish(service, pk);

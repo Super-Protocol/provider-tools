@@ -2,17 +2,21 @@ import inquirer from 'inquirer';
 
 import { ConfigLoader } from '../../common/loader.config';
 import { ISpctlService } from '../../services/spctl';
-import { getProvider, registerTeeProvider } from '../../services/register/tee.provider';
+import { getProvider, registerProvider } from '../../services/register/provider';
 import { IRegisterProviderAnswers, ProviderRegisterQuestions } from './questions';
 import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ILogger } from '../../common/logger';
 import { writeToFile } from '../../services/utils/file.utils';
 
-export default async (
-  config: ConfigLoader,
-  service: ISpctlService,
-  logger: ILogger,
-): Promise<void> => {
+interface ProviderProcessParams {
+  config: ConfigLoader;
+  service: ISpctlService;
+  logger: ILogger;
+}
+
+export default async (params: ProviderProcessParams): Promise<void> => {
+  const { config, service, logger } = params;
+
   const accounts = config.loadSection('account');
   const existedProvider = await getProvider(service, accounts.authority);
 
@@ -21,11 +25,13 @@ export default async (
     const answers = (await inquirer.prompt(
       ProviderRegisterQuestions.getProviderMetaData(providerInfoConfig),
     )) as IRegisterProviderAnswers;
+    const name = answers.getProviderMetaData?.providerName || providerInfoConfig?.name;
+    const description =
+      answers.getProviderMetaData?.providerDescription || providerInfoConfig?.description;
+
     config.updateSection('providerInfo', {
-      name: answers.getProviderMetaData.providerName,
-      ...(answers.getProviderMetaData.providerDescription && {
-        description: answers.getProviderMetaData.providerDescription,
-      }),
+      name,
+      ...(description && { description }),
     });
   } else {
     logger.info('Existed provider was found');
@@ -34,7 +40,7 @@ export default async (
   const providerInfoConfig = config.loadSection('providerInfo');
   const provider =
     existedProvider ||
-    (await registerTeeProvider({
+    (await registerProvider({
       accounts,
       service,
       logger,

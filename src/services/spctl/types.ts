@@ -1,3 +1,5 @@
+export type SpctlOfferType = 'tee' | 'value';
+
 export interface IProvider {
   name: string;
   description?: string;

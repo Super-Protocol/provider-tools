@@ -8,6 +8,16 @@ import { ConfigLoader } from '../../common/loader.config';
 import Path from 'path';
 import * as os from 'os';
 import { ProviderOffer } from '../../common/config';
+import { OfferType } from './types';
+import { toSpctlOfferType } from './utils';
+import { SpctlOfferType } from '../../services/spctl/types';
+
+interface OfferProcessParams {
+  config: ConfigLoader;
+  service: ISpctlService;
+  offerType: OfferType;
+  logger: ILogger;
+}
 
 const buildResultPublicKey = (base64EncryptKey: string): { argsPublicKey: string } => {
   const encryption = {
@@ -36,12 +46,17 @@ const addSlots = async (
   offerId: string,
   service: ISpctlService,
   logger: ILogger,
+  offerType: SpctlOfferType,
 ): Promise<void> => {
   const ask = async (): Promise<void> => {
     const createSlotAnswers = (await inquirer.prompt(
       ProviderRegisterQuestions.addSlot,
     )) as IRegisterProviderAnswers;
-    const slotId = await service.addTeeOfferSlot(createSlotAnswers.addSlot.slotInfo, offerId);
+    const slotId = await service.addOfferSlot(
+      createSlotAnswers.addSlot.slotInfo,
+      offerId,
+      offerType,
+    );
     logger.info(`Slot ${slotId} for offer ${offerId} has been created successfully`);
 
     if (createSlotAnswers.addSlot.anymore) {
@@ -75,11 +90,12 @@ const addOptions = async (
   await ask();
 };
 
-const createTeeOffer = async (
+const createOffer = async (
   publicKey: string,
   pathToOfferInfo: string,
   service: ISpctlService,
   logger: ILogger,
+  offerType: SpctlOfferType,
 ): Promise<string> => {
   let offerId = '';
 
@@ -91,7 +107,7 @@ const createTeeOffer = async (
   await writeToFile(tmpFileName, offerInfo);
 
   try {
-    offerId = await service.createTeeOffer(tmpFileName);
+    offerId = await service.createOffer(tmpFileName, offerType);
   } finally {
     await removeFileIfExist(tmpFileName);
   }
@@ -100,32 +116,35 @@ const createTeeOffer = async (
   return offerId;
 };
 
-export default async (
-  config: ConfigLoader,
-  service: ISpctlService,
-  logger: ILogger,
-): Promise<string> => {
+export default async (params: OfferProcessParams): Promise<string> => {
+  const { config, service, logger } = params;
+  const offerType = toSpctlOfferType(params.offerType);
+
   const deployedOfferIds = config.loadSection('providerOffers').map((item) => item.id);
-  const createOfferAnswers = (await inquirer.prompt(
-    ProviderRegisterQuestions.createOffer(deployedOfferIds, service),
-  )) as IRegisterProviderAnswers;
+  const questions = ProviderRegisterQuestions.createOffer(deployedOfferIds, service, offerType);
+  const createOfferAnswers = (await inquirer.prompt(questions)) as IRegisterProviderAnswers;
   let offerId = '';
 
   if (!createOfferAnswers.createOffer.auto && createOfferAnswers.createOffer.offerInfo) {
     const keys = generatePair();
 
-    offerId = await createTeeOffer(
+    offerId = await createOffer(
       keys.publicKey,
       createOfferAnswers.createOffer.offerInfo,
       service,
       logger,
+      offerType,
     );
     updateProviderOffers(config, offerId, keys.privateKey);
-    await addSlots(offerId, service, logger);
-    await addOptions(offerId, service, logger);
+    await addSlots(offerId, service, logger, offerType);
+
+    if (offerType === 'tee') {
+      await addOptions(offerId, service, logger);
+    }
   } else if (createOfferAnswers.createOffer.hasOffer && createOfferAnswers.createOffer.offerId) {
+    offerId = createOfferAnswers.createOffer.offerId;
+
     if (createOfferAnswers.createOffer.pk) {
-      offerId = createOfferAnswers.createOffer.offerId;
       updateProviderOffers(config, offerId, createOfferAnswers.createOffer.pk);
     }
   }
