@@ -75,6 +75,14 @@ export const ProviderInfoSchema = z.object({
 });
 export type ProviderInfoConfig = z.infer<typeof ProviderInfoSchema>;
 
+export const SshConfigSchema = z.object({
+  pathToPrivateKey: z.coerce.string().min(1),
+  user: z.coerce.string().min(1).default('root'),
+  port: z.coerce.number().int().gt(0).default(22),
+  host: z.coerce.string().min(1),
+});
+export type SshConfig = z.infer<typeof SshConfigSchema>;
+
 export const ProviderOfferSchema = z.object({
   id: z.coerce.string(),
   argsPrivateKey: z.coerce.string(),
@@ -90,5 +98,6 @@ export const ConfigSchema = z.object({
   metadata: MetadataConfigSchema.optional(),
   providerInfo: ProviderInfoSchema.optional(),
   providerOffers: ProviderOffersSchema,
+  sshConfig: SshConfigSchema.optional(),
 });
 export type Config = z.infer<typeof ConfigSchema>;

@@ -36,3 +36,4 @@ export const DEFAULT_PROVIDER_NAME = `auto generated provider by ${APP_NAME}`;
 export const DEFAULT_DEPLOY_CONFIG_FILE_NAME = 'deploy_config.yaml';
 export const DEPLOY_CONFIG_PROVIDER_OFFER_DEVICE_ID = '{{ device-id }}';
 export const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
+export const DEFAULT_DEPLOY_DESTINATION_FOLDER_PATH = '/sp/manifests';

@@ -10,7 +10,6 @@ import { matchKeys } from '../../services/utils/crypto.utils';
 export interface IProviderRegisterQuestions {
   getProviderMetaData: (config?: ProviderInfoConfig) => Question[];
   doYouWantToSaveProvider: Question[];
-  giveUsTheSshKey: Question[];
   createOffer: (ids: string[], service: ISpctlService) => Question[];
   addSlot: Question[];
   addOption: Question[];
@@ -69,10 +68,6 @@ export interface IRegisterProviderAnswers {
   };
   doYouWantToSaveProvider: {
     shouldBeSaved: boolean;
-    fileName: string;
-  };
-  giveUsTheSshKey: {
-    hasSshKey: boolean;
     fileName: string;
   };
   createOffer: {
@@ -150,29 +145,6 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
           return 'The path to the file is outside the current directory. Please enter another filename: ';
         }
 
-        return true;
-      },
-      when: (answers: Answers) => answers.doYouWantToSaveProvider.shouldBeSaved,
-    },
-  ],
-  giveUsTheSshKey: [
-    {
-      type: 'confirm',
-      name: 'giveUsTheSshKey.hasSshKey',
-      message:
-        'Could you please provide us with your SSH key for connecting to the remote server in the TEE environment? ' +
-        "This would enable us to automatically determine offer's slots' requirements (such as RAM, disk space, network limits, etc.)",
-      default: true,
-    },
-    {
-      type: 'input',
-      name: 'giveUsTheSshKey.fileName',
-      message: 'Please specify your ssh private key: ',
-      validate: (fileName: string): string | boolean => {
-        if (!fs.existsSync(fileName)) {
-          return 'File was not found or unreachable. Please try again: ';
-        }
-        // TODO: need to add validation that is it ssh private key file
         return true;
       },
       when: (answers: Answers) => answers.doYouWantToSaveProvider.shouldBeSaved,

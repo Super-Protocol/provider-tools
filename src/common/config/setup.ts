@@ -13,13 +13,15 @@ import {
 } from '../constant';
 import { createWallet } from '../../services/utils/wallet.utils';
 
-interface Answers {
+export interface Answers {
   spctl: {
     backend: {
       accessToken: string;
     };
   };
-  account: AccountConfig & { isAutoGenerationNeeded: { [K in keyof AccountConfig]: boolean } };
+  account: AccountConfig & { isAutoGenerationNeeded: { [K in keyof AccountConfig]: boolean } } & {
+    needToClearProviderOffers: boolean;
+  };
 }
 
 type AccountType = keyof AccountConfig;
@@ -30,8 +32,20 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
     {
       type: 'confirm',
       name: `account.isAutoGenerationNeeded.${accountType}`,
-      message: `Do you need to generate new ${accountType} account? If you choose "yes" the ${accountType} account will be auto generated for you. Otherwise, you will be asked to enter private key from existing account`,
+      message:
+        `Do you need to generate new ${accountType} account? If you choose "yes" the ${accountType} account will ` +
+        'be auto generated for you. Otherwise, you will be asked to enter private key from existing account: ',
       default: false,
+    },
+    {
+      type: 'confirm',
+      name: `account.needToClearProviderOffers`,
+      askAnswered: true,
+      message:
+        `Due to the fact that you are going to change the ${accountType} account, please confirm that you ` +
+        'agree with all previous published provider offers will be lost on the next deployment: ',
+      when: (answers?: Answers) =>
+        config?.providerOffers.length && !answers?.account.needToClearProviderOffers,
     },
     {
       type: 'input',
@@ -45,7 +59,9 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
 
         return `Please, enter valid ${accountType} account private key.`;
       },
-      when: (answers: Answers) => !answers.account.isAutoGenerationNeeded[accountType],
+      when: (answers?: Answers) =>
+        !answers?.account.isAutoGenerationNeeded[accountType] &&
+        answers?.account.needToClearProviderOffers,
     },
   ];
 
@@ -71,17 +87,43 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
   ];
 };
 
+export const hasAccountChanges = (
+  config: Partial<AccountConfig> = {},
+  answers: Answers['account'],
+): boolean => {
+  if (accountTypeKeys.some((accountType) => answers.isAutoGenerationNeeded[accountType])) {
+    return true;
+  }
+  if (Object.keys(config).length !== accountTypeKeys.length) {
+    return true;
+  }
+  const isEqual = (accountType: AccountType): boolean =>
+    Boolean(config[accountType]) && config[accountType] === answers[accountType];
+
+  return accountTypeKeys.some((accountType) => !isEqual(accountType));
+};
+
 export const setup = async (config?: Config): Promise<Config> => {
   const questions = getQuestionsObj(config);
   const answers = (await inquirer.prompt(questions)) as Answers;
-  const getAccount = (answers: Answers, accountType: AccountType): string =>
-    answers.account.isAutoGenerationNeeded[accountType]
-      ? createWallet().privateKey
-      : answers.account[accountType];
+  const getAccount = (answers: Answers['account'], accountType: AccountType): string => {
+    if (!answers.needToClearProviderOffers && config?.account[accountType]) {
+      return config.account[accountType];
+    }
 
-  const actionAccount = getAccount(answers, 'action');
-  const authorityAccount = getAccount(answers, 'authority');
-  const tokenReceiverAccount = getAccount(answers, 'tokenReceiver');
+    if (answers.isAutoGenerationNeeded[accountType]) {
+      return createWallet().privateKey;
+    }
+
+    return answers[accountType];
+  };
+
+  const [authorityAccount, actionAccount, tokenReceiverAccount] = accountTypeKeys.map(
+    (accountType) => getAccount(answers.account, accountType),
+  );
+  const providerOffers = hasAccountChanges(config?.account, answers.account)
+    ? []
+    : config?.providerOffers ?? [];
 
   return {
     spctl: {
@@ -119,7 +161,7 @@ export const setup = async (config?: Config): Promise<Config> => {
       action: actionAccount,
       tokenReceiver: tokenReceiverAccount,
     },
-    providerOffers: config?.providerOffers ?? [],
+    providerOffers,
     ...(config?.logger && { logger: config.logger }),
   };
 };
