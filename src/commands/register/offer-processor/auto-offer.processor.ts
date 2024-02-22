@@ -72,7 +72,7 @@ const etherToWei = (ether: string): BigNumber => {
 const positiveNumberValidator: Validator = (input) => {
   const number = parseFloat(input);
 
-  if (!Number.isNaN(number) || number <= 0) {
+  if (Number.isNaN(number) || number <= 0) {
     return 'It should be positive number. Please try again:';
   }
 
