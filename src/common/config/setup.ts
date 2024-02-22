@@ -124,6 +124,12 @@ export const setup = async (config?: Config): Promise<Config> => {
   const providerOffers = hasAccountChanges(config?.account, answers.account)
     ? []
     : config?.providerOffers ?? [];
+  const providerDataOffers = hasAccountChanges(config?.account, answers.account)
+    ? []
+    : config?.providerDataOffers ?? [];
+  const providerSolutionOffers = hasAccountChanges(config?.account, answers.account)
+    ? []
+    : config?.providerSolutionOffers ?? [];
 
   return {
     spctl: {
@@ -162,6 +168,8 @@ export const setup = async (config?: Config): Promise<Config> => {
       tokenReceiver: tokenReceiverAccount,
     },
     providerOffers,
+    providerDataOffers,
+    providerSolutionOffers,
     ...(config?.logger && { logger: config.logger }),
   };
 };
