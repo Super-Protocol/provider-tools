@@ -11,6 +11,7 @@ import buildDeployConfig from './deploy-config-builder';
 import { OfferType } from './types';
 import { generateEnvFile } from './generateEnvFile';
 import { getRunnerAsset } from './utils';
+import { printInstruction } from './printInstuction';
 
 type CommandParams = ConfigCommandParam & {
   backendUrl: string;
@@ -91,5 +92,7 @@ export const RegisterCommand = new Command()
       for (const file of files) {
         await fs.writeFile(path.join(outputDirPath, file.name), file.content, 'utf-8');
       }
+
+      await printInstruction({ outputDirPath });
     }
   });
