@@ -55,10 +55,10 @@ const splitOptions = (resources: IHardwareInfo['optionInfo']): IHardwareInfo['op
   return options;
 };
 
-const positiveIntegerValidator: Validator = (input) => {
+const nonNegativeIntegerValidator: Validator = (input) => {
   const number = parseInt(input);
 
-  if (!Number.isSafeInteger(number) || number <= 0) {
+  if (!Number.isSafeInteger(number) || number < 0) {
     return 'It should be positive integer number. Please try again:';
   }
 
@@ -113,7 +113,7 @@ const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] => [
     message: 'Please adjust the bandwidth value if necessary (in Mbps):',
     validate: nonNegativeNumberValidator,
     filter(val: number): number {
-      return val * 1000000;
+      return Math.floor(val * 1000000);
     },
     default: optionInfo.bandwidth,
     when: (_answers: IOfferOption): boolean => !optionInfo.externalPort,
@@ -124,7 +124,7 @@ const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] => [
     message: 'Please adjust the traffic value if necessary ( in Mbps):',
     validate: nonNegativeNumberValidator,
     filter(val: number): number {
-      return val * 1000000;
+      return Math.floor(val * 1000000);
     },
     default: optionInfo.traffic,
     when: (_answers: IOfferOption): boolean => !optionInfo.externalPort,
@@ -133,14 +133,14 @@ const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] => [
     type: 'number',
     name: 'usage.minTimeMinutes',
     message: 'Please specify the min rent time(in minutes):',
-    validate: nonNegativeNumberValidator,
+    validate: nonNegativeIntegerValidator,
     default: 0,
   },
   {
     type: 'number',
     name: 'usage.maxTimeMinutes',
     message: 'Please specify the max rent time(in minutes):',
-    validate: nonNegativeNumberValidator,
+    validate: nonNegativeIntegerValidator,
     default: 0,
   },
   {
@@ -217,14 +217,14 @@ const slotUsageQuestions = (offerType: SpctlOfferType): any[] => [
     type: 'number',
     name: 'minTimeMinutes',
     message: 'Please specify min rent time(in minutes):',
-    validate: nonNegativeNumberValidator,
+    validate: nonNegativeIntegerValidator,
     default: 0,
   },
   {
     type: 'number',
     name: 'maxTimeMinutes',
     message: 'Please specify max rent time(in minutes):',
-    validate: nonNegativeNumberValidator,
+    validate: nonNegativeIntegerValidator,
     default: 0,
   },
   {
