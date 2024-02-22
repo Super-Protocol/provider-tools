@@ -89,7 +89,32 @@ export const ProviderOfferSchema = z.object({
 });
 export type ProviderOffer = z.infer<typeof ProviderOfferSchema>;
 
+const ProviderValueOfferSchema = z.object({
+  id: z.string(),
+  argsPrivateKey: z.coerce.string(),
+  encryption: z.object({
+    algo: z.string(),
+    encoding: z.string(),
+    cipher: z.string(),
+    iv: z.string(),
+    mac: z.string(),
+    key: z.string(),
+  }),
+  resource: z.object({
+    type: z.string(),
+    storageType: z.string(),
+    filepath: z.string(),
+    credentials: z.object({
+      token: z.string(),
+      bucket: z.string(),
+      prefix: z.string(),
+    }),
+  }),
+});
+export type ProviderValueOffer = z.infer<typeof ProviderValueOfferSchema>;
+
 export const ProviderOffersSchema = z.array(ProviderOfferSchema).default([]);
+export const ProviderValueOffersSchema = z.array(ProviderValueOfferSchema).default([]);
 
 export const ConfigSchema = z.object({
   logger: LoggerConfigSchema.optional(),
@@ -98,6 +123,8 @@ export const ConfigSchema = z.object({
   metadata: MetadataConfigSchema.optional(),
   providerInfo: ProviderInfoSchema.optional(),
   providerOffers: ProviderOffersSchema,
+  providerDataOffers: ProviderValueOffersSchema,
+  providerSolutionOffers: ProviderValueOffersSchema,
   sshConfig: SshConfigSchema.optional(),
 });
 export type Config = z.infer<typeof ConfigSchema>;

@@ -3,15 +3,17 @@ import { build } from '../offer-builder';
 import { createSshService } from '../../../services/ssh';
 import { ConfigLoader } from '../../../common/loader.config';
 import { processOffer } from './manual-offer.processor';
-import { ISpctlService, SpctlOfferType } from '../../../services/spctl';
+import { ISpctlService } from '../../../services/spctl';
 import { ILogger } from '../../../common/logger';
 import { process as processAutoSlots } from './auto-offer-slot.processor';
 import { process as processAutoOptions } from './auto-offer-option.processor';
+import { OfferType } from '../types';
+import { toSpctlOfferType } from '../utils';
 
 interface IAutoOfferProcessorParams {
   config: ConfigLoader;
   logger: ILogger;
-  offerType: SpctlOfferType;
+  offerType: OfferType;
   service: ISpctlService;
 }
 
@@ -22,11 +24,21 @@ export const process = async (params: IAutoOfferProcessorParams): Promise<string
 
   const offerInfo = await build({ service: await createSshService({ config }) });
   const offerId = await processOffer({ ...params, offerInfo });
+  const spctlOfferType = toSpctlOfferType(params.offerType);
 
-  await processAutoSlots({ ...params, offerId, resources: offerInfo.hardwareInfo.slotInfo });
+  await processAutoSlots({
+    ...params,
+    offerId,
+    resources: offerInfo.hardwareInfo.slotInfo,
+  });
 
   if (params.offerType === 'tee') {
-    await processAutoOptions({ ...params, offerId, resources: offerInfo.hardwareInfo.optionInfo });
+    await processAutoOptions({
+      ...params,
+      offerId,
+      resources: offerInfo.hardwareInfo.optionInfo,
+      offerType: spctlOfferType,
+    });
   }
 
   return offerId;

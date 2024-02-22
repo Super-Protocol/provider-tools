@@ -8,6 +8,8 @@ import { IHardwareInfo } from '../offer-builder';
 import { IUsageAnswers, PriceType } from '../questions/types';
 import inquirer from 'inquirer';
 import { slotUsageQuestions } from '../questions/slot.question';
+import { OfferType } from '../types';
+import { toSpctlOfferType } from '../utils';
 
 interface ISlotOfferInfo {
   info: IHardwareInfo['slotInfo'];
@@ -57,7 +59,7 @@ interface IProcessAutoSlotsParams {
   offerId: string;
   service: ISpctlService;
   logger: ILogger;
-  offerType: SpctlOfferType;
+  offerType: OfferType;
   resources: IHardwareInfo['slotInfo'];
 }
 
@@ -66,7 +68,7 @@ export const process = async (params: IProcessAutoSlotsParams): Promise<void> =>
   let count = 0;
   for (const slot of slots) {
     count++;
-    const data = await processAutoSlot(slot, params.offerType);
+    const data = await processAutoSlot(slot, toSpctlOfferType(params.offerType));
 
     const tmpFileName = Path.join(os.tmpdir(), `${new Date().valueOf()}-slot-info-${count}.json`);
     await writeToFile(tmpFileName, data);

@@ -1,20 +1,22 @@
 import inquirer from 'inquirer';
 
-import { ISpctlService, SpctlOfferType } from '../../../services/spctl';
+import { ISpctlService } from '../../../services/spctl';
 import { ILogger } from '../../../common/logger';
 import { IRegisterProviderAnswers, ProviderRegisterQuestions } from '../questions';
+import { toSpctlOfferType } from '../utils';
+import { OfferType } from '../types';
 
 interface IProcessSlotParams {
   offerId: string;
   service: ISpctlService;
   logger: ILogger;
-  offerType: SpctlOfferType;
+  offerType: OfferType;
   pathToSlotInfo: string;
 }
 
 export const processSlot = async (params: IProcessSlotParams): Promise<void> => {
   const { offerId, service, logger, offerType, pathToSlotInfo } = params;
-  const slotId = await service.addOfferSlot(pathToSlotInfo, offerId, offerType);
+  const slotId = await service.addOfferSlot(pathToSlotInfo, offerId, toSpctlOfferType(offerType));
   logger.info(`Slot ${slotId} for offer ${offerId} has been created successfully`);
 };
 

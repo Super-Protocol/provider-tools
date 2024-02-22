@@ -1,7 +1,7 @@
 import Path from 'path';
 import os from 'os';
 
-import { ISpctlService, SpctlOfferType } from '../../../services/spctl';
+import { ISpctlService } from '../../../services/spctl';
 import { ILogger } from '../../../common/logger';
 import { removeFileIfExist, writeToFile } from '../../../services/utils/file.utils';
 import { ConfigLoader } from '../../../common/loader.config';
@@ -10,6 +10,8 @@ import { updateProviderOffers } from './config.utils';
 import { process as processSlots } from './offer-slot.processor';
 import { process as processOptions } from './offer-option.processor';
 import { IOfferInfo } from '../offer-builder';
+import { OfferType } from '../types';
+import { toSpctlOfferType } from '../utils';
 
 const buildResultPublicKey = (base64EncryptKey: string): { argsPublicKey: string } => {
   const encryption = {
@@ -35,13 +37,19 @@ export const processOffer = async (params: ProcessOfferParams): Promise<string> 
   await writeToFile(tmpFileName, updatedOfferInfo);
 
   try {
-    offerId = await service.createOffer(tmpFileName, offerType);
+    offerId = await service.createOffer(tmpFileName, toSpctlOfferType(offerType));
   } finally {
     await removeFileIfExist(tmpFileName);
   }
   logger.info(`Offer ${offerId} has been created successfully`);
 
-  updateProviderOffers(config, offerId, keys.privateKey);
+  updateProviderOffers({
+    config,
+    offerId,
+    decryptKey: keys.privateKey,
+    offerType,
+    resourceFileData: null,
+  });
 
   return offerId;
 };
@@ -50,7 +58,7 @@ interface IManualOfferProcessorParams {
   offerInfo: IOfferInfo;
   service: ISpctlService;
   logger: ILogger;
-  offerType: SpctlOfferType;
+  offerType: OfferType;
   config: ConfigLoader;
 }
 export const process = async (params: IManualOfferProcessorParams): Promise<string> => {
