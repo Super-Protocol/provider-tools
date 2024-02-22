@@ -1,7 +1,7 @@
 import Path from 'path';
 import os from 'os';
 import inquirer, { Validator } from 'inquirer';
-import ethers, { BigNumber } from 'ethers';
+import { BigNumber, utils as ethersUtils } from 'ethers';
 
 import { prepareSshConfig } from '../../deploy';
 import { build } from '../offer-builder';
@@ -66,7 +66,7 @@ const positiveIntegerValidator: Validator = (input) => {
 };
 
 const etherToWei = (ether: string): BigNumber => {
-  return ethers.utils.parseEther(ether);
+  return ethersUtils.parseEther(ether);
 };
 
 const positiveNumberValidator: Validator = (input) => {
