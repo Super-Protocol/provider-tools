@@ -14,14 +14,6 @@ export interface ISshServiceOptions
   logger: ILogger;
 }
 
-export interface IMemoryInfo {
-  total: number;
-}
-
-export interface IStorageInfo {
-  max: number;
-}
-
 export interface IRemoteHardwareInfo {
   hardware: {
     cpusPerSocket: number;
@@ -38,3 +30,9 @@ export interface IRemoteHardwareInfo {
     bandWidth: number;
   };
 }
+
+type StringifyNested<T> = {
+  [K in keyof T]: T[K] extends object ? StringifyNested<T[K]> : string;
+};
+
+export type IRawRemoteHardwareInfo = StringifyNested<IRemoteHardwareInfo>;

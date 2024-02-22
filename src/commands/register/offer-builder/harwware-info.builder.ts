@@ -1,18 +1,27 @@
-import { IMemoryInfo, ISshService, IStorageInfo } from '../../../services/ssh';
+import { IRemoteHardwareInfo, ISshService } from '../../../services/ssh';
 import { IHardwareInfo } from './types';
 
-const build = (params: { memory: IMemoryInfo; storage: IStorageInfo }): IHardwareInfo => {
+const build = (params: { hardwareInfo: IRemoteHardwareInfo }): IHardwareInfo => {
+  const {
+    hardwareInfo: { hardware, network },
+  } = params;
+  const cpuCores = hardware.sockets * hardware.cpusPerSocket;
+  const ram = Math.round(hardware.ramTotal * 0.9);
+  const diskUsage = Math.round(hardware.storageMax * 0.8);
+  const bandwidth = Math.round(network.bandWidth * 1000 * 1000);
+  const externalPort = network.externalPort ? 1 : 0;
+
   return {
     slotInfo: {
-      cpuCores: 35.5, // TODO: should be replaced later, it will be gotten via ssh-service
-      ram: params.memory.total * 0.9,
-      diskUsage: params.storage.max * 0.8,
+      cpuCores,
+      ram,
+      diskUsage,
       gpuCores: 0,
     },
     optionInfo: {
-      bandwidth: 2300000, // TODO: should be replaced later, it will be gotten via ssh-service
-      externalPort: Math.round(Math.random()), // TODO: should be replaced later, it will be gotten via ssh-service
-      traffic: 321000000, // TODO: should be replaced later, it will be gotten via ssh-service
+      bandwidth: bandwidth,
+      externalPort,
+      traffic: 0,
     },
   };
 };
@@ -24,8 +33,7 @@ export interface IBuildHardwareInfoParams {
 export const buildPart = async (params: IBuildHardwareInfoParams): Promise<IHardwareInfo> => {
   const { service } = params;
 
-  const memory = await service.getMemoryInfo();
-  const storage = await service.getDiskInfo();
+  const hardwareInfo = await service.getHardwareInfo();
 
-  return build({ memory, storage });
+  return build({ hardwareInfo });
 };

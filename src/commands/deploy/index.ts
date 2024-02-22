@@ -1,9 +1,9 @@
 import { Command } from 'commander';
+import inquirer from 'inquirer';
 
 import { ConfigCommandParam } from '../types';
 import { createLogger } from '../../common/logger';
 import { ConfigLoader } from '../../common/loader.config';
-import inquirer from 'inquirer';
 import { DeployQuestions, IDeployAnswers } from './questions';
 import { SshConfig } from '../../common/config';
 import { createSshService } from '../../services/ssh';
