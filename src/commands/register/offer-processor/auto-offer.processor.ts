@@ -69,6 +69,15 @@ const etherToWei = (ether: string): BigNumber => {
   return ethersUtils.parseEther(ether);
 };
 
+const nonNegativeNumberValidator: Validator = (input) => {
+  const number = parseFloat(input);
+
+  if (Number.isNaN(number) || number < 0) {
+    return 'It should be non negative number. Please try again:';
+  }
+
+  return true;
+};
 const positiveNumberValidator: Validator = (input) => {
   const number = parseFloat(input);
 
@@ -102,7 +111,7 @@ const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] => [
     type: 'number',
     name: 'info.bandwidth',
     message: 'Please adjust the bandwidth value if necessary (in Mbps):',
-    validate: positiveNumberValidator,
+    validate: nonNegativeNumberValidator,
     filter(val: number): number {
       return val * 1000000;
     },
@@ -113,7 +122,7 @@ const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] => [
     type: 'number',
     name: 'info.traffic',
     message: 'Please adjust the traffic value if necessary ( in Mbps):',
-    validate: positiveNumberValidator,
+    validate: nonNegativeNumberValidator,
     filter(val: number): number {
       return val * 1000000;
     },
@@ -124,14 +133,14 @@ const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] => [
     type: 'number',
     name: 'usage.minTimeMinutes',
     message: 'Please specify the min rent time(in minutes):',
-    validate: positiveIntegerValidator,
+    validate: nonNegativeNumberValidator,
     default: 0,
   },
   {
     type: 'number',
     name: 'usage.maxTimeMinutes',
     message: 'Please specify the max rent time(in minutes):',
-    validate: positiveIntegerValidator,
+    validate: nonNegativeNumberValidator,
     default: 0,
   },
   {
@@ -202,19 +211,20 @@ interface ISlotOfferInfo {
   usage: IUsageAnswers;
 }
 
-const slotUsageQuestions = [
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+const slotUsageQuestions = (offerType: SpctlOfferType): any[] => [
   {
     type: 'number',
     name: 'minTimeMinutes',
     message: 'Please specify min rent time(in minutes):',
-    validate: positiveIntegerValidator,
+    validate: nonNegativeNumberValidator,
     default: 0,
   },
   {
     type: 'number',
     name: 'maxTimeMinutes',
     message: 'Please specify max rent time(in minutes):',
-    validate: positiveIntegerValidator,
+    validate: nonNegativeNumberValidator,
     default: 0,
   },
   {
@@ -226,6 +236,7 @@ const slotUsageQuestions = [
       return val.split('-')[1].trim();
     },
     default: PriceType.perHour,
+    when: (): boolean => offerType === 'value',
   },
   {
     type: 'number',
@@ -239,15 +250,21 @@ const slotUsageQuestions = [
   },
 ];
 
-const processAutoSlot = async (value: IHardwareInfo['slotInfo']): Promise<ISlotOfferInfo> => {
+const processAutoSlot = async (
+  value: IHardwareInfo['slotInfo'],
+  offerType: SpctlOfferType = 'tee',
+): Promise<ISlotOfferInfo> => {
   const prefix = `Please ask next questions about slot:\n${JSON.stringify(value, null, 2)}\n`;
   const answers = (await inquirer.prompt(
-    slotUsageQuestions.map((q) => ({ ...q, prefix })),
+    slotUsageQuestions(offerType).map((q) => ({ ...q, prefix })),
   )) as IUsageAnswers;
 
   return {
     info: value,
-    usage: answers,
+    usage: {
+      ...answers,
+      priceType: answers.priceType ?? PriceType.perHour,
+    },
   };
 };
 
@@ -263,7 +280,7 @@ const processAutoSlots = async (params: IProcessAutoSlotsParams): Promise<void> 
   let count = 0;
   for (const slot of slots) {
     count++;
-    const data = await processAutoSlot(slot);
+    const data = await processAutoSlot(slot, params.offerType);
 
     const tmpFileName = Path.join(os.tmpdir(), `${new Date().valueOf()}-slot-info-${count}.json`);
     await writeToFile(tmpFileName, data);
