@@ -164,8 +164,8 @@ const processAutoOption = async (value: IHardwareInfo['optionInfo']): Promise<IO
 
   return {
     info: {
-      bandwidth: answers.info.bandwidth ?? value.bandwidth,
-      traffic: answers.info.traffic ?? value.traffic,
+      bandwidth: answers.info?.bandwidth ?? value.bandwidth,
+      traffic: answers.info?.traffic ?? value.traffic,
       externalPort: value.externalPort,
     },
     usage: answers.usage,
