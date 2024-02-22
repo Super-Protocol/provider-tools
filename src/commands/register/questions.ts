@@ -6,7 +6,7 @@ import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ISpctlService } from '../../services/spctl';
 import util from 'util';
 import { matchKeys } from '../../services/utils/crypto.utils';
-import { SpctlOfferType } from '../../services/spctl/types';
+import { SpctlOfferType } from '../../services/spctl';
 
 export interface IProviderRegisterQuestions {
   getProviderMetaData: (config?: ProviderInfoConfig) => Question[];

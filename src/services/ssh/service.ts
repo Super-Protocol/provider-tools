@@ -1,6 +1,6 @@
 import { ILogger } from '../../common/logger';
 import { SshClient } from './client';
-import { ISshServiceOptions } from './types';
+import { IRawRemoteHardwareInfo, IRemoteHardwareInfo, ISshServiceOptions } from './types';
 
 export type ISshService = Required<SshService>;
 export class SshService implements ISshService {
@@ -11,54 +11,35 @@ export class SshService implements ISshService {
     this.client = new SshClient(this.options, this.logger);
   }
 
-  async getDiskInfo(): Promise<number> {
-    const parse = (output: string): number => {
-      const result = parseInt(output, 10);
-      if (Number.isSafeInteger(result)) {
-        return result;
+  async getHardwareInfo(): Promise<IRemoteHardwareInfo> {
+    const convert = (rawHardwareInfo: IRawRemoteHardwareInfo): IRemoteHardwareInfo => ({
+      hardware: {
+        cpusPerSocket: Number.parseInt(rawHardwareInfo.hardware.cpusPerSocket),
+        sockets: Number.parseInt(rawHardwareInfo.hardware.sockets),
+        simultaneousMultithreading: Number.parseInt(
+          rawHardwareInfo.hardware.simultaneousMultithreading,
+        ),
+        cpuThreadsPerCore: Number.parseInt(rawHardwareInfo.hardware.cpuThreadsPerCore),
+        cpuTotalThreads: Number.parseInt(rawHardwareInfo.hardware.cpuTotalThreads),
+        logicalCores: Number.parseInt(rawHardwareInfo.hardware.logicalCores),
+        ramTotal: Number.parseInt(rawHardwareInfo.hardware.ramTotal),
+        storageMax: Number.parseInt(rawHardwareInfo.hardware.storageMax),
+      },
+      network: {
+        externalPort: rawHardwareInfo.network.externalPort.toLowerCase() === 'true',
+        bandWidth: Number.parseInt(rawHardwareInfo.network.bandWidth),
+      },
+    });
+
+    const parse = (output: string): IRemoteHardwareInfo => {
+      try {
+        return convert(JSON.parse(output));
+      } catch (err: unknown) {
+        throw Error(`Could not parse hardware info output: ${(err as Error).message}`);
       }
-
-      this.logger.debug('Could not parse disk info output');
-      return 0;
     };
-    const command =
-      'kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml -n longhorn-system get nodes.longhorn.io $(hostname) -o json' +
-      " | jq '.status.diskStatus | to_entries[] | .value.storageMaximum";
-    const data = await this.client.exec(command);
-    const value = parse(data);
-
-    return Math.round(value * 0.8);
-  }
-
-  async getMemoryInfo(): Promise<number> {
-    const parse = (output: string): number => {
-      const lines = output.split('\n');
-      const line = lines.find((line: string) => line.includes('Mem:'));
-      if (line) {
-        const words = line.split(/\s+/);
-        const neededIndex = 1;
-
-        const result = parseInt(words[neededIndex], 10);
-        if (Number.isSafeInteger(result)) {
-          return result;
-        }
-      }
-
-      this.logger.debug('Could not parse memory info output');
-      return 0;
-    };
-    const data = await this.client.exec('free -m');
-    const value = parse(data);
-
-    return Math.round(value * 0.9);
-  }
-
-  async getNetworkInfo(): Promise<string> {
-    const data = await this.client.exec('ifconfig');
-
-    this.logger.trace({ data }, 'Network info');
-
-    return data;
+    const data = await this.client.exec("/sp/hardware-info.sh | jq '{hardware,network}'");
+    return parse(data);
   }
 
   async copyFile(source: string, destination: string): Promise<void> {
