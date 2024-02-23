@@ -11,9 +11,15 @@ export const APP_VERSION = version;
 export const CONFIG_DEFAULT_FILENAME = path.resolve(execDir(), 'config.json');
 export const JWT_CHECK_REGEX = /(^[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*$)/;
 export const PRIVATE_KEY_CHECK_REGEX = /\b(?:0x)?[0-9a-fA-F]{64}\b/g;
-export const SPCTL_BACKEND_URL_DEFAULT = 'https://bff.testnet.superprotocol.com/graphql';
+export const SPCTL_BACKEND_URL_DEFAULT =
+  process.env.NODE_ENV === 'production'
+    ? 'https://bff.testnet.superprotocol.com/graphql'
+    : 'https://bff.dev.superprotocol.com/graphql';
 export const SPCTL_BLOCKCHAIN_URL_DEFAULT = 'https://mumbai.polygon.superprotocol.com/hesoyam';
-export const SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT = '0xA7Ff565f26b93926e4e6465Eb81d48EfF456848b';
+export const SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT =
+  process.env.NODE_ENV === 'production'
+    ? '0xA7Ff565f26b93926e4e6465Eb81d48EfF456848b'
+    : '0x987BC8d29C001d3b8c02AB344868b6D2989E4f71';
 export const SPCTL_CRYPTO_ALGO_DEFAULT = 'ECIES';
 export const SPCTL_ENCODING_DEFAULT: BufferEncoding = 'base64';
 export const SPCTL_PCCS_SERVICE_DEFAULT = 'https://pccs.superprotocol.io';
