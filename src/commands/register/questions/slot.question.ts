@@ -1,7 +1,6 @@
 import { SpctlOfferType } from '../../../services/spctl';
 import { nonNegativeIntegerValidator, positiveNumberValidator } from './validators';
 import { PriceType } from './types';
-import { etherToWei } from '../../../common/utils';
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const slotUsageQuestions = (offerType: SpctlOfferType): any[] => [
@@ -35,9 +34,6 @@ export const slotUsageQuestions = (offerType: SpctlOfferType): any[] => [
     name: 'price',
     message: 'Please specify the price(in TEE tokens):',
     validate: positiveNumberValidator,
-    filter(val: number): string {
-      return etherToWei(val.toString()).toString();
-    },
-    default: 1,
+    default: 0.0001,
   },
 ];

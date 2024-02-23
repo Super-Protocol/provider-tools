@@ -4,8 +4,8 @@ import {
   nonNegativeIntegerValidator,
   positiveNumberValidator,
 } from './validators';
-import { etherToWei } from '../../../common/utils';
 import { IOfferOptionAnswers, PriceType } from './types';
+import { MB_TO_BYTES_MULTIPLIER } from '../../../common/constant';
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] => [
@@ -14,10 +14,7 @@ export const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] 
     name: 'info.bandwidth',
     message: 'Please adjust the bandwidth value if necessary (in Mbps):',
     validate: nonNegativeNumberValidator,
-    filter(val: number): number {
-      return Math.floor(val * 1000000);
-    },
-    default: optionInfo.bandwidth,
+    default: Math.floor(optionInfo.bandwidth / MB_TO_BYTES_MULTIPLIER),
     when: (_answers: IOfferOptionAnswers): boolean => !optionInfo.externalPort,
   },
   {
@@ -25,10 +22,7 @@ export const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] 
     name: 'info.traffic',
     message: 'Please adjust the traffic value if necessary ( in Mbps):',
     validate: nonNegativeNumberValidator,
-    filter(val: number): number {
-      return Math.floor(val * 1000000);
-    },
-    default: optionInfo.traffic,
+    default: Math.floor(optionInfo.traffic / MB_TO_BYTES_MULTIPLIER),
     when: (_answers: IOfferOptionAnswers): boolean => !optionInfo.externalPort,
   },
   {
@@ -60,9 +54,6 @@ export const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] 
     name: 'usage.price',
     message: 'Please specify the price(in TEE tokens):',
     validate: positiveNumberValidator,
-    filter(val: number): string {
-      return etherToWei(val.toString()).toString();
-    },
-    default: 1,
+    default: 0.0001,
   },
 ];

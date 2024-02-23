@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    networks:
+      - local
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  minio:
+    image: 'quay.io/minio/minio:RELEASE.2022-03-26T06-49-28Z'
+    command: server /var/lib/minio/data --console-address ":9001"
+    restart: always
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    networks:
+      - local
+    ports:
+      - 9000:9000
+      - 9001:9001
+
+  mongodb:
+    image: mongo:7.0.5
+    networks:
+      - local
+    ports:
+      - "27017:27017"
+    volumes:
+      - './data:/data'
+
+  execution-controller:
+    image: 'ghcr.io/super-protocol/sp-execution-controller:latest'
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+    networks:
+      - local
+
+networks:
+  local:
+    driver: bridge

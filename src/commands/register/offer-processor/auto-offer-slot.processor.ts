@@ -1,13 +1,17 @@
 import Path from 'path';
 import os from 'os';
+import inquirer from 'inquirer';
+
 import { removeFileIfExist, writeToFile } from '../../../services/utils/file.utils';
 import { processSlot } from './offer-slot.processor';
 import { ISpctlService, SpctlOfferType } from '../../../services/spctl';
 import { ILogger } from '../../../common/logger';
 import { IHardwareInfo } from '../offer-builder';
 import { IUsageAnswers, PriceType } from '../questions/types';
-import inquirer from 'inquirer';
 import { slotUsageQuestions } from '../questions/slot.question';
+import { OfferType } from '../types';
+import { toSpctlOfferType } from '../utils';
+import { etherToWei } from '../../../common/utils';
 
 interface ISlotOfferInfo {
   info: IHardwareInfo['slotInfo'];
@@ -27,6 +31,7 @@ const processAutoSlot = async (
     info: value,
     usage: {
       ...answers,
+      price: etherToWei(answers.price.toString()).toString(),
       priceType: answers.priceType ?? PriceType.perHour,
     },
   };
@@ -57,7 +62,7 @@ interface IProcessAutoSlotsParams {
   offerId: string;
   service: ISpctlService;
   logger: ILogger;
-  offerType: SpctlOfferType;
+  offerType: OfferType;
   resources: IHardwareInfo['slotInfo'];
 }
 
@@ -66,7 +71,7 @@ export const process = async (params: IProcessAutoSlotsParams): Promise<void> =>
   let count = 0;
   for (const slot of slots) {
     count++;
-    const data = await processAutoSlot(slot, params.offerType);
+    const data = await processAutoSlot(slot, toSpctlOfferType(params.offerType));
 
     const tmpFileName = Path.join(os.tmpdir(), `${new Date().valueOf()}-slot-info-${count}.json`);
     await writeToFile(tmpFileName, data);
