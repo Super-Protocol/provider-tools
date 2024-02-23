@@ -6,7 +6,7 @@
 # Running the execution controller
 
 ## Option 1: Docker Desktop
-If you have Docker Desktop installed on your Windows 10 system, you can run the execution-controller using the following command:
+If you have Docker Desktop installed on your Windows system, you can run the execution-controller using the following command:
 ```shell
 $ docker-compose up -d
 ```
