@@ -6,7 +6,10 @@ export const removeFileIfExist = (path: string): Promise<void> => {
 };
 
 type WriteToFileSerializer = (content: unknown) => string;
+
 const defaultSerializer: WriteToFileSerializer = (data) => JSON.stringify(data, null, 2);
+export const textSerializer: WriteToFileSerializer = (data) => String(data);
+
 export const writeToFile = async (
   filePath: string,
   content: unknown,

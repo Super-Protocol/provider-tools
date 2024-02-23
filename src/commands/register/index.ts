@@ -12,6 +12,7 @@ import { OfferType } from './types';
 import { generateEnvFile } from './generateEnvFile';
 import { getRunnerAsset } from './utils';
 import { printInstruction } from './printInstuction';
+import { textSerializer, writeToFile } from '../../services/utils/file.utils';
 
 type CommandParams = ConfigCommandParam & {
   backendUrl: string;
@@ -87,10 +88,10 @@ export const RegisterCommand = new Command()
       ];
 
       const outputDirPath = path.resolve(options.output ?? `${offerType}-execution-controller`);
-      await fs.mkdir(outputDirPath, { recursive: true });
 
       for (const file of files) {
-        await fs.writeFile(path.join(outputDirPath, file.name), file.content, 'utf-8');
+        const filePath = path.join(outputDirPath, file.name);
+        await writeToFile(filePath, file.content, textSerializer);
       }
 
       await printInstruction({ outputDirPath });
