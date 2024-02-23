@@ -1,6 +1,7 @@
 import { marked } from 'marked';
 import { markedTerminal } from 'marked-terminal';
 import { getRunnerAsset } from './utils';
+import { supportedPlatform } from '../../services/download/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 marked.use(markedTerminal() as any);
@@ -10,7 +11,6 @@ interface PrintInstructionParams {
 }
 
 const getInstructionFileName = (): string => {
-  const supportedPlatform: NodeJS.Platform[] = ['darwin', 'linux', 'win32'];
   const platform = supportedPlatform.includes(process.platform) ? process.platform : 'linux';
 
   return `${platform}-instruction.md`;
