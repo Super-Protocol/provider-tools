@@ -12,6 +12,7 @@ import { process as processOptions } from './offer-option.processor';
 import { IOfferInfo } from '../offer-builder';
 import { OfferType } from '../types';
 import { toSpctlOfferType } from '../utils';
+import { ProviderValueOffer } from '../../../common/config';
 
 const buildResultPublicKey = (base64EncryptKey: string): { argsPublicKey: string } => {
   const encryption = {
@@ -25,7 +26,7 @@ const buildResultPublicKey = (base64EncryptKey: string): { argsPublicKey: string
 
 type ProcessOfferParams = IManualOfferProcessorParams;
 export const processOffer = async (params: ProcessOfferParams): Promise<string> => {
-  const { config, offerInfo, service, logger, offerType } = params;
+  const { config, offerInfo, service, logger, offerType, resourceFileData } = params;
   const keys = generatePair();
   let offerId = '';
 
@@ -48,7 +49,7 @@ export const processOffer = async (params: ProcessOfferParams): Promise<string> 
     offerId,
     decryptKey: keys.privateKey,
     offerType,
-    resourceFileData: null,
+    resourceFileData,
   });
 
   return offerId;
@@ -60,6 +61,7 @@ interface IManualOfferProcessorParams {
   logger: ILogger;
   offerType: OfferType;
   config: ConfigLoader;
+  resourceFileData: Omit<ProviderValueOffer, 'id'> | null;
 }
 export const process = async (params: IManualOfferProcessorParams): Promise<string> => {
   const offerId = await processOffer(params);

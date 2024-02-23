@@ -4,7 +4,6 @@ import { IRegisterProviderAnswers, ProviderRegisterQuestions } from '../question
 import { ILogger } from '../../../common/logger';
 import { ConfigLoader } from '../../../common/loader.config';
 import { OfferType } from '../types';
-import { toSpctlOfferType } from '../utils';
 import { updateProviderOffers } from './config.utils';
 import { process as processManualOffer } from './manual-offer.processor';
 import { process as processAutoOffer } from './auto-offer.processor';
@@ -26,7 +25,7 @@ export const process = async (params: OfferProcessParams): Promise<string | null
   const questions = ProviderRegisterQuestions.createOffer(
     deployedOfferIds,
     service,
-    toSpctlOfferType(params.offerType),
+    params.offerType,
   );
   const createOfferAnswers = (await inquirer.prompt(questions)) as IRegisterProviderAnswers;
 

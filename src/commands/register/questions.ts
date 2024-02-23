@@ -6,12 +6,13 @@ import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ISpctlService } from '../../services/spctl';
 import util from 'util';
 import { matchKeys } from '../../services/utils/crypto.utils';
-import { SpctlOfferType } from '../../services/spctl';
+import { OfferType } from './types';
+import { toSpctlOfferType } from './utils';
 
 export interface IProviderRegisterQuestions {
   getProviderMetaData: (config?: ProviderInfoConfig) => Question[];
   doYouWantToSaveProvider: Question[];
-  createOffer: (ids: string[], service: ISpctlService, offerType: SpctlOfferType) => Question[];
+  createOffer: (ids: string[], service: ISpctlService, offerType: OfferType) => Question[];
   addSlot: Question[];
   addOption: Question[];
 }
@@ -151,7 +152,7 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
       when: (answers: Answers) => answers.doYouWantToSaveProvider.shouldBeSaved,
     },
   ],
-  createOffer: (ids: string[] = [], service: ISpctlService, offerType: SpctlOfferType) => [
+  createOffer: (ids: string[] = [], service: ISpctlService, offerType: OfferType) => [
     {
       type: 'confirm',
       name: 'createOffer.hasOffer',
@@ -190,7 +191,7 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
           return 'Please specify valid order number (positive integer); ';
         }
         try {
-          const offer = await service.getOfferInfo(offerId, offerType);
+          const offer = await service.getOfferInfo(offerId, toSpctlOfferType(offerType));
           if (!offer) {
             return `Order ${offerId} was not found. Please try to specify another order number: `;
           }
