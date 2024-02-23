@@ -61,7 +61,7 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
       },
       when: (answers?: Answers) =>
         !answers?.account.isAutoGenerationNeeded[accountType] &&
-        answers?.account.needToClearProviderOffers,
+        (answers?.account.needToClearProviderOffers || !config?.account[accountType]),
     },
   ];
 

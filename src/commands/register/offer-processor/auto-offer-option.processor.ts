@@ -8,6 +8,8 @@ import Path from 'path';
 import os from 'os';
 import { removeFileIfExist, writeToFile } from '../../../services/utils/file.utils';
 import { processOption } from './offer-option.processor';
+import { MB_TO_BYTES_MULTIPLIER } from '../../../common/constant';
+import { etherToWei } from '../../../common/utils';
 
 const splitOptions = (resources: IHardwareInfo['optionInfo']): IHardwareInfo['optionInfo'][] => {
   const options: IHardwareInfo['optionInfo'][] = [];
@@ -35,14 +37,21 @@ const processAutoOption = async (value: IHardwareInfo['optionInfo']): Promise<IO
   const answers = (await inquirer.prompt(
     optionQuestions(value).map((q) => ({ ...q, prefix })),
   )) as IOfferOptionAnswers;
+  const convert = (value: number | undefined | null, defaultValue: number): number =>
+    typeof value === 'number' ? value * MB_TO_BYTES_MULTIPLIER : defaultValue;
+
+  const usage = {
+    ...answers.usage,
+    price: etherToWei(answers.usage.price.toString()).toString(),
+  };
 
   return {
     info: {
-      bandwidth: answers.info?.bandwidth ?? value.bandwidth,
-      traffic: answers.info?.traffic ?? value.traffic,
+      bandwidth: convert(answers.info?.bandwidth, value.bandwidth),
+      traffic: convert(answers.info?.traffic, value.traffic),
       externalPort: value.externalPort,
     },
-    usage: answers.usage,
+    usage,
   };
 };
 
