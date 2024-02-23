@@ -9,12 +9,14 @@ import { process as processAutoSlots } from './auto-offer-slot.processor';
 import { process as processAutoOptions } from './auto-offer-option.processor';
 import { OfferType } from '../types';
 import { toSpctlOfferType } from '../utils';
+import { ProviderValueOffer } from '../../../common/config';
 
 interface IAutoOfferProcessorParams {
   config: ConfigLoader;
   logger: ILogger;
   offerType: OfferType;
   service: ISpctlService;
+  resourceFileData: Omit<ProviderValueOffer, 'id'> | null;
 }
 
 export const process = async (params: IAutoOfferProcessorParams): Promise<string> => {
