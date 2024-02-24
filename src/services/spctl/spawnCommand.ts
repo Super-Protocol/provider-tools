@@ -10,8 +10,8 @@ export function spawnCommand(
   const logger = createLogger({
     parentLogger,
     bindings: {
-      command,
-      args: args.join(),
+      exec: command,
+      args: args.join(' '),
       cwd,
       module: 'executeCommand',
     },

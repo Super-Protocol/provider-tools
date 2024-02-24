@@ -11,5 +11,5 @@ export interface ILogger {
   fatal: LogFn;
   audit: LogFn;
 
-  child(bindings: IBindings): ILogger;
+  child(bindings: IBindings, options?: ILoggerOptions): ILogger;
 }
