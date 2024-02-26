@@ -53,7 +53,10 @@ export const hasUpdates = async (
         lastCheckForUpdates: Date.now(),
       },
     });
-  } else if (toolMetadata.lastCheckForUpdates + MILLISECONDS_IN_DAY > Date.now()) {
+  } else if (
+    currentVersion &&
+    toolMetadata.lastCheckForUpdates + MILLISECONDS_IN_DAY > Date.now()
+  ) {
     return {
       hasNewVersion: false,
       version: currentVersion,
