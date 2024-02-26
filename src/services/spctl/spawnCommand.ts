@@ -26,7 +26,7 @@ export function spawnCommand(
   });
 
   childProcess.stderr.on('data', (data: Buffer) => {
-    logger.error(`stderr: ${data.toString()}`);
+    logger.trace(`stderr: ${data.toString()}`);
     stderr.push(data);
   });
 

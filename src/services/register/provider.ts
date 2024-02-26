@@ -8,6 +8,7 @@ import { createWallet } from '../utils/wallet.utils';
 import { AccountConfig } from '../../common/config';
 import { ILogger } from '../../common/logger';
 import { IProvider } from '../spctl/types';
+import { CreateProviderError, ReplenishAccountBalanceError } from './errors';
 
 export type RegisterProviderParams = {
   logger?: ILogger;
@@ -29,19 +30,23 @@ const needReplenish = async (
 };
 
 const createProvider = async (params: RegisterProviderParams): Promise<IProvider> => {
-  const timestamp = new Date().toISOString();
-  const provider: IProvider = {
-    name: params.providerName ?? `${timestamp} - auto generated provider by ${APP_NAME}`,
-    description: params.providerDescription ?? '',
-    tokenReceiver: createWallet(params.accounts.tokenReceiver).address,
-    actionAccount: createWallet(params.accounts.action).address,
-    metadata: '',
-  };
+  try {
+    const timestamp = new Date().toISOString();
+    const provider: IProvider = {
+      name: params.providerName ?? `${timestamp} - auto generated provider by ${APP_NAME}`,
+      description: params.providerDescription ?? '',
+      tokenReceiver: createWallet(params.accounts.tokenReceiver).address,
+      actionAccount: createWallet(params.accounts.action).address,
+      metadata: '',
+    };
 
-  const fileName = `provider_${timestamp}.json`;
-  await params.service.createProvider(fileName, provider);
+    const fileName = `provider_${timestamp}.json`;
+    await params.service.createProvider(fileName, provider);
 
-  return provider;
+    return provider;
+  } catch (err) {
+    throw new CreateProviderError('Failed to create provider', err as Error);
+  }
 };
 
 export const getProvider = async (
@@ -56,11 +61,15 @@ export const getProvider = async (
 export const registerProvider = async (params: RegisterProviderParams): Promise<IProvider> => {
   const { service } = params;
   const replenishAccountBalance = async (pk: string): Promise<void> => {
-    const needs = await needReplenish(service, pk);
-    await service.requestTokens({
-      ...needs,
-      account4Replenish: pk,
-    });
+    try {
+      const needs = await needReplenish(service, pk);
+      await service.requestTokens({
+        ...needs,
+        account4Replenish: pk,
+      });
+    } catch (err) {
+      throw new ReplenishAccountBalanceError('Failed to replenish account balance', err as Error);
+    }
   };
 
   await Promise.all([
