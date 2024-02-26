@@ -74,7 +74,6 @@ export const RegisterCommand = new Command()
           content: await generateEnvFile({
             config,
             offerType,
-            service,
           }),
         },
         {
