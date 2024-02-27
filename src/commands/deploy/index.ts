@@ -8,7 +8,10 @@ import { DeployQuestions, IDeployAnswers } from './questions';
 import { SshConfig } from '../../common/config';
 import { createSshService } from '../../services/ssh';
 import path from 'path';
-import { DEFAULT_DEPLOY_DESTINATION_FOLDER_PATH } from '../../common/constant';
+import {
+  DEFAULT_DEPLOY_DESTINATION_FOLDER_PATH,
+  DEFAULT_DESTINATION_DEPLOY_CONFIG_FILE_NAME,
+} from '../../common/constant';
 
 type CommandParams = ConfigCommandParam & {
   tee: boolean;
@@ -70,8 +73,10 @@ export const DeployCommand = new Command()
 
     try {
       const source = path.resolve(options.path);
-      const filename = path.basename(source);
-      const destination = path.join(DEFAULT_DEPLOY_DESTINATION_FOLDER_PATH, filename);
+      const destination = path.join(
+        DEFAULT_DEPLOY_DESTINATION_FOLDER_PATH,
+        DEFAULT_DESTINATION_DEPLOY_CONFIG_FILE_NAME,
+      );
       await service.copyFile(source, destination);
       logger.info(`${options.path} was coped to the remote host`);
     } catch (err) {
