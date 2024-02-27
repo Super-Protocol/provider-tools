@@ -11,7 +11,7 @@ export const toSpctlOfferType = (offerType: OfferType): SpctlOfferType => {
   return 'value';
 };
 
-export const getRunnerAssetsPath = (): string => {
+const getRunnerAssetsPath = (): string => {
   return path.resolve(__dirname, '..', '..', '..', 'runner-assets');
 };
 

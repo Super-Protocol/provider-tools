@@ -10,9 +10,10 @@ import processProvider from './provider.processor';
 import buildDeployConfig from './deploy-config-builder';
 import { OfferType } from './types';
 import { generateEnvFile } from './generateEnvFile';
-import { getRunnerAsset } from './utils';
 import { printInstruction } from './printInstuction';
 import { textSerializer, writeToFile } from '../../services/utils/file.utils';
+import axios, { AxiosError } from 'axios';
+import { DOCKER_COMPOSE_URL, RUNNER_SH_URL } from '../../common/constant';
 
 type CommandParams = ConfigCommandParam & {
   backendUrl: string;
@@ -68,22 +69,34 @@ export const RegisterCommand = new Command()
     }
 
     if (offerType === 'data' || offerType === 'solution') {
+      const downloadFile = async (url: string): Promise<string> => {
+        try {
+          const res = await axios.get(url);
+          return res.data;
+        } catch (err) {
+          throw new Error(
+            `Failed to download the file from the provided URL: ${url}. The server responded with the following error: ${
+              (err as AxiosError).response?.data || (err as Error).message
+            }`,
+          );
+        }
+      };
+
       const files = [
         {
           name: '.env',
           content: await generateEnvFile({
             config,
             offerType,
-            service,
           }),
         },
         {
           name: 'docker-compose.yaml',
-          content: await getRunnerAsset('docker-compose.yaml'),
+          content: await downloadFile(DOCKER_COMPOSE_URL),
         },
         {
           name: 'runner.sh',
-          content: await getRunnerAsset('runner.sh'),
+          content: await downloadFile(RUNNER_SH_URL),
         },
       ];
 

@@ -45,3 +45,9 @@ export const DEFAULT_DEPLOY_DESTINATION_FOLDER_PATH = '/sp/manifests';
 export const DEFAULT_DESTINATION_DEPLOY_CONFIG_FILE_NAME =
   'configmap.execution-controller-tee-prov.yaml';
 export const MB_TO_BYTES_MULTIPLIER = 1000000;
+export const RUNNER_SH_URL =
+  process.env.RUNNER_SH_URL ||
+  'https://raw.githubusercontent.com/Super-Protocol/provider-tools/main/runner-assets/runner.sh';
+export const DOCKER_COMPOSE_URL =
+  process.env.DOCKER_COMPOSE_URL ||
+  'https://raw.githubusercontent.com/Super-Protocol/provider-tools/main/runner-assets/docker-compose.yaml';
