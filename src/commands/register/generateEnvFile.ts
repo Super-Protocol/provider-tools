@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ConfigLoader } from '../../common/loader.config';
+import { createWallet } from '../../services/utils/wallet.utils';
 import { getConfigOffersSection } from './offer-processor/config.utils';
 import { OfferType } from './types';
 
@@ -94,7 +95,7 @@ export const generateEnvFile = async (params: GenereteEnvFileParams): Promise<st
     offers,
     offerType,
     contractAddress: spctl.blockchain.smartContractAddress,
-    authorityAddress: account.authority,
+    authorityAddress: createWallet(account.authority).address,
     actionAccountKey: account.action,
   });
 
