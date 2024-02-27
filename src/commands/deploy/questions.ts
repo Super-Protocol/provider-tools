@@ -8,7 +8,6 @@ export interface IDeployQuestions {
 
 export interface IDeployAnswers extends Answers {
   giveUsSshConnectionInfo: {
-    hasSshKey: boolean;
     pathToPrivateKey: string;
     user: string;
     port: string;
@@ -19,18 +18,9 @@ export interface IDeployAnswers extends Answers {
 export const DeployQuestions: IDeployQuestions = {
   giveUsSshConnectionInfo: (config?: SshConfig): Question[] => [
     {
-      type: 'confirm',
-      name: 'giveUsSshConnectionInfo.hasSshKey',
-      message:
-        'Could you please provide us with your SSH key for connecting to the remote server in the TEE environment? ' +
-        "This would enable us to automatically determine offer's slots' requirements (such as RAM, disk space, network limits, etc.)",
-      default: true,
-      when: () => !config?.pathToPrivateKey,
-    },
-    {
       type: 'input',
       name: 'giveUsSshConnectionInfo.pathToPrivateKey',
-      message: 'Please specify your ssh private key: ',
+      message: 'Please specify the path to the file with your ssh private key: ',
       default: config?.pathToPrivateKey,
       validate: (value: string): string | boolean => {
         if (!fs.existsSync(value)) {

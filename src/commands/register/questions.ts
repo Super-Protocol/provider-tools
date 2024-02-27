@@ -121,7 +121,7 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
     {
       type: 'confirm',
       name: 'doYouWantToSaveProvider.shouldBeSaved',
-      message: 'Do you want to save provider info into the file?',
+      message: 'Do you want to save provider info into a file?',
       default: false,
     },
     {
