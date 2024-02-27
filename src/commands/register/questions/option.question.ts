@@ -20,7 +20,7 @@ export const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] 
   {
     type: 'number',
     name: 'info.traffic',
-    message: 'Please adjust the traffic value if necessary ( in Mbps):',
+    message: 'Please adjust the traffic value if necessary ( in Mb):',
     validate: nonNegativeNumberValidator,
     default: Math.floor(optionInfo.traffic / MB_TO_BYTES_MULTIPLIER),
     when: (_answers: IOfferOptionAnswers): boolean => !optionInfo.externalPort,
