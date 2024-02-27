@@ -42,4 +42,6 @@ export const DEFAULT_DEPLOY_CONFIG_FILE_NAME = 'deploy-config.yaml';
 export const DEPLOY_CONFIG_PROVIDER_OFFER_DEVICE_ID = '{{ device-id }}';
 export const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
 export const DEFAULT_DEPLOY_DESTINATION_FOLDER_PATH = '/sp/manifests';
+export const DEFAULT_DESTINATION_DEPLOY_CONFIG_FILE_NAME =
+  'configmap.execution-controller-tee-prov.yaml';
 export const MB_TO_BYTES_MULTIPLIER = 1000000;
