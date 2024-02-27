@@ -22,7 +22,6 @@ export default async (params: DeployConfigBuilderParams): Promise<string> => {
   const deploy = { ...deployConfig };
   deploy.data.PROVIDER_ACTION_ACCOUNT_KEY = actions.action;
   deploy.data.PROVIDER_AUTH_ADDRESS = createWallet(actions.authority).address;
-  deploy.data.PROVIDER_PRIVATE_KEY = actions.authority;
   deploy.data.PROVIDER_OFFERS_JSON = config
     .loadSection('providerOffers')
     .map((providerOffer: ProviderOffer) => ({

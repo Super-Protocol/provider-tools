@@ -9,6 +9,5 @@ export const deployConfig = {
         deviceId: '{{ device-id }}',
       },
     ],
-    PROVIDER_PRIVATE_KEY: '{{ authority-account-private-key }}',
   },
 };
