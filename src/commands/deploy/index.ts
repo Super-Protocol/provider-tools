@@ -121,11 +121,7 @@ export const DeployCommand = new Command()
         });
 
         filteredResult = result.filter((r) => !predicateItemFn(r));
-        logger.debug(
-          `time: ${new Date().toISOString()} -> ${ids.length}/${
-            offerIds.length
-          } are waiting...${ids.join()}`,
-        );
+        logger.debug(`${ids.join()} offer(s) still not ready - ${ids.length}/${offerIds.length}`);
 
         return result;
       };
@@ -145,6 +141,6 @@ export const DeployCommand = new Command()
       if (err instanceof RetryByConditionError) {
         return logger.warn('Your offers are not ready yet. Please try again');
       }
-      return logger.error({ err }, `Failed on waiting for offers' readiness`);
+      return logger.error({ err }, `Failed while waiting for offers' readiness`);
     }
   });
