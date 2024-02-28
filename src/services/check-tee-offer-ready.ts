@@ -34,17 +34,10 @@ export const checkTeeOffersReady = async (params: {
     ),
   );
 
-  return result.map((result, index): CheckTeeOffersReadyItemResult => {
-    if (result.status === 'fulfilled') {
-      return {
-        id: offerIds[index],
-        ready: Boolean(result.value),
-      };
-    } else {
-      return {
-        id: offerIds[index],
-        ready: false,
-      };
-    }
-  });
+  return result.map(
+    (result, index): CheckTeeOffersReadyItemResult => ({
+      id: offerIds[index],
+      ready: result.status === 'fulfilled' ? Boolean(result.value) : false,
+    }),
+  );
 };
