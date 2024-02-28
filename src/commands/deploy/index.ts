@@ -30,7 +30,6 @@ type CommandParams = ConfigCommandParam & {
 };
 
 const COMMAND_NAME = 'deploy';
-const logger = createLogger().child({ command: COMMAND_NAME });
 
 const updatedSshConfig = (
   answers: Partial<IDeployAnswers['giveUsSshConnectionInfo']> = {},
@@ -71,12 +70,16 @@ export const DeployCommand = new Command()
   .requiredOption('--tee', 'specified type of provider', false)
   .requiredOption('--path <deploy-config.yaml>', 'path to deploy config file')
   .action(async (options: CommandParams): Promise<void> => {
+    const config = new ConfigLoader(options.config);
+    const logger = createLogger({
+      options: config.loadSection('logger'),
+      bindings: { command: COMMAND_NAME },
+    });
     if (!options.tee) {
       return logger.error(
         'At least one of supported provider types should be specified. Please try to run command again and have specified the "--tee" param.',
       );
     }
-    const config = new ConfigLoader(options.config);
 
     await prepareSshConfig(config);
 

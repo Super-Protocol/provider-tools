@@ -24,7 +24,6 @@ type CommandParams = ConfigCommandParam & {
 };
 
 const COMMAND_NAME = 'register';
-const logger = createLogger().child({ command: COMMAND_NAME });
 
 export const RegisterCommand = new Command()
   .name(COMMAND_NAME)
@@ -39,11 +38,15 @@ export const RegisterCommand = new Command()
   .option('--blockchain-url <url>', 'blockchain url')
   .option('--contract-address <address>', 'contract address')
   .action(async (offerType: OfferType, options: CommandParams): Promise<void> => {
+    const config = new ConfigLoader(options.config);
+    const logger = createLogger({
+      options: config.loadSection('logger'),
+      bindings: { command: COMMAND_NAME },
+    });
+
     if (offerType !== 'tee' && !options.result) {
       return logger.info(`required option '--result <resultPath>' is not specified`);
     }
-
-    const config = new ConfigLoader(options.config);
     const service = await createSpctlService({
       logger,
       config,
