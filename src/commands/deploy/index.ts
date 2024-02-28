@@ -86,7 +86,7 @@ export const DeployCommand = new Command()
     const offerIds = config.loadSection('providerOffers').map((item) => item.id);
     if (!offerIds.length) {
       return logger.warn(
-        `Your config "${options.config}" has not any provider's offer. The program will be closed. Before running current command please try to run "register" command.`,
+        `Your config "${options.config}" doesn't have any provider's offer. The program will be closed. Before running current command please try to run "register" command.`,
       );
     }
 
@@ -104,7 +104,7 @@ export const DeployCommand = new Command()
       return logger.error({ err }, `Copy file ${options.path} was failed`);
     }
 
-    logger.info("Waiting offers' readiness...");
+    logger.info("Waiting for offers' readiness...");
 
     const spctlService = await createSpctlService({ logger, config });
     try {
@@ -131,7 +131,7 @@ export const DeployCommand = new Command()
       };
       const sleepFn = sleepExpFn(3 * DEFAULT_SLEEP_INTERVAL, DEFAULT_SLEEP_MULTIPLIER);
       const errorLoggerFn = (err: Error, attemptNumber: number): void =>
-        logger.error({ err }, `waiting offers' readiness: attempt ${attemptNumber} is failed`);
+        logger.error({ err }, `waiting for offers' readiness: attempt ${attemptNumber} is failed`);
 
       await retryByCondition({
         method,
@@ -145,6 +145,6 @@ export const DeployCommand = new Command()
       if (err instanceof RetryByConditionError) {
         return logger.warn('Your offers are not ready yet. Please try again');
       }
-      return logger.error({ err }, `Failed to wait offers' readiness`);
+      return logger.error({ err }, `Failed on waiting for offers' readiness`);
     }
   });
