@@ -10,11 +10,13 @@ jobs:
       matrix:
         include:
           - os: macos-12 # Intel Mac
-            output: spctl-macos-x64
+            output: provider-tools-macos-x64
           - os: ubuntu-20.04
-            output: spctl-linux-x64
+            output: provider-tools-linux-x64
           - os: macos-14 # M1 Mac
-            output: spctl-macos-arm64
+            output: provider-tools-macos-arm64
+          - os: windows-latest
+            output: provider-tools-win-x64
     steps:
     - name: Checkout 🛎️
       uses: actions/checkout@v4
@@ -24,13 +26,18 @@ jobs:
       uses: ./.github/actions/install-dependencies
     - name: Build binary
       run: |
-          npm run build
+        npm run build
+        if [ "${{ matrix.os }}" == "windows-latest" ]; then
+          mv ./dist/provider_tools.exe ./dist/${{ matrix.output }}
+        else
           mv ./dist/provider_tools ./dist/${{ matrix.output }}
+        fi
+      shell: bash
     - name: "Save build results for release job"
       uses: actions/upload-artifact@v2
       with:
         name: release
-        path: dist/spctl-*
+        path: dist/provider-tools-*
         retention-days: 1
 
   create-release:
@@ -45,6 +52,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            spctl-macos-x64
-            spctl-linux-x64
-            spctl-macos-arm64
+            provider-tools-macos-x64
+            provider-tools-linux-x64
+            provider-tools-macos-arm64
+            provider-tools-win-x64

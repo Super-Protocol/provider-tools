@@ -18,13 +18,20 @@ node_modules
 # dotenv environment variables file
 .env
 
+config.json
+deploy-config.yaml
+
 # build output
 build
 dist
 tool
+coverage
+configs
 
 # TypeScript cache
 *.tsbuildinfo
 
 # Temporally directory
 tmp
+
+runner-artifacts
