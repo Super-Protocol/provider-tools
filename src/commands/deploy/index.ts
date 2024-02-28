@@ -11,7 +11,18 @@ import path from 'path';
 import {
   DEFAULT_DEPLOY_DESTINATION_FOLDER_PATH,
   DEFAULT_DESTINATION_DEPLOY_CONFIG_FILE_NAME,
+  DEFAULT_SLEEP_INTERVAL,
+  DEFAULT_SLEEP_MULTIPLIER,
+  DEFAULT_RETRY_COUNT,
 } from '../../common/constant';
+import { retryByCondition, RetryByConditionError } from '../../services/utils/retry.utils';
+import {
+  checkTeeOffersReady,
+  CheckTeeOffersReadyItemResult,
+  CheckTeeOffersReadyResult,
+} from '../../services/check-tee-offer-ready';
+import { createSpctlService } from '../../services/spctl';
+import { sleepExpFn } from '../../services/utils/timer.utils';
 
 type CommandParams = ConfigCommandParam & {
   tee: boolean;
@@ -69,7 +80,14 @@ export const DeployCommand = new Command()
 
     await prepareSshConfig(config);
 
-    const service = await createSshService({ config });
+    const offerIds = config.loadSection('providerOffers').map((item) => item.id);
+    if (!offerIds.length) {
+      return logger.warn(
+        `Your config "${options.config}" has not any provider's offer. The program will be closed. Before running current command please try to run "register" command.`,
+      );
+    }
+
+    const sshService = await createSshService({ config });
 
     try {
       const source = path.resolve(options.path);
@@ -77,9 +95,53 @@ export const DeployCommand = new Command()
         DEFAULT_DEPLOY_DESTINATION_FOLDER_PATH,
         DEFAULT_DESTINATION_DEPLOY_CONFIG_FILE_NAME,
       );
-      await service.copyFile(source, destination);
+      await sshService.copyFile(source, destination);
       logger.info(`${options.path} was coped to the remote host`);
     } catch (err) {
-      logger.error({ err }, `Copy file ${options.path} was failed`);
+      return logger.error({ err }, `Copy file ${options.path} was failed`);
+    }
+
+    logger.info("Waiting offers' readiness...");
+
+    const spctlService = await createSpctlService({ logger, config });
+    try {
+      const predicateItemFn = (value: CheckTeeOffersReadyItemResult): boolean => value.ready;
+      const predicateFn = (value: CheckTeeOffersReadyResult): boolean =>
+        value.every(predicateItemFn);
+      let filteredResult: CheckTeeOffersReadyResult | null = null;
+      const method = async (): Promise<CheckTeeOffersReadyResult> => {
+        const ids = filteredResult ? filteredResult.map((r) => r.id) : offerIds;
+        const result = await checkTeeOffersReady({
+          offerIds: ids,
+          service: spctlService,
+          logger,
+        });
+
+        filteredResult = result.filter((r) => !predicateItemFn(r));
+        logger.debug(
+          `time: ${new Date().toISOString()} -> ${ids.length}/${
+            offerIds.length
+          } are waiting...${ids.join()}`,
+        );
+
+        return result;
+      };
+      const sleepFn = sleepExpFn(3 * DEFAULT_SLEEP_INTERVAL, DEFAULT_SLEEP_MULTIPLIER);
+      const errorLoggerFn = (err: Error, attemptNumber: number): void =>
+        logger.error({ err }, `waiting offers' readiness: attempt ${attemptNumber} is failed`);
+
+      await retryByCondition({
+        method,
+        retryCount: 5 * DEFAULT_RETRY_COUNT,
+        sleepFn,
+        predicateFn,
+        errorLoggerFn,
+      });
+      logger.info(`Your offers [${offerIds.join()}] are ready to use.`);
+    } catch (err) {
+      if (err instanceof RetryByConditionError) {
+        return logger.warn('Your offers are not ready yet. Please try again');
+      }
+      return logger.error({ err }, `Failed to wait offers' readiness`);
     }
   });

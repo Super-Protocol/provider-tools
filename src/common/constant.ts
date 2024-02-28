@@ -51,4 +51,6 @@ export const RUNNER_SH_URL =
 export const DOCKER_COMPOSE_URL =
   process.env.DOCKER_COMPOSE_URL ||
   'https://raw.githubusercontent.com/Super-Protocol/provider-tools/main/runner-assets/docker-compose.yaml';
+export const DEFAULT_SLEEP_INTERVAL = 1000;
+export const DEFAULT_SLEEP_MULTIPLIER = 2;
 export const DEFAULT_RETRY_COUNT = 5;
