@@ -1,5 +1,4 @@
 import { Command, Argument } from 'commander';
-import fs from 'fs/promises';
 import fsExtra from 'fs-extra';
 import path from 'path';
 import { ConfigCommandParam } from '../types';
@@ -12,7 +11,7 @@ import buildDeployConfig from './deploy-config-builder';
 import { OfferType } from './types';
 import { generateEnvFile } from './generateEnvFile';
 import { printInstruction } from './printInstuction';
-import { textSerializer, writeToFile } from '../../services/utils/file.utils';
+import { readJsonFile, textSerializer, writeToFile } from '../../services/utils/file.utils';
 import axios, { AxiosError } from 'axios';
 import {
   CONFIG_DEFAULT_FILENAME,
@@ -21,7 +20,7 @@ import {
   SPCTL_SUFFIX,
   TOOL_DIRECTORY_PATH,
 } from '../../common/constant';
-import { KnownTool } from '../../common/config';
+import { KnownTool, ProviderValueOffer } from '../../common/config';
 
 type CommandParams = ConfigCommandParam & {
   backendUrl: string;
@@ -63,7 +62,7 @@ export const RegisterCommand = new Command()
       contractAddress: options.contractAddress,
     });
     const resourceFileData = options.result
-      ? JSON.parse(await fs.readFile(options.result, 'utf-8'))
+      ? ((await readJsonFile(options.result)) as Omit<ProviderValueOffer, 'id'>)
       : null;
 
     await processProvider({ config, service, logger });
