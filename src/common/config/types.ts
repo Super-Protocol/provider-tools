@@ -59,6 +59,7 @@ export const SpctlConfigSchema = z.object({
     }),
   }),
   tii: z.object({ pccsServiceApiUrl: z.string().default(SPCTL_PCCS_SERVICE_DEFAULT) }).default({}),
+  metadata: z.object({ lastCheckForUpdates: z.number().optional() }).optional(),
 });
 export type SpctlConfig = z.infer<typeof SpctlConfigSchema>;
 
