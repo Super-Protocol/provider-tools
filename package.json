@@ -66,9 +66,7 @@
     "assets": [
       "config.example.json",
       "node_modules/axios/**/*",
-      "runner-assets/darwin-instruction.md",
-      "runner-assets/win32-instruction.md",
-      "runner-assets/linux-instruction.md"
+      "runner-assets/*.md"
     ]
   },
   "dependencies": {
