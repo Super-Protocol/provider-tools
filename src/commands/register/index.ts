@@ -1,5 +1,6 @@
 import { Command, Argument } from 'commander';
 import fs from 'fs/promises';
+import fsExtra from 'fs-extra';
 import path from 'path';
 import { ConfigCommandParam } from '../types';
 import { createSpctlService } from '../../services/spctl';
@@ -13,7 +14,14 @@ import { generateEnvFile } from './generateEnvFile';
 import { printInstruction } from './printInstuction';
 import { textSerializer, writeToFile } from '../../services/utils/file.utils';
 import axios, { AxiosError } from 'axios';
-import { DOCKER_COMPOSE_URL, RUNNER_SH_URL } from '../../common/constant';
+import {
+  CONFIG_DEFAULT_FILENAME,
+  DOCKER_COMPOSE_URL,
+  RUNNER_SH_URL,
+  SPCTL_SUFFIX,
+  TOOL_DIRECTORY_PATH,
+} from '../../common/constant';
+import { KnownTool } from '../../common/config';
 
 type CommandParams = ConfigCommandParam & {
   backendUrl: string;
@@ -99,7 +107,10 @@ export const RegisterCommand = new Command()
         },
         {
           name: 'runner.sh',
-          content: await downloadFile(RUNNER_SH_URL),
+          content: (await downloadFile(RUNNER_SH_URL)).replaceAll(
+            './tool/spctl',
+            `./tool/spctl${SPCTL_SUFFIX}`,
+          ),
         },
       ];
 
@@ -109,6 +120,19 @@ export const RegisterCommand = new Command()
         const filePath = path.join(outputDirPath, file.name);
         await writeToFile(filePath, file.content, textSerializer);
       }
+
+      const spctlFileName = `${KnownTool.SPCTL}${SPCTL_SUFFIX}`;
+      const spctlConfigName = path.basename(CONFIG_DEFAULT_FILENAME);
+      const toolDirName = path.basename(TOOL_DIRECTORY_PATH);
+
+      const spctlDestination = path.resolve(TOOL_DIRECTORY_PATH, spctlFileName);
+      const spctlConfigDestination = path.resolve(TOOL_DIRECTORY_PATH, spctlConfigName);
+
+      await fsExtra.copy(spctlDestination, path.join(outputDirPath, toolDirName, spctlFileName));
+      await fsExtra.copy(
+        spctlConfigDestination,
+        path.join(outputDirPath, toolDirName, spctlConfigName),
+      );
 
       await printInstruction({ outputDirPath });
     }
