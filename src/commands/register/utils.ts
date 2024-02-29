@@ -12,7 +12,10 @@ export const toSpctlOfferType = (offerType: OfferType): SpctlOfferType => {
 };
 
 const getRunnerAssetsPath = (): string => {
-  return path.resolve(__dirname, '..', '..', '..', 'runner-assets');
+  const level = process.env.NODE_ENV === 'development' ? 3 : 4;
+  const subpath = '..,'.repeat(level).split(',').filter(Boolean);
+
+  return path.resolve(__dirname, ...subpath, 'runner-assets');
 };
 
 export const getRunnerAsset = (assetName: string): Promise<string> => {
