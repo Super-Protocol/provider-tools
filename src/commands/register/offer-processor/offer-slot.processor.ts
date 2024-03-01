@@ -2,7 +2,7 @@ import inquirer from 'inquirer';
 
 import { ISpctlService } from '../../../services/spctl';
 import { ILogger } from '../../../common/logger';
-import { IRegisterProviderAnswers, ProviderRegisterQuestions } from '../questions';
+import { addSlotQuestions, IAddSlotAnswers } from '../questions/slot.question';
 import { toSpctlOfferType } from '../utils';
 import { OfferType } from '../types';
 
@@ -12,6 +12,7 @@ interface IProcessSlotParams {
   logger: ILogger;
   offerType: OfferType;
   pathToSlotInfo: string;
+  offerSlotIds?: string[];
 }
 
 export const processSlot = async (params: IProcessSlotParams): Promise<void> => {
@@ -25,18 +26,20 @@ export const process = async (
 ): Promise<void> => {
   const ask = async (): Promise<void> => {
     const createSlotAnswers = (await inquirer.prompt(
-      ProviderRegisterQuestions.addSlot,
-    )) as IRegisterProviderAnswers;
+      addSlotQuestions(params.offerSlotIds),
+    )) as IAddSlotAnswers;
 
-    try {
-      await processSlot({ ...params, pathToSlotInfo: createSlotAnswers.addSlot.slotInfo });
-    } catch (err) {
-      params.logger.error({ err }, 'Failed on add slot');
-      await ask();
-    }
+    if (createSlotAnswers.needSlot || !params.offerSlotIds?.length) {
+      try {
+        await processSlot({ ...params, pathToSlotInfo: createSlotAnswers.slotInfo });
+      } catch (err) {
+        params.logger.error({ err }, 'Failed on add slot');
+        await ask();
+      }
 
-    if (createSlotAnswers.addSlot.anymore) {
-      await ask();
+      if (createSlotAnswers.anymore) {
+        await ask();
+      }
     }
   };
 

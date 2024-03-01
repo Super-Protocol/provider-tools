@@ -1,13 +1,14 @@
 import { ISpctlService } from '../../../services/spctl';
 import { ILogger } from '../../../common/logger';
 import inquirer from 'inquirer';
-import { IRegisterProviderAnswers, ProviderRegisterQuestions } from '../questions';
+import { addOptionQuestions, IAddOptionAnswers } from '../questions/option.question';
 
 interface IProcessOptionParams {
   offerId: string;
   service: ISpctlService;
   logger: ILogger;
   pathToOption: string;
+  offerOptionsIds?: string[];
 }
 
 export const processOption = async (params: IProcessOptionParams): Promise<void> => {
@@ -21,18 +22,20 @@ export const process = async (
 ): Promise<void> => {
   const ask = async (): Promise<void> => {
     const createOptionAnswers = (await inquirer.prompt(
-      ProviderRegisterQuestions.addOption,
-    )) as IRegisterProviderAnswers;
+      addOptionQuestions(params.offerOptionsIds),
+    )) as IAddOptionAnswers;
 
-    try {
-      await processOption({ ...params, pathToOption: createOptionAnswers.addOption.optionInfo });
-    } catch (err) {
-      params.logger.error({ err }, 'Failed on add option');
-      await ask();
-    }
+    if (createOptionAnswers.needOption || !params.offerOptionsIds?.length) {
+      try {
+        await processOption({ ...params, pathToOption: createOptionAnswers.optionInfo });
+      } catch (err) {
+        params.logger.error({ err }, 'Failed on add option');
+        await ask();
+      }
 
-    if (createOptionAnswers.addOption.anymore) {
-      await ask();
+      if (createOptionAnswers.anymore) {
+        await ask();
+      }
     }
   };
 

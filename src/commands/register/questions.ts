@@ -13,55 +13,7 @@ export interface IProviderRegisterQuestions {
   getProviderMetaData: (config?: ProviderInfoConfig) => Question[];
   doYouWantToSaveProvider: Question[];
   createOffer: (service: ISpctlService, offerType: OfferType) => Question[];
-  addSlot: Question[];
-  addOption: Question[];
 }
-
-const addSlotQuestions: Question[] = [
-  {
-    type: 'input',
-    name: 'addSlot.slotInfo',
-    askAnswered: true,
-    message: 'Please specify a path to the slot info json file: ',
-    validate(fileName: string): boolean | string {
-      if (!fs.existsSync(fileName)) {
-        return 'File not found, please specify it again: ';
-      }
-
-      return true;
-    },
-  },
-  {
-    type: 'confirm',
-    name: 'addSlot.anymore',
-    askAnswered: true,
-    default: false,
-    message: 'Do you want to add another slot?',
-  },
-];
-
-const addOptionQuestions: Question[] = [
-  {
-    type: 'input',
-    name: 'addOption.optionInfo',
-    askAnswered: true,
-    message: 'Please specify a path to the option info json file: ',
-    validate(fileName: string): boolean | string {
-      if (!fs.existsSync(fileName)) {
-        return 'File not found, please specify it again: ';
-      }
-
-      return true;
-    },
-  },
-  {
-    type: 'confirm',
-    name: 'addOption.anymore',
-    askAnswered: true,
-    default: false,
-    message: 'Do you want to add another option?',
-  },
-];
 
 export interface IRegisterProviderAnswers {
   getProviderMetaData: {
@@ -79,10 +31,6 @@ export interface IRegisterProviderAnswers {
     offerId: string;
     publicKey?: string;
     pk: string;
-  };
-  addSlot: {
-    slotInfo: string;
-    anymore: boolean;
   };
   addOption: {
     optionInfo: string;
@@ -226,6 +174,4 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
       },
     },
   ],
-  addSlot: addSlotQuestions,
-  addOption: addOptionQuestions,
 };

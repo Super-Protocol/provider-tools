@@ -10,6 +10,10 @@ import { process as processAutoOffer } from './auto-offer.processor';
 import { readJsonFile } from '../../../services/utils/file.utils';
 import { IOfferInfo } from '../offer-builder';
 import { ProviderValueOffer } from '../../../common/config';
+import { toSpctlOfferType } from '../utils';
+import { process as processSlots } from './offer-slot.processor';
+import { process as processOptions } from './offer-option.processor';
+import { ITeeOffer } from '../../../services/spctl/types';
 
 interface OfferProcessParams {
   config: ConfigLoader;
@@ -40,6 +44,19 @@ export const process = async (params: OfferProcessParams): Promise<string | null
     createOfferAnswers.createOffer.pk
   ) {
     const offerId = createOfferAnswers.createOffer.offerId;
+    const offerSlotAndOptionInfo = await service.getSlotAndOptionIdsByOfferId(
+      offerId,
+      toSpctlOfferType(params.offerType),
+    );
+    await processSlots({ ...params, offerId, offerSlotIds: offerSlotAndOptionInfo?.slots });
+
+    if (params.offerType === 'tee') {
+      await processOptions({
+        ...params,
+        offerId,
+        offerOptionsIds: (offerSlotAndOptionInfo as ITeeOffer)?.options,
+      });
+    }
     updateProviderOffers({
       config,
       offerId,
