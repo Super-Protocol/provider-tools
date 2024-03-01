@@ -24,7 +24,12 @@ export const process = async (
       ProviderRegisterQuestions.addOption,
     )) as IRegisterProviderAnswers;
 
-    await processOption({ ...params, pathToOption: createOptionAnswers.addOption.optionInfo });
+    try {
+      await processOption({ ...params, pathToOption: createOptionAnswers.addOption.optionInfo });
+    } catch (err) {
+      params.logger.error({ err }, 'Failed on add option');
+      await ask();
+    }
 
     if (createOptionAnswers.addOption.anymore) {
       await ask();

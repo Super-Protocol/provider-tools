@@ -28,7 +28,12 @@ export const process = async (
       ProviderRegisterQuestions.addSlot,
     )) as IRegisterProviderAnswers;
 
-    await processSlot({ ...params, pathToSlotInfo: createSlotAnswers.addSlot.slotInfo });
+    try {
+      await processSlot({ ...params, pathToSlotInfo: createSlotAnswers.addSlot.slotInfo });
+    } catch (err) {
+      params.logger.error({ err }, 'Failed on add slot');
+      await ask();
+    }
 
     if (createSlotAnswers.addSlot.anymore) {
       await ask();
