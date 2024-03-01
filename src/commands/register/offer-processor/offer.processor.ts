@@ -21,12 +21,7 @@ interface OfferProcessParams {
 
 export const process = async (params: OfferProcessParams): Promise<string | null> => {
   const { config, service } = params;
-  const deployedOfferIds = config.loadSection('providerOffers').map((item) => item.id);
-  const questions = ProviderRegisterQuestions.createOffer(
-    deployedOfferIds,
-    service,
-    params.offerType,
-  );
+  const questions = ProviderRegisterQuestions.createOffer(service, params.offerType);
   const createOfferAnswers = (await inquirer.prompt(questions)) as IRegisterProviderAnswers;
 
   if (!createOfferAnswers.createOffer.auto && createOfferAnswers.createOffer.offerInfo) {

@@ -12,7 +12,7 @@ import { toSpctlOfferType } from './utils';
 export interface IProviderRegisterQuestions {
   getProviderMetaData: (config?: ProviderInfoConfig) => Question[];
   doYouWantToSaveProvider: Question[];
-  createOffer: (ids: string[], service: ISpctlService, offerType: OfferType) => Question[];
+  createOffer: (service: ISpctlService, offerType: OfferType) => Question[];
   addSlot: Question[];
   addOption: Question[];
 }
@@ -152,7 +152,7 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
       when: (answers: Answers) => answers.doYouWantToSaveProvider.shouldBeSaved,
     },
   ],
-  createOffer: (ids: string[] = [], service: ISpctlService, offerType: OfferType) => [
+  createOffer: (service: ISpctlService, offerType: OfferType) => [
     {
       type: 'confirm',
       name: 'createOffer.hasOffer',
@@ -199,6 +199,9 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
           if (answers) {
             answers.createOffer.publicKey = JSON.parse(offer.argsPublicKey).key;
           }
+          if (!answers?.createOffer.publicKey) {
+            return `Order ${offerId} does not have "argsPublicKey" or it has invalid data. Please try to specify another order number: `;
+          }
         } catch (err) {
           return (
             `Get offer info error:\n${util.inspect(err, { compact: true })}` +
@@ -214,10 +217,7 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
       name: 'createOffer.pk',
       message:
         'Please specify the private key which was used for offer encryption (argsPublicKey): ',
-      when: (answers: Answers) =>
-        answers.createOffer.hasOffer &&
-        answers.createOffer.offerId &&
-        !ids.find((id) => id === answers.createOffer.offerId),
+      when: (answers: Answers) => answers.createOffer.hasOffer && answers.createOffer.offerId,
       validate(pk: string, answers?: Answers): boolean | string {
         if (answers?.createOffer.publicKey && !matchKeys(answers.createOffer.publicKey, pk)) {
           return 'Private does not match with offer args public key. Please specify the valid private key: ';
