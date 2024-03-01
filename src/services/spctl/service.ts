@@ -4,7 +4,7 @@ import { spawnCommand } from './spawnCommand';
 import { KnownTool, SpctlConfig } from '../../common/config';
 import * as Path from 'path';
 import { fileExist, readJsonFile, removeFileIfExist, writeToFile } from '../utils/file.utils';
-import { IOfferInfo, IProvider, SpctlOfferType } from './types';
+import { IOfferInfo, IProvider, ITeeOffer, IValueOffer, SpctlOfferType } from './types';
 
 export type SpctlServiceParams = {
   locationPath: string;
@@ -150,6 +150,35 @@ export class SpctlService implements ISpctlService {
     }
 
     return id;
+  }
+
+  async getSlotAndOptionIdsByOfferId(
+    offerId: string,
+    offerType: SpctlOfferType,
+  ): Promise<ITeeOffer | IValueOffer | null> {
+    const saveFileName = `offer-${offerId}.json`;
+    const args = [
+      'offers',
+      'get',
+      offerType,
+      offerId,
+      '--save-to',
+      saveFileName,
+      '--fields',
+      ['slots', 'options'].join(),
+    ];
+    const response = await this.exec(args);
+    this.logger.trace({ response }, `offers get ${offerType} ${offerId} response`);
+    const fileName = Path.join(this.locationPath, saveFileName);
+    if (await fileExist(fileName)) {
+      const obj = await readJsonFile(fileName);
+
+      await removeFileIfExist(fileName);
+
+      return offerType === 'tee' ? (obj as unknown as ITeeOffer) : (obj as unknown as IValueOffer);
+    }
+
+    return null;
   }
 
   async getOfferInfo(offerId: string, offerType: SpctlOfferType): Promise<IOfferInfo | null> {
