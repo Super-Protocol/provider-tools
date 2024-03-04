@@ -34,6 +34,7 @@ export const updateProviderOffers = (params: UpdateProviderOffersParams): void =
       return {
         id: offerId,
         argsPrivateKey: decryptKey,
+        modifiedAt: Date.now(),
       };
     }
 

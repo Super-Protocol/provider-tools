@@ -87,6 +87,7 @@ export type SshConfig = z.infer<typeof SshConfigSchema>;
 export const ProviderOfferSchema = z.object({
   id: z.coerce.string(),
   argsPrivateKey: z.coerce.string(),
+  modifiedAt: z.number().optional(),
 });
 export type ProviderOffer = z.infer<typeof ProviderOfferSchema>;
 
