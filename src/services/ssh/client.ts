@@ -1,4 +1,4 @@
-import { Client, ConnectConfig } from 'ssh2';
+import { Client, ClientCallback, ConnectConfig } from 'ssh2';
 import { createLogger, ILogger } from '../../common/logger';
 
 export class SshClient {
@@ -18,36 +18,35 @@ export class SshClient {
     });
 
     return new Promise((resolve, reject): void => {
-      this.connection
-        .on('ready', () => {
-          logger.trace('Client :: ready');
-          this.connection.exec(command, (err, stream) => {
-            if (err) {
-              reject(err);
-              return;
-            }
-
-            let output = '';
-            stream
-              .on('data', (data: Buffer) => {
-                output += data.toString();
-              })
-              .on('error', (err: Error) => {
-                reject(err);
-              })
-              .on('close', (code: unknown) => {
-                this.connection.end();
-                if (code) {
-                  reject(new Error(`Command '${command}' finished with code ${code}`));
-                  return;
-                }
-                resolve(output);
-              });
-          });
-        })
-        .on('error', (err) => {
+      let output = '';
+      const onData = (data: Buffer): void => {
+        output += data.toString();
+      };
+      const onError = (err: Error): void => {
+        reject(err);
+      };
+      const onClose = (code: unknown): void => {
+        this.connection.end();
+        if (code) {
+          reject(new Error(`Command '${command}' finished with code ${code}`));
+          return;
+        }
+        resolve(output);
+      };
+      const onExec: ClientCallback = (err, stream) => {
+        if (err) {
           reject(err);
-        });
+          return;
+        }
+
+        stream.on('data', onData).on('error', onError).on('close', onClose);
+      };
+      const onReady = (): void => {
+        logger.trace('Client :: ready');
+        this.connection.exec(command, onExec);
+      };
+
+      this.connection.once('ready', onReady).on('error', onError);
 
       this.connection.connect(this.options);
     });
