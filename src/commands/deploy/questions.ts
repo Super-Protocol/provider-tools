@@ -26,7 +26,6 @@ export const DeployQuestions: IDeployQuestions = {
         if (!fs.existsSync(value)) {
           return 'File was not found or unreachable. Please try again: ';
         }
-        // TODO: need to add validation that is it ssh private key file
         return true;
       },
       when: (_answers: Answers) => !config?.pathToPrivateKey,
@@ -66,7 +65,6 @@ export const DeployQuestions: IDeployQuestions = {
         if (!value) {
           return 'Invalid host. Please try again: ';
         }
-        // TODO: need to validate host well
         return true;
       },
       when: (_answers: Answers) => !config?.host,

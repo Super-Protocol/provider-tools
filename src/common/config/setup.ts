@@ -66,7 +66,7 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
   ];
 
   const accountQuestions = accountTypeKeys
-    .map((accountType) => buildAccountQuestion(accountType as AccountType))
+    .map((accountType) => buildAccountQuestion(accountType))
     .flat();
 
   return [

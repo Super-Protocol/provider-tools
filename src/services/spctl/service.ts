@@ -59,9 +59,11 @@ export class SpctlService implements ISpctlService {
     };
     while ((match = regex.exec(response)) !== null) {
       const value = match[1];
-      match[2].toLowerCase() === 'tee'
-        ? (result.tee = ethers.utils.parseEther(value))
-        : (result.matic = ethers.utils.parseEther(value));
+      if (match[2].toLowerCase() === 'tee') {
+        result.tee = ethers.utils.parseEther(value);
+      } else {
+        result.matic = ethers.utils.parseEther(value);
+      }
     }
 
     return result;
