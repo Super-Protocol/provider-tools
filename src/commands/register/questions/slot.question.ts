@@ -51,7 +51,7 @@ export const addSlotQuestions = (ids: string[] = []): Question<IAddSlotAnswers>[
     type: 'confirm',
     name: 'needSlot',
     askAnswered: true,
-    message: `Current offer has already have next slots: [${ids.join()}]. Do you want anymore?`,
+    message: `The current offer has the following slots: [${ids.join()}]. Do you want anymore?`,
     default: true,
     when: () => Boolean(ids.length),
   },

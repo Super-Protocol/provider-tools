@@ -71,7 +71,7 @@ export const addOptionQuestions = (ids: string[] = []): Question<IAddOptionAnswe
     type: 'confirm',
     name: 'needOption',
     askAnswered: true,
-    message: `Current offer has already have next options: [${ids.join()}]. Do you want anymore?`,
+    message: `The current offer has the following options: [${ids.join()}]. Do you want anymore?`,
     default: true,
     when: () => Boolean(ids.length),
   },
