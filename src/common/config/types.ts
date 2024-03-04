@@ -59,6 +59,7 @@ export const SpctlConfigSchema = z.object({
     }),
   }),
   tii: z.object({ pccsServiceApiUrl: z.string().default(SPCTL_PCCS_SERVICE_DEFAULT) }).default({}),
+  metadata: z.object({ lastCheckForUpdates: z.number().optional() }).optional(),
 });
 export type SpctlConfig = z.infer<typeof SpctlConfigSchema>;
 
@@ -86,6 +87,7 @@ export type SshConfig = z.infer<typeof SshConfigSchema>;
 export const ProviderOfferSchema = z.object({
   id: z.coerce.string(),
   argsPrivateKey: z.coerce.string(),
+  modifiedAt: z.number().optional(),
 });
 export type ProviderOffer = z.infer<typeof ProviderOfferSchema>;
 

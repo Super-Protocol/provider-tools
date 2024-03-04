@@ -10,6 +10,10 @@ import { process as processAutoOffer } from './auto-offer.processor';
 import { readJsonFile } from '../../../services/utils/file.utils';
 import { IOfferInfo } from '../offer-builder';
 import { ProviderValueOffer } from '../../../common/config';
+import { toSpctlOfferType } from '../utils';
+import { process as processSlots } from './offer-slot.processor';
+import { process as processOptions } from './offer-option.processor';
+import { ITeeOffer } from '../../../services/spctl/types';
 
 interface OfferProcessParams {
   config: ConfigLoader;
@@ -21,12 +25,7 @@ interface OfferProcessParams {
 
 export const process = async (params: OfferProcessParams): Promise<string | null> => {
   const { config, service } = params;
-  const deployedOfferIds = config.loadSection('providerOffers').map((item) => item.id);
-  const questions = ProviderRegisterQuestions.createOffer(
-    deployedOfferIds,
-    service,
-    params.offerType,
-  );
+  const questions = ProviderRegisterQuestions.createOffer(service, params.offerType);
   const createOfferAnswers = (await inquirer.prompt(questions)) as IRegisterProviderAnswers;
 
   if (!createOfferAnswers.createOffer.auto && createOfferAnswers.createOffer.offerInfo) {
@@ -45,6 +44,19 @@ export const process = async (params: OfferProcessParams): Promise<string | null
     createOfferAnswers.createOffer.pk
   ) {
     const offerId = createOfferAnswers.createOffer.offerId;
+    const offerSlotAndOptionInfo = await service.getSlotAndOptionIdsByOfferId(
+      offerId,
+      toSpctlOfferType(params.offerType),
+    );
+    await processSlots({ ...params, offerId, offerSlotIds: offerSlotAndOptionInfo?.slots });
+
+    if (params.offerType === 'tee') {
+      await processOptions({
+        ...params,
+        offerId,
+        offerOptionsIds: (offerSlotAndOptionInfo as ITeeOffer)?.options,
+      });
+    }
     updateProviderOffers({
       config,
       offerId,
