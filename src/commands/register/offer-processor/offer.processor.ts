@@ -69,7 +69,7 @@ export const process = async (params: OfferProcessParams): Promise<string | null
   }
 
   if (!createOfferAnswers.createOffer.hasOffer && createOfferAnswers.createOffer.auto) {
-    return await processAutoOffer(params);
+    return processAutoOffer(params);
   }
 
   return null;

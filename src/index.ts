@@ -89,4 +89,5 @@ main()
   })
   .catch((err: unknown) => {
     logger.error({ err }, 'Something went wrong');
+    process.exit(1);
   });
