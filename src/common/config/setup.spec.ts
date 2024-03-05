@@ -3,6 +3,12 @@ import { AccountConfig } from './types';
 
 describe('setup', () => {
   describe('hasAccountChanges', () => {
+    const check = (
+      answers: Answers['account'],
+      config: Partial<AccountConfig>,
+      result: boolean,
+    ): void => expect(hasAccountChanges(answers, config)).toBe(result);
+
     describe('true', () => {
       it('when config does not have one account type', () => {
         const config: Partial<AccountConfig> = {
@@ -20,7 +26,7 @@ describe('setup', () => {
           needToClearProviderOffers: true,
         };
 
-        expect(hasAccountChanges(answers as never, config)).toBe(true);
+        check(answers as never, config, true);
       });
 
       it('when config is empty', () => {
@@ -35,7 +41,7 @@ describe('setup', () => {
           needToClearProviderOffers: false,
         };
 
-        expect(hasAccountChanges(answers as never, {})).toBe(true);
+        check(answers as never, {}, true);
       });
 
       it('when we have one new private key by manually', () => {
@@ -56,7 +62,7 @@ describe('setup', () => {
           needToClearProviderOffers: true,
         };
 
-        expect(hasAccountChanges(answers as never, config)).toBe(true);
+        check(answers as never, config, true);
       });
 
       it('when we have all new private key by auto', () => {
@@ -77,7 +83,7 @@ describe('setup', () => {
           needToClearProviderOffers: true,
         };
 
-        expect(hasAccountChanges(answers as never, config)).toBe(true);
+        check(answers as never, config, true);
       });
     });
     describe('false', () => {
@@ -99,7 +105,7 @@ describe('setup', () => {
           needToClearProviderOffers: true,
         };
 
-        expect(hasAccountChanges(answers as never, config)).toBe(false);
+        check(answers as never, config, false);
       });
 
       it('when we did not confirm to clear provider offers', () => {
@@ -120,7 +126,7 @@ describe('setup', () => {
           needToClearProviderOffers: false,
         };
 
-        expect(hasAccountChanges(answers as never, config)).toBe(false);
+        check(answers as never, config, false);
       });
     });
   });
