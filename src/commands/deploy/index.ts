@@ -90,7 +90,7 @@ export const DeployCommand = new Command()
       );
     }
 
-    const sshService = await createSshService({ config });
+    const sshService = await createSshService({ config, logger });
 
     try {
       const source = path.resolve(options.path);
