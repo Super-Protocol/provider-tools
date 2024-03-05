@@ -159,6 +159,11 @@ export class SpctlService implements ISpctlService {
     offerType: SpctlOfferType,
   ): Promise<ITeeOffer | IValueOffer | null> {
     const saveFileName = `offer-${offerId}.json`;
+    const fields = ['slots'];
+    if (offerType === 'tee') {
+      fields.push('options');
+    }
+
     const args = [
       'offers',
       'get',
@@ -167,7 +172,7 @@ export class SpctlService implements ISpctlService {
       '--save-to',
       saveFileName,
       '--fields',
-      ['slots', 'options'].join(),
+      fields.join(),
     ];
     const response = await this.exec(args);
     this.logger.trace({ response }, `offers get ${offerType} ${offerId} response`);
