@@ -23,6 +23,7 @@ import {
 } from '../../services/check-tee-offer-ready';
 import { createSpctlService } from '../../services/spctl';
 import { sleepExpFn } from '../../services/utils/timer.utils';
+import { sortOffers } from '../register/deploy-config-builder/utils';
 
 type CommandParams = ConfigCommandParam & {
   tee: boolean;
@@ -83,7 +84,11 @@ export const DeployCommand = new Command()
 
     await prepareSshConfig(config);
 
-    const offerIds = config.loadSection('providerOffers').map((item) => item.id);
+    const offerIds = config
+      .loadSection('providerOffers')
+      .sort(sortOffers)
+      .map((item) => item.id);
+
     if (!offerIds.length) {
       return logger.warn(
         `Your config "${options.config}" doesn't have any provider's offer. The program will be closed. Before running current command please try to run "register" command.`,
@@ -113,7 +118,7 @@ export const DeployCommand = new Command()
         value.every(predicateItemFn);
       let filteredResult: CheckTeeOffersReadyResult | null = null;
       const method = async (): Promise<CheckTeeOffersReadyResult> => {
-        const ids = filteredResult ? filteredResult.map((r) => r.id) : offerIds;
+        const ids = filteredResult ? filteredResult.map((r) => r.id) : [offerIds[0]];
         const result = await checkTeeOffersReady({
           offerIds: ids,
           service: spctlService,
