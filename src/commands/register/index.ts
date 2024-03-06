@@ -36,7 +36,10 @@ export const RegisterCommand = new Command()
   .name(COMMAND_NAME)
   .description('register provider and offers')
   .addArgument(new Argument('offerType', 'offer type').choices(['tee', 'data', 'solution']))
-  .option('--result <resultPath>', 'path to the resource.json file')
+  .option(
+    '--result <resultPath>',
+    'path to the resource.json file (is required for "data"|"solution" offer type)',
+  )
   .option(
     '--output <dirPath>',
     'directory path where files needed for running execution controller will be placed',
