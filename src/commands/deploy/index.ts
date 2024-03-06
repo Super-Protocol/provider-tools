@@ -48,14 +48,17 @@ const updatedSshConfig = (
     ...(answers.host && {
       host: answers.host,
     }),
+    ...(answers.requiredPassphrase && {
+      requiredPassphrase: answers.requiredPassphrase,
+    }),
   };
 };
 
-export const prepareSshConfig = async (config: ConfigLoader): Promise<void> => {
+export const prepareSshConfig = async (config: ConfigLoader): Promise<IDeployAnswers> => {
   const sshConfig = config.loadSection('sshConfig');
   const answers = (await inquirer.prompt(
     DeployQuestions.giveUsSshConnectionInfo(sshConfig),
-  )) as IDeployAnswers;
+  )) as unknown as IDeployAnswers;
   const updatedConfig = updatedSshConfig(answers.giveUsSshConnectionInfo);
   if (Object.keys(updatedConfig).length) {
     config.updateSection('sshConfig', {
@@ -63,6 +66,8 @@ export const prepareSshConfig = async (config: ConfigLoader): Promise<void> => {
       ...updatedConfig,
     });
   }
+
+  return answers;
 };
 
 export const DeployCommand = new Command()
@@ -82,7 +87,9 @@ export const DeployCommand = new Command()
       );
     }
 
-    await prepareSshConfig(config);
+    const {
+      giveUsSshConnectionInfo: { passphrase },
+    } = await prepareSshConfig(config);
 
     const offerIds = config
       .loadSection('providerOffers')
@@ -95,7 +102,11 @@ export const DeployCommand = new Command()
       );
     }
 
-    const sshService = await createSshService({ config, logger });
+    const sshService = await createSshService({
+      passphrase,
+      config,
+      logger,
+    });
 
     try {
       const source = path.resolve(options.path);
