@@ -46,7 +46,7 @@ export const DeployQuestions: IDeployQuestions = {
     {
       type: 'password',
       name: 'giveUsSshConnectionInfo.passphrase',
-      message: 'Please specify passphrase: ',
+      message: 'Please specify SSH passphrase: ',
       validate: (value: string): string | boolean => {
         if (!value) {
           return 'Invalid passphrase. Please try again: ';
