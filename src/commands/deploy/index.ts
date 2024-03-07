@@ -23,6 +23,7 @@ import {
 } from '../../services/check-tee-offer-ready';
 import { createSpctlService } from '../../services/spctl';
 import { sleepExpFn } from '../../services/utils/timer.utils';
+import { sortOffers } from '../register/deploy-config-builder/utils';
 
 type CommandParams = ConfigCommandParam & {
   tee: boolean;
@@ -47,14 +48,17 @@ const updatedSshConfig = (
     ...(answers.host && {
       host: answers.host,
     }),
+    ...(answers.requiredPassphrase && {
+      requiredPassphrase: answers.requiredPassphrase,
+    }),
   };
 };
 
-export const prepareSshConfig = async (config: ConfigLoader): Promise<void> => {
+export const prepareSshConfig = async (config: ConfigLoader): Promise<IDeployAnswers> => {
   const sshConfig = config.loadSection('sshConfig');
   const answers = (await inquirer.prompt(
     DeployQuestions.giveUsSshConnectionInfo(sshConfig),
-  )) as IDeployAnswers;
+  )) as unknown as IDeployAnswers;
   const updatedConfig = updatedSshConfig(answers.giveUsSshConnectionInfo);
   if (Object.keys(updatedConfig).length) {
     config.updateSection('sshConfig', {
@@ -62,6 +66,8 @@ export const prepareSshConfig = async (config: ConfigLoader): Promise<void> => {
       ...updatedConfig,
     });
   }
+
+  return answers;
 };
 
 export const DeployCommand = new Command()
@@ -81,16 +87,26 @@ export const DeployCommand = new Command()
       );
     }
 
-    await prepareSshConfig(config);
+    const {
+      giveUsSshConnectionInfo: { passphrase },
+    } = await prepareSshConfig(config);
 
-    const offerIds = config.loadSection('providerOffers').map((item) => item.id);
+    const offerIds = config
+      .loadSection('providerOffers')
+      .sort(sortOffers)
+      .map((item) => item.id);
+
     if (!offerIds.length) {
       return logger.warn(
         `Your config "${options.config}" doesn't have any provider's offer. The program will be closed. Before running current command please try to run "register" command.`,
       );
     }
 
-    const sshService = await createSshService({ config, logger });
+    const sshService = await createSshService({
+      passphrase,
+      config,
+      logger,
+    });
 
     try {
       const source = path.resolve(options.path);
@@ -113,7 +129,7 @@ export const DeployCommand = new Command()
         value.every(predicateItemFn);
       let filteredResult: CheckTeeOffersReadyResult | null = null;
       const method = async (): Promise<CheckTeeOffersReadyResult> => {
-        const ids = filteredResult ? filteredResult.map((r) => r.id) : offerIds;
+        const ids = filteredResult ? filteredResult.map((r) => r.id) : [offerIds[0]];
         const result = await checkTeeOffersReady({
           offerIds: ids,
           service: spctlService,

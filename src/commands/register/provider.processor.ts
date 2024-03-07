@@ -2,7 +2,11 @@ import inquirer from 'inquirer';
 
 import { ConfigLoader } from '../../common/loader.config';
 import { ISpctlService } from '../../services/spctl';
-import { getProvider, registerProvider } from '../../services/register/provider';
+import {
+  getProvider,
+  registerProvider,
+  replenishAccountBalance,
+} from '../../services/register/provider';
 import { IRegisterProviderAnswers, ProviderRegisterQuestions } from './questions';
 import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ILogger } from '../../common/logger';
@@ -38,6 +42,12 @@ export default async (params: ProviderProcessParams): Promise<void> => {
   }
 
   const providerInfoConfig = config.loadSection('providerInfo');
+
+  await Promise.all([
+    replenishAccountBalance({ service, account: accounts.authority }),
+    replenishAccountBalance({ service, account: accounts.action }),
+  ]);
+
   const provider =
     existedProvider ||
     (await registerProvider({

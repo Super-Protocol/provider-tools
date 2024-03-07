@@ -22,7 +22,7 @@ const processAutoSlot = async (
   value: IHardwareInfo['slotInfo'],
   offerType: SpctlOfferType = 'tee',
 ): Promise<ISlotOfferInfo> => {
-  const prefix = `Please ask next questions about slot:\n${JSON.stringify(value, null, 2)}\n`;
+  const prefix = `Please answer next questions about slot:\n${JSON.stringify(value, null, 2)}\n`;
   const answers = (await inquirer.prompt(
     slotUsageQuestions(offerType).map((q) => ({ ...q, prefix })),
   )) as IUsageAnswers;

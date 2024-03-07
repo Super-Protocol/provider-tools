@@ -33,7 +33,7 @@ const splitOptions = (resources: IHardwareInfo['optionInfo']): IHardwareInfo['op
 type IOfferOption = IOfferOptionAnswers;
 
 const processAutoOption = async (value: IHardwareInfo['optionInfo']): Promise<IOfferOption> => {
-  const prefix = `Please ask next questions about option:\n${JSON.stringify(value, null, 2)}\n`;
+  const prefix = `Please answer next questions about option:\n${JSON.stringify(value, null, 2)}\n`;
   const answers = (await inquirer.prompt(
     optionQuestions(value).map((q) => ({ ...q, prefix })),
   )) as IOfferOptionAnswers;

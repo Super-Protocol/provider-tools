@@ -10,6 +10,7 @@ import {
 import { ConfigLoader } from '../../../common/loader.config';
 import { createWallet } from '../../../services/utils/wallet.utils';
 import { ProviderOffer } from '../../../common/config';
+import { sortOffers } from './utils';
 
 export type DeployConfigBuilderParams = {
   fileName?: string;
@@ -26,17 +27,7 @@ export default async (params: DeployConfigBuilderParams): Promise<string> => {
 
   const providerOffers = config
     .loadSection('providerOffers')
-    .sort((a, b) => {
-      const a1 = a.modifiedAt ?? 0;
-      const b1 = b.modifiedAt ?? 0;
-      if (a1 > b1) {
-        return -1;
-      } else if (a1 < b1) {
-        return 1;
-      }
-
-      return 0;
-    })
+    .sort(sortOffers)
     .map((providerOffer: ProviderOffer) => ({
       id: providerOffer.id,
       argsPrivateKey: providerOffer.argsPrivateKey,
