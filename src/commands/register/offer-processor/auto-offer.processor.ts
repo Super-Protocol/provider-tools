@@ -22,9 +22,7 @@ interface IAutoOfferProcessorParams {
 export const process = async (params: IAutoOfferProcessorParams): Promise<string> => {
   const { config, logger } = params;
 
-  const {
-    giveUsSshConnectionInfo: { passphrase },
-  } = await prepareSshConfig(config);
+  const { passphrase } = await prepareSshConfig(config);
 
   const offerInfo = await build({
     service: await createSshService({ passphrase, config, logger }),
