@@ -110,7 +110,7 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
     {
       type: 'confirm',
       name: 'createOffer.auto',
-      message: `Do you want a ${offerType.toUpperCase()} offer to be created automatically? if not you will be asked to provide offer json file`,
+      message: `Do you want a ${offerType.toUpperCase()} offer to be created automatically? if not, you will be asked to provide offer json file`,
       default: false,
       when: (answers: Answers) => !answers.createOffer.hasOffer && offerType === 'tee',
     },

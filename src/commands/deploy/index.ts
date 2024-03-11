@@ -54,20 +54,25 @@ const updatedSshConfig = (
   };
 };
 
-export const prepareSshConfig = async (config: ConfigLoader): Promise<IDeployAnswers> => {
-  const sshConfig = config.loadSection('sshConfig');
+export const prepareSshConfig = async (
+  config: ConfigLoader,
+): Promise<IDeployAnswers['giveUsSshConnectionInfo']> => {
+  let sshConfig = config.loadSection('sshConfig');
   const answers = (await inquirer.prompt(
     DeployQuestions.giveUsSshConnectionInfo(sshConfig),
   )) as unknown as IDeployAnswers;
   const updatedConfig = updatedSshConfig(answers.giveUsSshConnectionInfo);
   if (Object.keys(updatedConfig).length) {
-    config.updateSection('sshConfig', {
+    sshConfig = config.updateSection('sshConfig', {
       ...sshConfig,
       ...updatedConfig,
     });
   }
 
-  return answers;
+  return {
+    ...sshConfig,
+    ...answers?.giveUsSshConnectionInfo,
+  };
 };
 
 export const DeployCommand = new Command()
@@ -87,9 +92,7 @@ export const DeployCommand = new Command()
       );
     }
 
-    const {
-      giveUsSshConnectionInfo: { passphrase },
-    } = await prepareSshConfig(config);
+    const { passphrase } = await prepareSshConfig(config);
 
     const offerIds = config
       .loadSection('providerOffers')

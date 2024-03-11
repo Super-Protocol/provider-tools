@@ -75,7 +75,8 @@ export const DeployQuestions: IDeployQuestions = {
       message: 'Please specify port: ',
       default: config?.port || 22,
       validate: (value: number): string | boolean => {
-        if (!Number.isSafeInteger(value) || value < 1) {
+        const port = Number(value);
+        if (!Number.isSafeInteger(port) || port < 1) {
           return 'It should be positive integer number. Please try again: ';
         }
         return true;

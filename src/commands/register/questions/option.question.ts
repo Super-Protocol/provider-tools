@@ -13,6 +13,20 @@ import fs from 'fs';
 export const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] => [
   {
     type: 'number',
+    name: 'usage.minTimeMinutes',
+    message: 'Please specify the min rent time(in minutes):',
+    validate: nonNegativeIntegerValidator,
+    default: 0,
+  },
+  {
+    type: 'number',
+    name: 'usage.maxTimeMinutes',
+    message: 'Please specify the max rent time(in minutes):',
+    validate: nonNegativeIntegerValidator,
+    default: 0,
+  },
+  {
+    type: 'number',
     name: 'info.bandwidth',
     message: 'Please adjust the bandwidth value if necessary (in Mbps):',
     validate: nonNegativeNumberValidator,
@@ -26,20 +40,6 @@ export const optionQuestions = (optionInfo: IHardwareInfo['optionInfo']): any[] 
     validate: nonNegativeNumberValidator,
     default: Math.floor(optionInfo.traffic / MB_TO_BYTES_MULTIPLIER),
     when: (_answers: IOfferOptionAnswers): boolean => !optionInfo.externalPort,
-  },
-  {
-    type: 'number',
-    name: 'usage.minTimeMinutes',
-    message: 'Please specify the min rent time(in minutes):',
-    validate: nonNegativeIntegerValidator,
-    default: 0,
-  },
-  {
-    type: 'number',
-    name: 'usage.maxTimeMinutes',
-    message: 'Please specify the max rent time(in minutes):',
-    validate: nonNegativeIntegerValidator,
-    default: 0,
   },
   {
     type: 'list',

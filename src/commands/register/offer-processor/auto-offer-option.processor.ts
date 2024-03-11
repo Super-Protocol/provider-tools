@@ -35,7 +35,7 @@ type IOfferOption = IOfferOptionAnswers;
 const processAutoOption = async (value: IHardwareInfo['optionInfo']): Promise<IOfferOption> => {
   const prefix = `Please answer next questions about option:\n${JSON.stringify(value, null, 2)}\n`;
   const answers = (await inquirer.prompt(
-    optionQuestions(value).map((q) => ({ ...q, prefix })),
+    optionQuestions(value).map((q, index) => ({ ...q, ...(!index && { prefix }) })),
   )) as IOfferOptionAnswers;
   const convert = (value: number | undefined | null, defaultValue: number): number =>
     typeof value === 'number' ? value * MB_TO_BYTES_MULTIPLIER : defaultValue;
