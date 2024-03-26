@@ -29,3 +29,12 @@ export interface IOfferInfo {
     };
   };
 }
+
+export interface IValueOffer {
+  id?: string;
+  slots?: string[];
+}
+
+export interface ITeeOffer extends IValueOffer {
+  options?: string[];
+}

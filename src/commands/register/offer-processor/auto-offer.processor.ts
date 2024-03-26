@@ -20,11 +20,13 @@ interface IAutoOfferProcessorParams {
 }
 
 export const process = async (params: IAutoOfferProcessorParams): Promise<string> => {
-  const { config } = params;
+  const { config, logger } = params;
 
-  await prepareSshConfig(config);
+  const { passphrase } = await prepareSshConfig(config);
 
-  const offerInfo = await build({ service: await createSshService({ config }) });
+  const offerInfo = await build({
+    service: await createSshService({ passphrase, config, logger }),
+  });
   const offerId = await processOffer({ ...params, offerInfo });
   const spctlOfferType = toSpctlOfferType(params.offerType);
 

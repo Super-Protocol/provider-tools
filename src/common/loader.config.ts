@@ -51,7 +51,7 @@ export class ConfigLoader {
   updateSection<T extends keyof Config.Config>(
     sectionName: T,
     newValues: Partial<Config.Config[T]>,
-  ): void {
+  ): Config.Config[T] {
     if (!ConfigLoader.validatedConfig) {
       throw new Error(`Config is missing! Please run '${KnownTool.PROVIDER} setup' command`);
     }
@@ -66,5 +66,7 @@ export class ConfigLoader {
     }
 
     fs.writeFileSync(this.configPath, JSON.stringify(ConfigLoader.validatedConfig, null, 4));
+
+    return ConfigLoader.validatedConfig[sectionName];
   }
 }

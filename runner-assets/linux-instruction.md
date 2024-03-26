@@ -2,6 +2,8 @@
 - .env
 - docker-compose.yaml
 - runner.sh
+- tool/spctl
+- tool/config.json
 
 # Running the execution controller
 

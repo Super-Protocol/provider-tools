@@ -10,7 +10,7 @@ export const APP_NAME = name;
 export const APP_VERSION = version;
 export const CONFIG_DEFAULT_FILENAME = path.resolve(execDir(), 'config.json');
 export const JWT_CHECK_REGEX = /(^[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*$)/;
-export const PRIVATE_KEY_CHECK_REGEX = /\b(?:0x)?[0-9a-fA-F]{64}\b/g;
+export const PRIVATE_KEY_CHECK_REGEX = /^(?:0x)?[0-9a-fA-F]{64}$/;
 export const SPCTL_BACKEND_URL_DEFAULT =
   process.env.NODE_ENV === 'production'
     ? 'https://bff.testnet.superprotocol.com/graphql'
@@ -36,7 +36,7 @@ export const PROVIDER_TOOLS_REPO_NAME = 'provider-tools';
 export const REPO_DOWNLOAD_URL_TEMPLATE = `https://github.com/Super-Protocol/${REPO_MATCH}/releases/download/v${VERSION_MATCH}/${TOOL_NAME_MATCH}-${OS_MATCH}-${ARCH_MATCH}`;
 export const LATEST_RELEASE_URL_TEMPLATE = `https://api.github.com/repos/Super-Protocol/${REPO_MATCH}/releases/latest`;
 export const MIN_TEE_SUM_FOR_PROVIDER_ACCOUNT = '9000000000000000000';
-export const MIN_MATIC_SUM_FOR_PROVIDER_ACCOUNT = '200000000000000000';
+export const MIN_MATIC_SUM_FOR_PROVIDER_ACCOUNT = '500000000000000000';
 export const DEFAULT_PROVIDER_NAME = `auto generated provider by ${APP_NAME}`;
 export const DEFAULT_DEPLOY_CONFIG_FILE_NAME = 'deploy-config.yaml';
 export const DEPLOY_CONFIG_PROVIDER_OFFER_DEVICE_ID = '{{ device-id }}';
@@ -51,3 +51,6 @@ export const RUNNER_SH_URL =
 export const DOCKER_COMPOSE_URL =
   process.env.DOCKER_COMPOSE_URL ||
   'https://raw.githubusercontent.com/Super-Protocol/provider-tools/main/runner-assets/docker-compose.yaml';
+export const DEFAULT_SLEEP_INTERVAL = 1000;
+export const DEFAULT_SLEEP_MULTIPLIER = 2;
+export const DEFAULT_RETRY_COUNT = 5;
