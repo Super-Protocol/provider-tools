@@ -15,7 +15,6 @@ import { readJsonFile, textSerializer, writeToFile } from '../../services/utils/
 import axios, { AxiosError } from 'axios';
 import {
   CONFIG_DEFAULT_FILENAME,
-  DOCKER_COMPOSE_URL,
   RUNNER_SH_URL,
   SPCTL_SUFFIX,
   TOOL_DIRECTORY_PATH,
@@ -102,10 +101,6 @@ export const RegisterCommand = new Command()
             config,
             offerType,
           }),
-        },
-        {
-          name: 'docker-compose.yaml',
-          content: await downloadFile(DOCKER_COMPOSE_URL),
         },
         {
           name: 'runner.sh',
