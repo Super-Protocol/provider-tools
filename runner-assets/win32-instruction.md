@@ -12,6 +12,6 @@ To run the `runner.sh` script, first install [Git Bash](https://git-scm.com/down
 
 Once **Git Bash** and **jq** are installed, open **Git Bash**, navigate to the directory `{{output}}`, and run the script:
 ```shell
-$ sh runner.sh
+$ bash runner.sh
 ```
 
