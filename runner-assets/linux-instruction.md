@@ -14,6 +14,6 @@ $ sudo apt-get install jq
 ```
 Once jq is installed, open your terminal, navigate to the directory containing the runner.sh file, and run the script with the following command:
 ```shell
-$ sh runner.sh
+$ bash runner.sh
 ```
 

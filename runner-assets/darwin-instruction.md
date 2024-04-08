@@ -17,6 +17,6 @@ If you don’t have Homebrew installed, you can install it from the [official we
 
 Once **jq** is installed, open your terminal, navigate to the directory `{{output}}`, and run the script with the following command:
 ```shell
-$ sh runner.sh
+$ bash runner.sh
 ```
 
