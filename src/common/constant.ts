@@ -15,11 +15,11 @@ export const SPCTL_BACKEND_URL_DEFAULT =
   process.env.NODE_ENV === 'production'
     ? 'https://bff.testnet.superprotocol.com/graphql'
     : 'https://bff.dev.superprotocol.com/graphql';
-export const SPCTL_BLOCKCHAIN_URL_DEFAULT = 'https://mumbai.polygon.superprotocol.com/hesoyam';
+export const SPCTL_BLOCKCHAIN_URL_DEFAULT = 'https://amoy.polygon.superprotocol.com/hesoyam';
 export const SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT =
   process.env.NODE_ENV === 'production'
-    ? '0xA7Ff565f26b93926e4e6465Eb81d48EfF456848b'
-    : '0x987BC8d29C001d3b8c02AB344868b6D2989E4f71';
+    ? '0x589c5F093524e9a6cD4bAEe786859bC6C3e38bec'
+    : '0x6D5C1F3Ccda361c0EFCf028Bc99Ca2783Be766ce';
 export const SPCTL_CRYPTO_ALGO_DEFAULT = 'ECIES';
 export const SPCTL_ENCODING_DEFAULT: BufferEncoding = 'base64';
 export const SPCTL_PCCS_SERVICE_DEFAULT = 'https://pccs.superprotocol.io';
