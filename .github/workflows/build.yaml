@@ -30,7 +30,7 @@ jobs:
         CURRENT_TAG=${{ github.ref }}
 
         echo "Setup $CURRENT_TAG envs"
-        TAG_PATTERN="^v[0-9]+\.[0-9]+\.[0-9]+"
+        TAG_PATTERN="v[0-9]+\.[0-9]+\.[0-9]+"
 
         if [[ $CURRENT_TAG =~ ($TAG_PATTERN)-alpha\.[0-9]+$ ]]; then
           echo "${{ secrets.DEV_ENV_BASE64 }}" | base64 --decode > .env
