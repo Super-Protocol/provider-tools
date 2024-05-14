@@ -41,6 +41,7 @@ jobs:
         else echo "Invalid instance $CURRENT_TAG"
           exit 1
         fi
+      shell: bash
     - name: Build binary
       run: |
         npm run build
