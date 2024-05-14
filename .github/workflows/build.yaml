@@ -24,6 +24,23 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
     - name: Install dependencies 🧩
       uses: ./.github/actions/install-dependencies
+
+    - name: Setup envs
+      run: |
+        CURRENT_BRANCH=${{ github.head_ref }}
+
+        echo "Setup $CURRENT_BRANCH envs"
+
+        if [ "$CURRENT_BRANCH" == "develop" ]; then
+          echo "${{ secrets.DEV_ENV_BASE64 }}" | base64 --decode > .env
+        elif [ "$CURRENT_BRANCH" == "stage" ]; then
+          echo "${{ secrets.STG_ENV_BASE64 }}" | base64 --decode > .env
+        elif [ "$CURRENT_BRANCH" == "testnet" ]; then
+          echo "${{ secrets.TESTNET_ENV_BASE64 }}" | base64 --decode > .env
+        else
+          echo "Invalid instace $CURRENT_BRANCH"
+          exit 1
+        fi
     - name: Build binary
       run: |
         npm run build
