@@ -29,6 +29,7 @@ export const createSpctlService = async (
 
   const buildSpctlConfig = (): SpctlConfig => {
     const spctlConfig = options.config.loadSection('spctl');
+    const FAR_FUTURE = 1000 * 24 * 60 * 60 * 365;
     const accountConfig = options.config.loadSection('account');
     spctlConfig.backend.url =
       options.backendUrl ?? spctlConfig.backend.url ?? SPCTL_BACKEND_URL_DEFAULT;
@@ -40,6 +41,9 @@ export const createSpctlService = async (
       SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT;
     spctlConfig.blockchain.authorityAccountPrivateKey = accountConfig.authority;
     spctlConfig.blockchain.accountPrivateKey = accountConfig.action;
+    spctlConfig.metadata = {
+      lastCheckForUpdates: Date.now() + FAR_FUTURE,
+    };
 
     return spctlConfig;
   };

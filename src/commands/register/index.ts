@@ -1,5 +1,5 @@
 import { Command, Argument } from 'commander';
-import fs from 'fs/promises';
+import fsExtra from 'fs-extra';
 import path from 'path';
 import { ConfigCommandParam } from '../types';
 import { createSpctlService } from '../../services/spctl';
@@ -11,9 +11,15 @@ import buildDeployConfig from './deploy-config-builder';
 import { OfferType } from './types';
 import { generateEnvFile } from './generateEnvFile';
 import { printInstruction } from './printInstuction';
-import { textSerializer, writeToFile } from '../../services/utils/file.utils';
+import { readJsonFile, textSerializer, writeToFile } from '../../services/utils/file.utils';
 import axios, { AxiosError } from 'axios';
-import { DOCKER_COMPOSE_URL, RUNNER_SH_URL } from '../../common/constant';
+import {
+  CONFIG_DEFAULT_FILENAME,
+  RUNNER_SH_URL,
+  SPCTL_SUFFIX,
+  TOOL_DIRECTORY_PATH,
+} from '../../common/constant';
+import { KnownTool, ProviderValueOffer } from '../../common/config';
 
 type CommandParams = ConfigCommandParam & {
   backendUrl: string;
@@ -24,13 +30,15 @@ type CommandParams = ConfigCommandParam & {
 };
 
 const COMMAND_NAME = 'register';
-const logger = createLogger().child({ command: COMMAND_NAME });
 
 export const RegisterCommand = new Command()
   .name(COMMAND_NAME)
   .description('register provider and offers')
   .addArgument(new Argument('offerType', 'offer type').choices(['tee', 'data', 'solution']))
-  .option('--result <resultPath>', 'path to the resource.json file')
+  .option(
+    '--result <resultPath>',
+    'path to the resource.json file (is required for "data"|"solution" offer type)',
+  )
   .option(
     '--output <dirPath>',
     'directory path where files needed for running execution controller will be placed',
@@ -39,11 +47,15 @@ export const RegisterCommand = new Command()
   .option('--blockchain-url <url>', 'blockchain url')
   .option('--contract-address <address>', 'contract address')
   .action(async (offerType: OfferType, options: CommandParams): Promise<void> => {
+    const config = new ConfigLoader(options.config);
+    const logger = createLogger({
+      options: config.loadSection('logger'),
+      bindings: { command: COMMAND_NAME },
+    });
+
     if (offerType !== 'tee' && !options.result) {
       return logger.info(`required option '--result <resultPath>' is not specified`);
     }
-
-    const config = new ConfigLoader(options.config);
     const service = await createSpctlService({
       logger,
       config,
@@ -52,7 +64,7 @@ export const RegisterCommand = new Command()
       contractAddress: options.contractAddress,
     });
     const resourceFileData = options.result
-      ? JSON.parse(await fs.readFile(options.result, 'utf-8'))
+      ? ((await readJsonFile(options.result)) as Omit<ProviderValueOffer, 'id'>)
       : null;
 
     await processProvider({ config, service, logger });
@@ -91,12 +103,11 @@ export const RegisterCommand = new Command()
           }),
         },
         {
-          name: 'docker-compose.yaml',
-          content: await downloadFile(DOCKER_COMPOSE_URL),
-        },
-        {
           name: 'runner.sh',
-          content: await downloadFile(RUNNER_SH_URL),
+          content: (await downloadFile(RUNNER_SH_URL)).replaceAll(
+            './tool/spctl',
+            `./tool/spctl${SPCTL_SUFFIX}`,
+          ),
         },
       ];
 
@@ -106,6 +117,19 @@ export const RegisterCommand = new Command()
         const filePath = path.join(outputDirPath, file.name);
         await writeToFile(filePath, file.content, textSerializer);
       }
+
+      const spctlFileName = `${KnownTool.SPCTL}${SPCTL_SUFFIX}`;
+      const spctlConfigName = path.basename(CONFIG_DEFAULT_FILENAME);
+      const toolDirName = path.basename(TOOL_DIRECTORY_PATH);
+
+      const spctlDestination = path.resolve(TOOL_DIRECTORY_PATH, spctlFileName);
+      const spctlConfigDestination = path.resolve(TOOL_DIRECTORY_PATH, spctlConfigName);
+
+      await fsExtra.copy(spctlDestination, path.join(outputDirPath, toolDirName, spctlFileName));
+      await fsExtra.copy(
+        spctlConfigDestination,
+        path.join(outputDirPath, toolDirName, spctlConfigName),
+      );
 
       await printInstruction({ outputDirPath });
     }

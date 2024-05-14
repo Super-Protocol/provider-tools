@@ -2,8 +2,10 @@ import { Answers, Question } from 'inquirer';
 import fs from 'fs';
 import { SshConfig } from '../../common/config';
 
-export interface IDeployQuestions {
-  giveUsSshConnectionInfo: (config?: SshConfig) => Question[];
+interface IDeployQuestions {
+  giveUsSshConnectionInfo: (
+    config?: SshConfig,
+  ) => Question<IDeployAnswers['giveUsSshConnectionInfo']>[];
 }
 
 export interface IDeployAnswers extends Answers {
@@ -12,11 +14,15 @@ export interface IDeployAnswers extends Answers {
     user: string;
     port: string;
     host: string;
+    requiredPassphrase: boolean;
+    passphrase?: string;
   };
 }
 
 export const DeployQuestions: IDeployQuestions = {
-  giveUsSshConnectionInfo: (config?: SshConfig): Question[] => [
+  giveUsSshConnectionInfo: (
+    config?: SshConfig,
+  ): Question<IDeployAnswers['giveUsSshConnectionInfo']>[] => [
     {
       type: 'input',
       name: 'giveUsSshConnectionInfo.pathToPrivateKey',
@@ -26,10 +32,29 @@ export const DeployQuestions: IDeployQuestions = {
         if (!fs.existsSync(value)) {
           return 'File was not found or unreachable. Please try again: ';
         }
-        // TODO: need to add validation that is it ssh private key file
         return true;
       },
       when: (_answers: Answers) => !config?.pathToPrivateKey,
+    },
+    {
+      type: 'confirm',
+      name: 'giveUsSshConnectionInfo.requiredPassphrase',
+      message: 'Does your SSH private key have a passphrase?',
+      default: false,
+      when: (answers: Answers) => Boolean(answers.giveUsSshConnectionInfo?.pathToPrivateKey),
+    },
+    {
+      type: 'password',
+      name: 'giveUsSshConnectionInfo.passphrase',
+      message: 'Please specify SSH passphrase: ',
+      validate: (value: string): string | boolean => {
+        if (!value) {
+          return 'Invalid passphrase. Please try again: ';
+        }
+        return true;
+      },
+      when: (answers: Answers) =>
+        Boolean(answers.giveUsSshConnectionInfo?.requiredPassphrase || config?.requiredPassphrase),
     },
     {
       type: 'input',
@@ -38,7 +63,7 @@ export const DeployQuestions: IDeployQuestions = {
       default: config?.user || 'root',
       validate: (value: string): string | boolean => {
         if (!value) {
-          return 'File was not found or unreachable. Please try again: ';
+          return 'Invalid username. Please try again: ';
         }
         return true;
       },
@@ -50,7 +75,8 @@ export const DeployQuestions: IDeployQuestions = {
       message: 'Please specify port: ',
       default: config?.port || 22,
       validate: (value: number): string | boolean => {
-        if (Number.isSafeInteger(value) && value > 0) {
+        const port = Number(value);
+        if (!Number.isSafeInteger(port) || port < 1) {
           return 'It should be positive integer number. Please try again: ';
         }
         return true;
@@ -66,7 +92,6 @@ export const DeployQuestions: IDeployQuestions = {
         if (!value) {
           return 'Invalid host. Please try again: ';
         }
-        // TODO: need to validate host well
         return true;
       },
       when: (_answers: Answers) => !config?.host,

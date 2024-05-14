@@ -20,7 +20,7 @@ describe('setup', () => {
           needToClearProviderOffers: true,
         };
 
-        expect(hasAccountChanges(config, answers as never)).toBe(true);
+        expect(hasAccountChanges(answers as never, config)).toBe(true);
       });
 
       it('when config is empty', () => {
@@ -35,7 +35,7 @@ describe('setup', () => {
           needToClearProviderOffers: false,
         };
 
-        expect(hasAccountChanges({}, answers as never)).toBe(true);
+        expect(hasAccountChanges(answers as never, {})).toBe(true);
       });
 
       it('when we have one new private key by manually', () => {
@@ -56,7 +56,7 @@ describe('setup', () => {
           needToClearProviderOffers: true,
         };
 
-        expect(hasAccountChanges(config, answers as never)).toBe(true);
+        expect(hasAccountChanges(answers as never, config)).toBe(true);
       });
 
       it('when we have all new private key by auto', () => {
@@ -77,7 +77,7 @@ describe('setup', () => {
           needToClearProviderOffers: true,
         };
 
-        expect(hasAccountChanges(config, answers as never)).toBe(true);
+        expect(hasAccountChanges(answers as never, config)).toBe(true);
       });
     });
     describe('false', () => {
@@ -99,7 +99,7 @@ describe('setup', () => {
           needToClearProviderOffers: true,
         };
 
-        expect(hasAccountChanges(config, answers as never)).toBe(false);
+        expect(hasAccountChanges(answers as never, config)).toBe(false);
       });
 
       it('when we did not confirm to clear provider offers', () => {
@@ -120,7 +120,7 @@ describe('setup', () => {
           needToClearProviderOffers: false,
         };
 
-        expect(hasAccountChanges(config, answers as never)).toBe(false);
+        expect(hasAccountChanges(answers as never, config)).toBe(false);
       });
     });
   });

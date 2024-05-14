@@ -1,6 +1,6 @@
 {
   "name": "provider-tools",
-  "version": "0.0.2-beta.7",
+  "version": "0.0.2-beta.17",
   "description": "A tool for provider registration in super protocol by secure and reliable way.",
   "main": "./build/index.js",
   "author": "SuperProtocol",
@@ -52,23 +52,21 @@
     "@types/jsonfile": "^6.1.4",
     "@types/marked-terminal": "^6.1.0",
     "@types/ssh2": "^1.11.19",
+    "@types/ssh2-streams": "^0.1.12",
     "jest": "^29.7.0",
     "jest-junit": "^16.0.0",
     "madge": "^6.1.0",
     "pkg": "^5.8.1",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
-    "typescript": "^4.8.4",
-    "pino-pretty": "^10.3.1"
+    "typescript": "^4.8.4"
   },
   "bin": "build/src/index.js",
   "pkg": {
     "assets": [
       "config.example.json",
       "node_modules/axios/**/*",
-      "runner-assets/darwin-instruction.md",
-      "runner-assets/win32-instruction.md",
-      "runner-assets/linux-instruction.md"
+      "runner-assets/*.md"
     ]
   },
   "dependencies": {
@@ -76,6 +74,7 @@
     "cli-progress": "^3.12.0",
     "colors": "^1.4.0",
     "commander": "^12.0.0",
+    "dotenv": "^16.4.5",
     "ethers": "^5.7.2",
     "fs-extra": "^11.2.0",
     "inquirer": "^8.2.6",
@@ -85,7 +84,7 @@
     "pino": "^8.18.0",
     "save-dev": "^0.0.1-security",
     "semver": "^7.6.0",
-    "ssh2": "^1.15.0",
+    "ssh2-promise": "^1.0.3",
     "yaml": "^2.3.4",
     "zod": "^3.22.4"
   },
