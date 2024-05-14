@@ -1,6 +1,6 @@
+import fs from 'fs';
 import { Config, ConfigSchema } from './types';
 import { CONFIG_DEFAULT_FILENAME } from '../constant';
-import fs from 'fs';
 
 export const validate = (config: unknown): Config => {
   try {
