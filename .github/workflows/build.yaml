@@ -27,18 +27,18 @@ jobs:
 
     - name: Setup envs
       run: |
-        CURRENT_BRANCH=${{ github.head_ref }}
+        CURRENT_TAG=${{ github.ref }}
 
-        echo "Setup $CURRENT_BRANCH envs"
+        echo "Setup $CURRENT_TAG envs"
+        TAG_PATTERN="^v[0-9]+\.[0-9]+\.[0-9]+"
 
-        if [ "$CURRENT_BRANCH" == "develop" ]; then
+        if [[ $CURRENT_TAG =~ ($TAG_PATTERN)-alpha\.[0-9]+$ ]]; then
           echo "${{ secrets.DEV_ENV_BASE64 }}" | base64 --decode > .env
-        elif [ "$CURRENT_BRANCH" == "stage" ]; then
+        elif [[ $CURRENT_TAG =~ ($TAG_PATTERN)-beta\.[0-9]+$ ]]; then
           echo "${{ secrets.STG_ENV_BASE64 }}" | base64 --decode > .env
-        elif [ "$CURRENT_BRANCH" == "testnet" ]; then
+        elif [[ $CURRENT_TAG =~ ($TAG_PATTERN)$ ]]; then
           echo "${{ secrets.TESTNET_ENV_BASE64 }}" | base64 --decode > .env
-        else
-          echo "Invalid instace $CURRENT_BRANCH"
+        else echo "Invalid instance $CURRENT_TAG"
           exit 1
         fi
     - name: Build binary
