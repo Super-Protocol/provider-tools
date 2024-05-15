@@ -64,6 +64,7 @@
   "bin": "build/src/index.js",
   "pkg": {
     "assets": [
+      ".env",
       "config.example.json",
       "node_modules/axios/**/*",
       "runner-assets/*.md"
