@@ -1,6 +1,6 @@
 {
   "name": "provider-tools",
-  "version": "0.1.0-beta.0",
+  "version": "0.2.0-alpha.0",
   "description": "A tool for provider registration in super protocol by secure and reliable way.",
   "main": "./build/index.js",
   "author": "SuperProtocol",
@@ -64,6 +64,7 @@
   "bin": "build/src/index.js",
   "pkg": {
     "assets": [
+      ".env",
       "config.example.json",
       "node_modules/axios/**/*",
       "runner-assets/*.md"

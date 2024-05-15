@@ -3,7 +3,14 @@ import os from 'os';
 import dotenv from 'dotenv';
 import { name, description, version } from '../../package.json';
 
-dotenv.config();
+const getEnvFilePath = (): string => {
+  const level = process.env.NODE_ENV === 'development' ? 2 : 3;
+  const subpath = '..,'.repeat(level).split(',').filter(Boolean);
+
+  return path.resolve(__dirname, ...subpath, '.env');
+};
+
+dotenv.config({ path: getEnvFilePath() });
 
 const execDir = (): string =>
   process.env.NODE_ENV === 'development' ? process.cwd() : path.dirname(process.execPath);
