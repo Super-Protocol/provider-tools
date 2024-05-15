@@ -1,56 +1,35 @@
-import { Client, ConnectConfig } from 'ssh2';
+import { ConnectConfig } from 'ssh2';
+import SSH2Promise from 'ssh2-promise';
+
 import { createLogger, ILogger } from '../../common/logger';
 
 export class SshClient {
-  private readonly connection: Client;
+  constructor(private readonly options: ConnectConfig, private readonly logger: ILogger) {}
 
-  constructor(private readonly options: ConnectConfig, private readonly logger: ILogger) {
-    this.connection = new Client();
-  }
-
-  exec(command: string): Promise<string> {
+  async exec(command: string): Promise<string> {
     const logger = createLogger({
       parentLogger: this.logger,
       bindings: {
         command,
         module: 'ssh-client-exec',
+        sshOptions: {
+          host: this.options.host,
+          port: this.options.port,
+          username: this.options.username,
+        },
       },
     });
 
-    return new Promise((resolve, reject): void => {
-      this.connection
-        .on('ready', () => {
-          logger.trace('Client :: ready');
-          this.connection.exec(command, (err, stream) => {
-            if (err) {
-              reject(err);
-              return;
-            }
+    try {
+      logger.trace('creating ssh-client');
+      const ssh = new SSH2Promise(this.options);
 
-            let output = '';
-            stream
-              .on('data', (data: Buffer) => {
-                output += data.toString();
-              })
-              .on('error', (err: Error) => {
-                reject(err);
-              })
-              .on('close', (code: unknown) => {
-                this.connection.end();
-                if (code) {
-                  reject(new Error(`Command '${command}' finished with code ${code}`));
-                  return;
-                }
-                resolve(output);
-              });
-          });
-        })
-        .on('error', (err) => {
-          reject(err);
-        });
-
-      this.connection.connect(this.options);
-    });
+      logger.trace(`try to execute command`);
+      return await ssh.exec(command);
+    } catch (err) {
+      logger.debug({ err }, 'Failed to execute command on the remote host');
+      throw err;
+    }
   }
 
   async copyFile(localPath: string, remotePath: string): Promise<void> {
@@ -60,33 +39,26 @@ export class SshClient {
         localPath,
         remotePath,
         module: 'ssh-client-sftp',
+        sshOptions: {
+          host: this.options.host,
+          port: this.options.port,
+          username: this.options.username,
+        },
       },
     });
 
-    await new Promise<void>((resolve, reject) => {
-      this.connection
-        .on('ready', () => {
-          logger.trace('Client :: ready');
-          this.connection.sftp((err, sftp) => {
-            if (err) {
-              reject(err);
-              return;
-            }
-            sftp.fastPut(localPath, remotePath, (err) => {
-              if (err) {
-                reject(err);
-                return;
-              }
-              this.connection.end();
-              resolve();
-            });
-          });
-        })
-        .on('error', (err) => {
-          reject(err);
-        });
+    try {
+      logger.trace('creating ssh-client');
+      const ssh = new SSH2Promise(this.options);
 
-      this.connection.connect(this.options);
-    });
+      logger.trace('creating sftp');
+      const sftp = ssh.sftp();
+
+      logger.trace('copy file');
+      await sftp.fastPut(localPath, remotePath);
+    } catch (err) {
+      logger.debug({ err }, 'Failed to copy file to the remote host');
+      throw err;
+    }
   }
 }

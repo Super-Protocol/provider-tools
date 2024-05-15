@@ -1,3 +1,4 @@
+import path from 'path';
 import * as fs from 'fs';
 import axios from 'axios';
 import { ILogger } from '../../common/logger';
@@ -16,6 +17,12 @@ type DownloadSpctlParams = Omit<CheckAndDownloadSpctlParams, 'configLoader'> & {
 const downloadSPCTL = async (params: DownloadSpctlParams): Promise<void> => {
   const { logger, destination } = params;
   const url = getDownloadUrl(params.version, KnownTool.SPCTL);
+
+  const folderPath = path.dirname(destination.toString());
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath, { recursive: true });
+  }
+
   const file = fs.createWriteStream(destination);
 
   try {

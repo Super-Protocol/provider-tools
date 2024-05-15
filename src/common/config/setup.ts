@@ -66,7 +66,7 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
   ];
 
   const accountQuestions = accountTypeKeys
-    .map((accountType) => buildAccountQuestion(accountType as AccountType))
+    .map((accountType) => buildAccountQuestion(accountType))
     .flat();
 
   return [
@@ -88,8 +88,8 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
 };
 
 export const hasAccountChanges = (
-  config: Partial<AccountConfig> = {},
   answers: Answers['account'],
+  config: Partial<AccountConfig> = {},
 ): boolean => {
   if (accountTypeKeys.some((accountType) => answers.isAutoGenerationNeeded[accountType])) {
     return true;
@@ -121,13 +121,13 @@ export const setup = async (config?: Config): Promise<Config> => {
   const [authorityAccount, actionAccount, tokenReceiverAccount] = accountTypeKeys.map(
     (accountType) => getAccount(answers.account, accountType),
   );
-  const providerOffers = hasAccountChanges(config?.account, answers.account)
+  const providerOffers = hasAccountChanges(answers.account, config?.account)
     ? []
     : config?.providerOffers ?? [];
-  const providerDataOffers = hasAccountChanges(config?.account, answers.account)
+  const providerDataOffers = hasAccountChanges(answers.account, config?.account)
     ? []
     : config?.providerDataOffers ?? [];
-  const providerSolutionOffers = hasAccountChanges(config?.account, answers.account)
+  const providerSolutionOffers = hasAccountChanges(answers.account, config?.account)
     ? []
     : config?.providerSolutionOffers ?? [];
 

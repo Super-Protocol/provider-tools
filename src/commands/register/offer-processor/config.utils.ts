@@ -28,12 +28,13 @@ interface UpdateProviderOffersParams {
 export const updateProviderOffers = (params: UpdateProviderOffersParams): void => {
   const { config, offerId, offerType, decryptKey } = params;
   const offersSection = getConfigOffersSection(offerType);
-  const offers = config.loadSection(offersSection);
+  const offers: Array<ProviderOffer | ProviderValueOffer> = config.loadSection(offersSection);
   const getProviderOfferInfo = (): ProviderOffer | ProviderValueOffer => {
     if (offerType === 'tee') {
       return {
         id: offerId,
         argsPrivateKey: decryptKey,
+        modifiedAt: Date.now(),
       };
     }
 
@@ -52,8 +53,11 @@ export const updateProviderOffers = (params: UpdateProviderOffersParams): void =
   const providerOfferInfo = getProviderOfferInfo();
   const index = offers.findIndex((item) => item.id === offerId);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  index === -1 ? offers.push(providerOfferInfo as any) : (offers[index] = providerOfferInfo);
+  if (index === -1) {
+    offers.push(providerOfferInfo);
+  } else {
+    offers[index] = providerOfferInfo;
+  }
 
   config.updateSection(offersSection, offers);
 };

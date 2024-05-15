@@ -20,6 +20,7 @@ export const createSshService = async (options: CreateSshServiceOptions): Promis
     port = sshConfig.port,
     username = sshConfig.user,
     pathToPrivateKey = sshConfig.pathToPrivateKey,
+    passphrase,
   } = options;
   const logger = createLogger({
     parentLogger: options.logger,
@@ -37,6 +38,7 @@ export const createSshService = async (options: CreateSshServiceOptions): Promis
     host,
     port,
     privateKey,
+    passphrase,
     logger,
   });
 

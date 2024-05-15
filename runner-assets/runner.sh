@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ARTIFACTS_DIR=runner-artifacts
 
 function get_offers_json() {

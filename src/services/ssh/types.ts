@@ -3,14 +3,14 @@ import { ILogger } from '../../common/logger';
 import { ConfigLoader } from '../../common/loader.config';
 
 export type CreateSshServiceOptions = Partial<
-  Pick<ISshServiceOptions, 'host' | 'port' | 'username' | 'logger'>
+  Pick<ISshServiceOptions, 'host' | 'port' | 'username' | 'passphrase' | 'logger'>
 > & {
   config: ConfigLoader;
   pathToPrivateKey?: string;
 };
 
 export interface ISshServiceOptions
-  extends Pick<ConnectConfig, 'host' | 'port' | 'username' | 'privateKey'> {
+  extends Pick<ConnectConfig, 'host' | 'port' | 'username' | 'privateKey' | 'passphrase'> {
   logger: ILogger;
 }
 
