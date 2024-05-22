@@ -7,7 +7,7 @@ import {
   CONFIG_DEFAULT_FILENAME,
   NODE_ENV_DEV,
   SPCTL_SUFFIX,
-  TOOL_DIRECTORY_PATH,
+  TOOL_HOME_PATH,
 } from './common/constant';
 import { createLogger } from './common/logger';
 import { ConfigLoader } from './common/loader.config';
@@ -53,7 +53,7 @@ const main = async (): Promise<void> => {
     }
 
     try {
-      const destination = path.resolve(TOOL_DIRECTORY_PATH, `${KnownTool.SPCTL}${SPCTL_SUFFIX}`);
+      const destination = path.resolve(TOOL_HOME_PATH, `${KnownTool.SPCTL}${SPCTL_SUFFIX}`);
       await checkAndDownloadSpctl({
         logger,
         destination: destination,

@@ -6,7 +6,7 @@ import {
   SPCTL_BACKEND_URL_DEFAULT,
   SPCTL_BLOCKCHAIN_URL_DEFAULT,
   SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT,
-  TOOL_DIRECTORY_PATH,
+  TOOL_HOME_PATH,
 } from '../../common/constant';
 import { SpctlConfig } from '../../common/config';
 import { ISpctlService, SpctlService, SpctlServiceParams } from './service';
@@ -22,7 +22,7 @@ export const createSpctlService = async (
   options: CreateSpctlServiceOptions,
 ): Promise<ISpctlService> => {
   const prepareSpctl = async (config: SpctlConfig): Promise<void> => {
-    const configPath = path.join(TOOL_DIRECTORY_PATH, 'config.json');
+    const configPath = path.join(TOOL_HOME_PATH, 'config.json');
     await removeFileIfExist(configPath);
     await writeToFile(configPath, config);
   };
@@ -51,7 +51,7 @@ export const createSpctlService = async (
   const config = buildSpctlConfig();
   await prepareSpctl(config);
   const params: SpctlServiceParams = {
-    locationPath: TOOL_DIRECTORY_PATH,
+    locationPath: TOOL_HOME_PATH,
     logger: createLogger({
       parentLogger: options.logger,
       bindings: { module: SpctlService.name },
