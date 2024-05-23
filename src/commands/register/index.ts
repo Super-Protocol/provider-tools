@@ -1,14 +1,13 @@
 import { Command, Argument } from 'commander';
 import fsExtra from 'fs-extra';
 import path from 'path';
-import { ConfigCommandParam } from '../types';
+import { ConfigCommandParam, OfferType } from '../types';
 import { createSpctlService } from '../../services/spctl';
 import { createLogger } from '../../common/logger';
 import { ConfigLoader } from '../../common/loader.config';
 import { process as processOffer } from './offer-processor';
 import processProvider from './provider.processor';
 import buildDeployConfig from './deploy-config-builder';
-import { OfferType } from '../types';
 import { generateEnvFile } from './generateEnvFile';
 import { printInstruction } from './printInstuction';
 import { readJsonFile, textSerializer, writeToFile } from '../../services/utils/file.utils';
