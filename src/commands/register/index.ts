@@ -12,14 +12,8 @@ import { OfferType } from './types';
 import { generateEnvFile } from './generateEnvFile';
 import { printInstruction } from './printInstuction';
 import { readJsonFile, textSerializer, writeToFile } from '../../services/utils/file.utils';
-import axios, { AxiosError } from 'axios';
-import {
-  CONFIG_DEFAULT_FILENAME,
-  RUNNER_SH_URL,
-  SPCTL_SUFFIX,
-  TOOL_DIRECTORY_PATH,
-} from '../../common/constant';
-import { KnownTool, ProviderValueOffer } from '../../common/config';
+import { SPCTL_CONFIG_FILENAME, TOOL_HOME_PATH } from '../../common/constant';
+import { ProviderValueOffer } from '../../common/config';
 
 type CommandParams = ConfigCommandParam & {
   backendUrl: string;
@@ -81,19 +75,6 @@ export const RegisterCommand = new Command()
     }
 
     if (offerType === 'data' || offerType === 'solution') {
-      const downloadFile = async (url: string): Promise<string> => {
-        try {
-          const res = await axios.get(url);
-          return res.data;
-        } catch (err) {
-          throw new Error(
-            `Failed to download the file from the provided URL: ${url}. The server responded with the following error: ${
-              (err as AxiosError).response?.data || (err as Error).message
-            }`,
-          );
-        }
-      };
-
       const files = [
         {
           name: '.env',
@@ -101,13 +82,6 @@ export const RegisterCommand = new Command()
             config,
             offerType,
           }),
-        },
-        {
-          name: 'runner.sh',
-          content: (await downloadFile(RUNNER_SH_URL)).replaceAll(
-            './tool/spctl',
-            `./tool/spctl${SPCTL_SUFFIX}`,
-          ),
         },
       ];
 
@@ -118,18 +92,9 @@ export const RegisterCommand = new Command()
         await writeToFile(filePath, file.content, textSerializer);
       }
 
-      const spctlFileName = `${KnownTool.SPCTL}${SPCTL_SUFFIX}`;
-      const spctlConfigName = path.basename(CONFIG_DEFAULT_FILENAME);
-      const toolDirName = path.basename(TOOL_DIRECTORY_PATH);
+      const spctlConfigSrc = path.resolve(TOOL_HOME_PATH, 'config.json');
 
-      const spctlDestination = path.resolve(TOOL_DIRECTORY_PATH, spctlFileName);
-      const spctlConfigDestination = path.resolve(TOOL_DIRECTORY_PATH, spctlConfigName);
-
-      await fsExtra.copy(spctlDestination, path.join(outputDirPath, toolDirName, spctlFileName));
-      await fsExtra.copy(
-        spctlConfigDestination,
-        path.join(outputDirPath, toolDirName, spctlConfigName),
-      );
+      await fsExtra.copy(spctlConfigSrc, path.join(outputDirPath, SPCTL_CONFIG_FILENAME));
 
       await printInstruction({ outputDirPath });
     }

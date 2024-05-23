@@ -6,7 +6,7 @@ import { ConfigLoader } from '../../common/loader.config';
 type CommandParams = ConfigCommandParam;
 export const SetupCommand = new Command()
   .name('setup')
-  .description('Setup config.json')
+  .description('Setup provider-tools config')
   .action(async (options: CommandParams) => {
     const config = Config.getRawConfig(options.config);
     const defaultConfig = await Config.setup(config);
