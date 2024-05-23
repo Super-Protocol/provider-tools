@@ -8,9 +8,17 @@ import { teeProviderDeployer } from './tee-provider-deployer';
 import { resourceProviderDeployer } from './resource-provider-deployer';
 import { BASE_IMAGE_OFFER, PROVIDER_PROVISIONER_OFFER, STORAGE_OFFER } from '../../common/constant';
 
-type CommandParams = ConfigCommandParam & {
-  tee: boolean;
+export type DeployTeeCommandOptions = ConfigCommandParam & {
+  config: string;
   path: string;
+};
+
+export type DeployResourceCommandOptions = ConfigCommandParam & {
+  path: string;
+  teeOffer: string;
+  solutionOffer: string;
+  baseImageOffer: string;
+  storageOffer: string;
 };
 
 const COMMAND_NAME = 'deploy';
@@ -20,7 +28,7 @@ export const DeployCommand = new Command().name(COMMAND_NAME);
 DeployCommand.command('tee')
   .description('deploy TEE offer provider')
   .requiredOption('--path <deploy-config.yaml>', 'path to deploy config file')
-  .action(async (options: CommandParams): Promise<void> => {
+  .action(async (options: DeployTeeCommandOptions): Promise<void> => {
     const config = new ConfigLoader(options.config);
     const logger = createLogger({
       options: config.loadSection('logger'),
@@ -55,7 +63,7 @@ const deployResourceProviderCommandWrapper = (command: Command): void => {
       'Storage offer. If slot is not specified, it will be autoselected',
       STORAGE_OFFER,
     )
-    .action(async (options: CommandParams): Promise<void> => {
+    .action(async (options: DeployResourceCommandOptions): Promise<void> => {
       const config = new ConfigLoader(options.config);
       const logger = createLogger({
         options: config.loadSection('logger'),

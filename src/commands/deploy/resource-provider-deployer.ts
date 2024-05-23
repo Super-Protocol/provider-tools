@@ -7,13 +7,14 @@ import { ILogger } from '../../common/logger';
 import { createSpctlService } from '../../services/spctl';
 import { CONFIG_DEFAULT_FILENAME, TEE_OFFERS } from '../../common/constant';
 import { createWallet } from '../../services/utils/wallet.utils';
+import { DeployResourceCommandOptions } from '.';
 
 const exec = promisify(execCallback);
 
 export async function resourceProviderDeployer(params: {
   config: ConfigLoader;
   logger: ILogger;
-  options: any;
+  options: DeployResourceCommandOptions;
 }): Promise<void> {
   const logger = params.logger.child({ service: resourceProviderDeployer.name });
 

@@ -21,11 +21,12 @@ import { sleepExpFn } from '../../services/utils/timer.utils';
 import { sortOffers } from '../register/deploy-config-builder/utils';
 import { ConfigLoader } from '../../common/loader.config';
 import { ILogger } from '../../common/logger';
+import { DeployTeeCommandOptions } from '.';
 
 export async function teeProviderDeployer(params: {
   config: ConfigLoader;
   logger: ILogger;
-  options: any;
+  options: DeployTeeCommandOptions;
 }): Promise<void> {
   const { options, config } = params;
   const logger = params.logger.child({ service: teeProviderDeployer.name });
