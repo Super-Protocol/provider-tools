@@ -12,3 +12,5 @@ export const processSubCommands = (program: Command, process: (command: Command)
 
   processRecursive(program);
 };
+
+export const supportedOfferTypes = ['tee', 'data', 'solution'] as const;

@@ -4,13 +4,14 @@ import { ConfigLoader } from '../../common/loader.config';
 import { ISpctlService } from '../../services/spctl';
 import {
   getProvider,
-  registerProvider,
+  registerProvider as registerProviderService,
   replenishAccountBalance,
 } from '../../services/register/provider';
 import { IRegisterProviderAnswers, ProviderRegisterQuestions } from './questions';
 import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ILogger } from '../../common/logger';
 import { writeToFile } from '../../services/utils/file.utils';
+import { IProvider } from '../../services/spctl/types';
 
 interface ProviderProcessParams {
   config: ConfigLoader;
@@ -43,20 +44,23 @@ export default async (params: ProviderProcessParams): Promise<void> => {
 
   const providerInfoConfig = config.loadSection('providerInfo');
 
-  await Promise.all([
-    replenishAccountBalance({ service, account: accounts.authority }),
-    replenishAccountBalance({ service, account: accounts.action }),
-  ]);
-
-  const provider =
-    existedProvider ||
-    (await registerProvider({
+  let provider: IProvider;
+  if (existedProvider) {
+    provider = existedProvider;
+  } else {
+    provider = await registerProviderService({
       accounts,
       service,
       logger,
       providerName: providerInfoConfig?.name ?? DEFAULT_PROVIDER_NAME,
       providerDescription: providerInfoConfig?.description,
-    }));
+    });
+
+    await Promise.all([
+      replenishAccountBalance({ service, account: accounts.authority }),
+      replenishAccountBalance({ service, account: accounts.action }),
+    ]);
+  }
 
   logger.info({ provider }, 'Here is your provider');
 

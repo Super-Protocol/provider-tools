@@ -12,6 +12,7 @@ import {
   SPCTL_STORAGE_TYPE_DEFAULT,
 } from '../constant';
 import { createWallet } from '../../services/utils/wallet.utils';
+import { workflowGenerateKey } from './utils';
 
 export interface Answers {
   spctl: {
@@ -154,7 +155,7 @@ export const setup = async (config?: Config): Promise<Config> => {
       workflow: {
         resultEncryption: {
           algo: config?.spctl.workflow.resultEncryption.algo ?? SPCTL_CRYPTO_ALGO_DEFAULT,
-          key: '',
+          key: config?.spctl.workflow.resultEncryption.key ?? workflowGenerateKey(),
           encoding: config?.spctl.workflow.resultEncryption.encoding ?? SPCTL_ENCODING_DEFAULT,
         },
       },
