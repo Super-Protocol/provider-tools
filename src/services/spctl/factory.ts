@@ -10,6 +10,7 @@ import {
 } from '../../common/constant';
 import { SpctlConfig } from '../../common/config';
 import { ISpctlService, SpctlService, SpctlServiceParams } from './service';
+import { createWallet } from '../utils/wallet.utils';
 
 export interface CreateSpctlServiceOptions {
   logger?: ILogger;
@@ -25,6 +26,10 @@ export const createSpctlService = async (
     const configPath = path.join(TOOL_HOME_PATH, 'config.json');
     await removeFileIfExist(configPath);
     await writeToFile(configPath, config);
+    await writeToFile(
+      `spctl-config-${createWallet(config.blockchain.authorityAccountPrivateKey).address}.json`,
+      config,
+    );
   };
 
   const buildSpctlConfig = (): SpctlConfig => {

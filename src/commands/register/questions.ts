@@ -76,7 +76,7 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
       type: 'input',
       name: 'doYouWantToSaveProvider.fileName',
       message: 'Please enter the filename: ',
-      default: `./tee-provider-${new Date().valueOf()}.json`,
+      default: `./provider-${new Date().valueOf()}.json`,
       validate: (fileName: string): string | boolean => {
         const fileNameRegex = /^[a-zA-Z0-9_.-]+$/;
         const baseName = Path.basename(fileName);

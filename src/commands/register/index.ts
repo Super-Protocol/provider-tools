@@ -8,12 +8,13 @@ import { ConfigLoader } from '../../common/loader.config';
 import { process as processOffer } from './offer-processor';
 import processProvider from './provider.processor';
 import buildDeployConfig from './deploy-config-builder';
-import { OfferType } from './types';
+import { OfferType } from '../types';
 import { generateEnvFile } from './generateEnvFile';
 import { printInstruction } from './printInstuction';
 import { readJsonFile, textSerializer, writeToFile } from '../../services/utils/file.utils';
-import { SPCTL_CONFIG_FILENAME, TOOL_HOME_PATH } from '../../common/constant';
+import { TOOL_HOME_PATH } from '../../common/constant';
 import { ProviderValueOffer } from '../../common/config';
+import { supportedOfferTypes } from '../utils';
 
 type CommandParams = ConfigCommandParam & {
   backendUrl: string;
@@ -28,7 +29,7 @@ const COMMAND_NAME = 'register';
 export const RegisterCommand = new Command()
   .name(COMMAND_NAME)
   .description('register provider and offers')
-  .addArgument(new Argument('offerType', 'offer type').choices(['tee', 'data', 'solution']))
+  .addArgument(new Argument('offerType', 'offer type').choices(supportedOfferTypes))
   .option(
     '--result <resultPath>',
     'path to the resource.json file (is required for "data"|"solution" offer type)',
@@ -94,8 +95,8 @@ export const RegisterCommand = new Command()
 
       const spctlConfigSrc = path.resolve(TOOL_HOME_PATH, 'config.json');
 
-      await fsExtra.copy(spctlConfigSrc, path.join(outputDirPath, SPCTL_CONFIG_FILENAME));
+      await fsExtra.copy(spctlConfigSrc, path.join(outputDirPath, 'config.json'));
 
-      await printInstruction({ outputDirPath });
+      await printInstruction({ outputDirPath, offerType });
     }
   });
