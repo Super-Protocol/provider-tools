@@ -1,6 +1,6 @@
 {
   "name": "provider-tools",
-  "version": "0.2.1-alpha.0",
+  "version": "0.2.1-beta.0",
   "description": "A tool for provider registration in super protocol by secure and reliable way.",
   "main": "./build/index.js",
   "author": "SuperProtocol",
