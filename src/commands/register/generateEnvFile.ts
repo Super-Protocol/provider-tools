@@ -2,7 +2,7 @@
 import { ConfigLoader } from '../../common/loader.config';
 import { createWallet } from '../../services/utils/wallet.utils';
 import { getConfigOffersSection } from './offer-processor/config.utils';
-import { OfferType } from './types';
+import { OfferType } from '../types';
 
 interface GenereteEnvFileParams {
   config: ConfigLoader;

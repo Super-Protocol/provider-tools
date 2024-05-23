@@ -6,7 +6,7 @@ import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ISpctlService } from '../../services/spctl';
 import util from 'util';
 import { matchKeys } from '../../services/utils/crypto.utils';
-import { OfferType } from './types';
+import { OfferType } from '../types';
 import { toSpctlOfferType } from './utils';
 
 export interface IProviderRegisterQuestions {

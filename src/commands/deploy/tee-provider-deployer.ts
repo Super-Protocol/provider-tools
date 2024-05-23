@@ -100,7 +100,7 @@ export async function teeProviderDeployer(params: {
   }
 }
 
-const prepareSshConfig = async (
+export const prepareSshConfig = async (
   config: ConfigLoader,
 ): Promise<IDeployAnswers['giveUsSshConnectionInfo']> => {
   let sshConfig = config.loadSection('sshConfig');

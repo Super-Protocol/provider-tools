@@ -3,7 +3,7 @@ import inquirer from 'inquirer';
 import { IRegisterProviderAnswers, ProviderRegisterQuestions } from '../questions';
 import { ILogger } from '../../../common/logger';
 import { ConfigLoader } from '../../../common/loader.config';
-import { OfferType } from '../types';
+import { OfferType } from '../../types';
 import { updateProviderOffers } from './config.utils';
 import { process as processManualOffer } from './manual-offer.processor';
 import { process as processAutoOffer } from './auto-offer.processor';
