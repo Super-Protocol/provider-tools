@@ -234,4 +234,50 @@ export class SpctlService implements ISpctlService {
 
     return id;
   }
+
+  async uploadToStorJ(filePath: string, resultPath: string, tag: string): Promise<string> {
+    const args = [
+      'files',
+      'upload',
+      filePath,
+      '--filename',
+      `provider-tools/${tag}.tar.gz`,
+      '--output',
+      resultPath,
+    ];
+    const response = await this.exec(args);
+
+    return response;
+  }
+
+  async createWorkflow(params: {
+    teeId: string;
+    solutionOffer: string;
+    baseImageOffer: string;
+    storageOffer: string;
+    dataResourceFilePath: string;
+  }): Promise<string> {
+    const args = [
+      'workflows',
+      'create',
+      '--tee',
+      params.teeId,
+      '--solution',
+      params.baseImageOffer,
+      '--solution',
+      params.solutionOffer,
+      '--storage',
+      params.storageOffer,
+      '--data',
+      params.dataResourceFilePath,
+    ];
+
+    const response = await this.exec(args);
+    const id = this.parse(/TEE\sorder\sid:\s\["(\d+)"\]/gm, response);
+
+    if (!id || id === 'null') {
+      throw Error(`Can't create order for Tee ${params.teeId}. Reason: ${response}`);
+    }
+    return id;
+  }
 }

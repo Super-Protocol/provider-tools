@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { generateMnemonic, mnemonicToEntropy } from 'bip39';
 import { Config, ConfigSchema } from './types';
 import { CONFIG_DEFAULT_FILENAME } from '../constant';
 
@@ -36,4 +37,11 @@ export const getRawConfig = (configPath: string, throwError = true): Config | un
 
     throw Error(`Config is not valid JSON. Error: ${(err as Error).message}`);
   }
+};
+
+export const workflowGenerateKey = (): string => {
+  const mnemonic = generateMnemonic(256);
+  const entropy = mnemonicToEntropy(mnemonic);
+
+  return Buffer.from(entropy, 'hex').toString('base64');
 };

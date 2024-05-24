@@ -10,7 +10,7 @@ import { updateProviderOffers } from './config.utils';
 import { process as processSlots } from './offer-slot.processor';
 import { process as processOptions } from './offer-option.processor';
 import { IOfferInfo } from '../offer-builder';
-import { OfferType } from '../types';
+import { OfferType } from '../../types';
 import { toSpctlOfferType } from '../utils';
 import { ProviderValueOffer } from '../../../common/config';
 

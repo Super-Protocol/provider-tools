@@ -1,4 +1,4 @@
-import { prepareSshConfig } from '../../deploy';
+import { prepareSshConfig } from '../../deploy/tee-provider-deployer';
 import { build } from '../offer-builder';
 import { createSshService } from '../../../services/ssh';
 import { ConfigLoader } from '../../../common/loader.config';
@@ -7,7 +7,7 @@ import { ISpctlService } from '../../../services/spctl';
 import { ILogger } from '../../../common/logger';
 import { process as processAutoSlots } from './auto-offer-slot.processor';
 import { process as processAutoOptions } from './auto-offer-option.processor';
-import { OfferType } from '../types';
+import { OfferType } from '../../types';
 import { toSpctlOfferType } from '../utils';
 import { ProviderValueOffer } from '../../../common/config';
 

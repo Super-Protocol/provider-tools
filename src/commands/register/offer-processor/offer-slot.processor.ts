@@ -4,7 +4,7 @@ import { ISpctlService } from '../../../services/spctl';
 import { ILogger } from '../../../common/logger';
 import { addSlotQuestions, IAddSlotAnswers } from '../questions/slot.question';
 import { toSpctlOfferType } from '../utils';
-import { OfferType } from '../types';
+import { OfferType } from '../../types';
 
 interface IProcessSlotParams {
   offerId: string;

@@ -61,3 +61,7 @@ export const DOCKER_COMPOSE_URL =
 export const DEFAULT_SLEEP_INTERVAL = 1000;
 export const DEFAULT_SLEEP_MULTIPLIER = 2;
 export const DEFAULT_RETRY_COUNT = 5;
+export const TEE_OFFERS: string[] = JSON.parse(process.env.TEE_OFFERS || '["1"]');
+export const PROVIDER_PROVISIONER_OFFER = process.env.PROVIDER_PROVISIONER_OFFER;
+export const BASE_IMAGE_OFFER = process.env.BASE_IMAGE_OFFER;
+export const STORAGE_OFFER = process.env.STORAGE_OFFER;

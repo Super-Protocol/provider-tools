@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs/promises';
 import { SpctlOfferType } from '../../services/spctl';
-import { OfferType } from './types';
+import { OfferType } from '../types';
 
 export const toSpctlOfferType = (offerType: OfferType): SpctlOfferType => {
   if (offerType === 'tee') {
