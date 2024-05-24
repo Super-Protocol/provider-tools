@@ -46,7 +46,10 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
         `Due to the fact that you are going to change the ${accountType} account, please confirm that you ` +
         'agree with all previous published provider offers will be lost on the next deployment: ',
       when: (answers?: Answers) =>
-        config?.providerOffers.length && !answers?.account.needToClearProviderOffers,
+        (config?.providerOffers.length ||
+          config?.providerDataOffers.length ||
+          config?.providerSolutionOffers.length) &&
+        !answers?.account.needToClearProviderOffers,
     },
     {
       type: 'input',
