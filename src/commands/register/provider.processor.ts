@@ -48,6 +48,11 @@ export default async (params: ProviderProcessParams): Promise<void> => {
   if (existedProvider) {
     provider = existedProvider;
   } else {
+    await Promise.all([
+      replenishAccountBalance({ service, account: accounts.authority }),
+      replenishAccountBalance({ service, account: accounts.action }),
+    ]);
+
     provider = await registerProviderService({
       accounts,
       service,
@@ -55,11 +60,6 @@ export default async (params: ProviderProcessParams): Promise<void> => {
       providerName: providerInfoConfig?.name ?? DEFAULT_PROVIDER_NAME,
       providerDescription: providerInfoConfig?.description,
     });
-
-    await Promise.all([
-      replenishAccountBalance({ service, account: accounts.authority }),
-      replenishAccountBalance({ service, account: accounts.action }),
-    ]);
   }
 
   logger.info({ provider }, 'Here is your provider');
