@@ -44,6 +44,7 @@ export async function resourceProviderDeployer(params: {
 
   if (answers.acquireStorJCredentials?.hasOwn) {
     spctlConfig.storage.bucket = answers.acquireStorJCredentials.getOwnBucket;
+    spctlConfig.storage.prefix = answers.acquireStorJCredentials.getOwnBucketPrefix;
     spctlConfig.storage.readAccessToken = answers.acquireStorJCredentials.getOwnReadToken;
     spctlConfig.storage.writeAccessToken = answers.acquireStorJCredentials.getOwnWriteToken;
     params.config.updateSection('spctl', spctlConfig);

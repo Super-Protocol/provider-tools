@@ -17,6 +17,7 @@ export interface IDeployAnswers extends Answers {
   acquireStorJCredentials: {
     hasOwn: boolean;
     getOwnBucket: string;
+    getOwnBucketPrefix: string;
     getOwnReadToken: string;
     getOwnWriteToken: string;
   };
