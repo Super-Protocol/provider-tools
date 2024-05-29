@@ -5,9 +5,12 @@ import * as fs from 'fs/promises';
 import { ConfigLoader } from '../../common/loader.config';
 import { ILogger } from '../../common/logger';
 import { createSpctlService } from '../../services/spctl';
-import { CONFIG_DEFAULT_FILENAME, TEE_OFFERS } from '../../common/constant';
+import { TEE_OFFERS } from '../../common/constant';
 import { createWallet } from '../../services/utils/wallet.utils';
 import { DeployResourceCommandOptions } from '.';
+import inquirer from 'inquirer';
+import { DeployQuestions, IDeployAnswers } from './questions/deploy-resource-questions';
+import { UploadToStorJParams } from '../../services/spctl/service';
 
 const exec = promisify(execCallback);
 
@@ -24,6 +27,7 @@ export async function resourceProviderDeployer(params: {
     solutionOffer,
     baseImageOffer,
     storageOffer,
+    minRentMinutes,
   } = params.options;
 
   let pickedTeeOffer: string = teeOffer;
@@ -33,13 +37,16 @@ export async function resourceProviderDeployer(params: {
     logger.info(`Selected Compute offer id: ${pickedTeeOffer}`);
   }
 
-  const storageConfig = params.config.loadSection('spctl').storage;
+  const spctlConfig = params.config.loadSection('spctl');
+  const answers = (await inquirer.prompt(
+    DeployQuestions.acquireStorJCredentials(spctlConfig.storage),
+  )) as unknown as IDeployAnswers;
 
-  if (!(storageConfig.writeAccessToken && storageConfig.readAccessToken && storageConfig.bucket)) {
-    throw new Error(
-      `Storage config must be specified in ${CONFIG_DEFAULT_FILENAME} under "spctl" section`,
-    );
-    // TODO: Add the ability to issue temporary storage through upload command
+  if (answers.acquireStorJCredentials?.hasOwn) {
+    spctlConfig.storage.bucket = answers.acquireStorJCredentials.getOwnBucket;
+    spctlConfig.storage.readAccessToken = answers.acquireStorJCredentials.getOwnReadToken;
+    spctlConfig.storage.writeAccessToken = answers.acquireStorJCredentials.getOwnWriteToken;
+    params.config.updateSection('spctl', spctlConfig);
   }
 
   const archivePath = await makeArchive('tmp-resource', ['.env', 'config.json'], configDirPath);
@@ -56,12 +63,24 @@ export async function resourceProviderDeployer(params: {
 
     logger.info('Uploading archive to StorJ');
 
-    await spctlService.uploadToStorJ(
-      path.resolve(archivePath),
-      resultResourcePath,
-      `${authorityAddress}/${now}`,
-    );
+    const uploadParams: UploadToStorJParams = {
+      filePath: path.resolve(archivePath),
+      resultPath: resultResourcePath,
+      tag: `${authorityAddress}/${now}`,
+    };
 
+    if (answers.acquireStorJCredentials?.hasOwn === false) {
+      if (storageOffer.split(',').length === 1) {
+        throw new Error(`Storage slot must be specified for offer ${storageOffer}`);
+      } else {
+        uploadParams.storage = storageOffer;
+      }
+      uploadParams.minRentMinutes = minRentMinutes;
+    }
+
+    const uploadLogs = await spctlService.uploadToStorJ(uploadParams);
+
+    logger.trace({ uploadLogs }, 'Upload log');
     logger.info(
       'Successfully uploaded archive to StorJ. Creating workflow for provider deployment...',
     );
@@ -72,11 +91,14 @@ export async function resourceProviderDeployer(params: {
       solutionOffer: solutionOffer,
       baseImageOffer: baseImageOffer,
       storageOffer: storageOffer,
+      minRentMinutes,
     });
 
     logger.info(
-      `Successfully created workflow with id: ${teeOrderId}. You can go to https://marketplace.dev.superprotocol.com/order/${teeOrderId} to track order status.`,
+      `Successfully created workflow with id: ${teeOrderId}. You can go to https://marketplace.superprotocol.com/order/${teeOrderId} to track order status.`,
     );
+  } catch (err) {
+    logger.error({ err }, 'Provider deployment failed');
   } finally {
     await fs.unlink(archivePath);
     await fs.unlink(resultResourcePath);

@@ -27,8 +27,11 @@ export class ConfigLoader {
       this.logger?.info(`Config file ${configPath} will be generated interactively`);
       const defaultConfig = await Config.setup(config);
       ConfigLoader.upsertConfig(configPath, defaultConfig);
+      const isSetup = Config.hasArgv('setup');
       this.logger?.info(
-        `Config file was generated and stores to ${configPath}. Please run your command again`,
+        `Config file was generated and saved to ${configPath}.${
+          isSetup ? '' : ' Please run your command again'
+        }`,
       );
 
       process.exit(0);

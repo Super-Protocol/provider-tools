@@ -23,6 +23,14 @@ export type RequestTokenParams = {
   matic: boolean;
   account4Replenish: string;
 };
+export type UploadToStorJParams = {
+  filePath: string;
+  resultPath: string;
+  tag: string;
+  storage?: string;
+  minRentMinutes?: string;
+};
+
 export class SpctlService implements ISpctlService {
   protected readonly logger: ILogger;
   protected readonly locationPath: string;
@@ -235,16 +243,24 @@ export class SpctlService implements ISpctlService {
     return id;
   }
 
-  async uploadToStorJ(filePath: string, resultPath: string, tag: string): Promise<string> {
+  async uploadToStorJ(params: UploadToStorJParams): Promise<string> {
     const args = [
       'files',
       'upload',
-      filePath,
+      params.filePath,
       '--filename',
-      `provider-tools/${tag}.tar.gz`,
+      `provider-tools/${params.tag}.tar.gz`,
       '--output',
-      resultPath,
+      params.resultPath,
     ];
+
+    if (params.storage) {
+      args.push('--storage', params.storage);
+      if (params.minRentMinutes) {
+        args.push('--min-rent-minutes', params.minRentMinutes);
+      }
+    }
+
     const response = await this.exec(args);
 
     return response;
@@ -256,6 +272,7 @@ export class SpctlService implements ISpctlService {
     baseImageOffer: string;
     storageOffer: string;
     dataResourceFilePath: string;
+    minRentMinutes: string;
   }): Promise<string> {
     const args = [
       'workflows',
@@ -270,6 +287,8 @@ export class SpctlService implements ISpctlService {
       params.storageOffer,
       '--data',
       params.dataResourceFilePath,
+      '--min-rent-minutes',
+      params.minRentMinutes,
     ];
 
     const response = await this.exec(args);

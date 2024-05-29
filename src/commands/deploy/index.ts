@@ -6,7 +6,12 @@ import { ConfigLoader } from '../../common/loader.config';
 
 import { teeProviderDeployer } from './tee-provider-deployer';
 import { resourceProviderDeployer } from './resource-provider-deployer';
-import { BASE_IMAGE_OFFER, PROVIDER_PROVISIONER_OFFER, STORAGE_OFFER } from '../../common/constant';
+import {
+  BASE_IMAGE_OFFER,
+  MINUTES_IN_WEEK,
+  PROVIDER_PROVISIONER_OFFER,
+  STORAGE_OFFER,
+} from '../../common/constant';
 
 export type DeployTeeCommandOptions = ConfigCommandParam & {
   config: string;
@@ -19,6 +24,7 @@ export type DeployResourceCommandOptions = ConfigCommandParam & {
   solutionOffer: string;
   baseImageOffer: string;
   storageOffer: string;
+  minRentMinutes: string;
 };
 
 const COMMAND_NAME = 'deploy';
@@ -58,10 +64,11 @@ const deployResourceProviderCommandWrapper = (command: Command): void => {
       'Base image offer. If slot is not specified, it will be autoselected',
       BASE_IMAGE_OFFER,
     )
+    .option('--storage-offer <id,slot>', 'Storage offer', STORAGE_OFFER)
     .option(
-      '--storage-offer <id,slot>',
-      'Storage offer. If slot is not specified, it will be autoselected',
-      STORAGE_OFFER,
+      '--min-rent-minutes <number>',
+      'Provider hosting time to be paid in advance. If not specified, the first week will be prepaid',
+      MINUTES_IN_WEEK.toString(),
     )
     .action(async (options: DeployResourceCommandOptions): Promise<void> => {
       const config = new ConfigLoader(options.config);

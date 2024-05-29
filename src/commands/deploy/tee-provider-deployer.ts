@@ -1,5 +1,5 @@
 import inquirer from 'inquirer';
-import { DeployQuestions, IDeployAnswers } from './questions';
+import { DeployQuestions, IDeployAnswers } from './questions/deploy-tee-questions';
 import { SshConfig } from '../../common/config';
 import { createSshService } from '../../services/ssh';
 import path from 'path';
