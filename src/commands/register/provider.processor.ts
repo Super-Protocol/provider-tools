@@ -50,7 +50,9 @@ export default async (params: ProviderProcessParams): Promise<void> => {
   } else {
     await Promise.all([
       replenishAccountBalance({ service, account: accounts.authority }),
-      replenishAccountBalance({ service, account: accounts.action }),
+      accounts.authority !== accounts.action
+        ? replenishAccountBalance({ service, account: accounts.action })
+        : Promise.resolve(),
     ]);
 
     provider = await registerProviderService({

@@ -1,6 +1,6 @@
 import { Answers, Question } from 'inquirer';
 import fs from 'fs';
-import { SshConfig } from '../../common/config';
+import { SshConfig } from '../../../common/config';
 
 interface IDeployQuestions {
   giveUsSshConnectionInfo: (

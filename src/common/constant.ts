@@ -65,3 +65,4 @@ export const TEE_OFFERS: string[] = JSON.parse(process.env.TEE_OFFERS || '["1"]'
 export const PROVIDER_PROVISIONER_OFFER = process.env.PROVIDER_PROVISIONER_OFFER;
 export const BASE_IMAGE_OFFER = process.env.BASE_IMAGE_OFFER;
 export const STORAGE_OFFER = process.env.STORAGE_OFFER;
+export const MINUTES_IN_WEEK = 10080;

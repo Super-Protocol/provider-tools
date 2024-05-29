@@ -17,6 +17,12 @@ export const getConfigPath = (): string => {
   return configArgIndex < 0 ? CONFIG_DEFAULT_FILENAME : process.argv[configArgIndex + 1];
 };
 
+export const hasArgv = (arg: string): boolean => {
+  const configArgIndex = process.argv.indexOf(arg);
+
+  return configArgIndex >= 0;
+};
+
 export const getRawConfig = (configPath: string, throwError = true): Config | undefined => {
   if (!fs.existsSync(configPath)) {
     if (!throwError) {
