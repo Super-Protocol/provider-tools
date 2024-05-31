@@ -102,7 +102,8 @@ export const hasAccountChanges = (
     return true;
   }
   const isEqual = (accountType: AccountType): boolean =>
-    Boolean(config[accountType]) && config[accountType] === answers[accountType];
+    Boolean(config[accountType]) &&
+    (!answers[accountType] || config[accountType] === answers[accountType]);
 
   return accountTypeKeys.some((accountType) => !isEqual(accountType));
 };
