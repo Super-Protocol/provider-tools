@@ -243,7 +243,7 @@ export class SpctlService implements ISpctlService {
     return id;
   }
 
-  async uploadToStorJ(params: UploadToStorJParams): Promise<string> {
+  async uploadToStorJ(params: UploadToStorJParams): Promise<{ id: string }> {
     const args = [
       'files',
       'upload',
@@ -263,7 +263,15 @@ export class SpctlService implements ISpctlService {
 
     const response = await this.exec(args);
 
-    return response;
+    const uploadSuccessRegexp = new RegExp(/File\swas\suploaded\ssuccessfully/gm);
+
+    if (!uploadSuccessRegexp.test(response)) {
+      throw Error(`Can't upload file ${params.filePath} to StorJ. Reason: ${response}`);
+    }
+
+    const id = this.parse(/Order\s\(id=(\d+)\)\s/gm, response);
+
+    return { id };
   }
 
   async createWorkflow(params: {

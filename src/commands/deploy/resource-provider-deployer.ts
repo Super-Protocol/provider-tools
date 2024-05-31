@@ -79,11 +79,12 @@ export async function resourceProviderDeployer(params: {
       uploadParams.minRentMinutes = minRentMinutes;
     }
 
-    const uploadLogs = await spctlService.uploadToStorJ(uploadParams);
+    const uploadResult = await spctlService.uploadToStorJ(uploadParams);
 
-    logger.trace({ uploadLogs }, 'Upload log');
     logger.info(
-      'Successfully uploaded archive to StorJ. Creating workflow for provider deployment...',
+      `Successfully uploaded archive to StorJ.${
+        uploadResult.id && ` Storage order id: ${uploadResult.id}`
+      } Creating workflow for provider deployment...`,
     );
 
     const teeOrderId = await spctlService.createWorkflow({
@@ -112,7 +113,7 @@ export async function makeArchive(
   archiveRootDir: string,
 ): Promise<string> {
   const archivePath = `${name}.tar.gz`;
-  const cmd = `cd ${archiveRootDir} && tar -czf ${archivePath} ${input.join(' ')}`;
+  const cmd = `cd "${archiveRootDir}" && tar -czf "${archivePath}" ${input.join(' ')}`;
 
   await exec(cmd);
 
