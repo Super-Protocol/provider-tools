@@ -12,6 +12,7 @@ import {
   SPCTL_STORAGE_TYPE_DEFAULT,
 } from '../constant';
 import { createWallet } from '../../services/utils/wallet.utils';
+import { workflowGenerateKey } from './utils';
 
 export interface Answers {
   spctl: {
@@ -45,7 +46,10 @@ const getQuestionsObj = (config?: Config): QuestionCollection => {
         `Due to the fact that you are going to change the ${accountType} account, please confirm that you ` +
         'agree with all previous published provider offers will be lost on the next deployment: ',
       when: (answers?: Answers) =>
-        config?.providerOffers.length && !answers?.account.needToClearProviderOffers,
+        (config?.providerOffers.length ||
+          config?.providerDataOffers.length ||
+          config?.providerSolutionOffers.length) &&
+        !answers?.account.needToClearProviderOffers,
     },
     {
       type: 'input',
@@ -98,7 +102,8 @@ export const hasAccountChanges = (
     return true;
   }
   const isEqual = (accountType: AccountType): boolean =>
-    Boolean(config[accountType]) && config[accountType] === answers[accountType];
+    Boolean(config[accountType]) &&
+    (!answers[accountType] || config[accountType] === answers[accountType]);
 
   return accountTypeKeys.some((accountType) => !isEqual(accountType));
 };
@@ -154,7 +159,7 @@ export const setup = async (config?: Config): Promise<Config> => {
       workflow: {
         resultEncryption: {
           algo: config?.spctl.workflow.resultEncryption.algo ?? SPCTL_CRYPTO_ALGO_DEFAULT,
-          key: '',
+          key: config?.spctl.workflow.resultEncryption.key ?? workflowGenerateKey(),
           encoding: config?.spctl.workflow.resultEncryption.encoding ?? SPCTL_ENCODING_DEFAULT,
         },
       },

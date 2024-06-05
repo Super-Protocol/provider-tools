@@ -23,6 +23,14 @@ export type RequestTokenParams = {
   matic: boolean;
   account4Replenish: string;
 };
+export type UploadToStorJParams = {
+  filePath: string;
+  resultPath: string;
+  tag: string;
+  storage?: string;
+  minRentMinutes?: string;
+};
+
 export class SpctlService implements ISpctlService {
   protected readonly logger: ILogger;
   protected readonly locationPath: string;
@@ -232,6 +240,71 @@ export class SpctlService implements ISpctlService {
       throw Error('Option creating was failed');
     }
 
+    return id;
+  }
+
+  async uploadToStorJ(params: UploadToStorJParams): Promise<{ id: string }> {
+    const args = [
+      'files',
+      'upload',
+      params.filePath,
+      '--filename',
+      `provider-tools/${params.tag}.tar.gz`,
+      '--output',
+      params.resultPath,
+    ];
+
+    if (params.storage) {
+      args.push('--storage', params.storage);
+      if (params.minRentMinutes) {
+        args.push('--min-rent-minutes', params.minRentMinutes);
+      }
+    }
+
+    const response = await this.exec(args);
+
+    const uploadSuccessRegexp = new RegExp(/File\swas\suploaded\ssuccessfully/gm);
+
+    if (!uploadSuccessRegexp.test(response)) {
+      throw Error(`Can't upload file ${params.filePath} to StorJ. Reason: ${response}`);
+    }
+
+    const id = this.parse(/Order\s\(id=(\d+)\)\s/gm, response);
+
+    return { id };
+  }
+
+  async createWorkflow(params: {
+    teeId: string;
+    solutionOffer: string;
+    baseImageOffer: string;
+    storageOffer: string;
+    dataResourceFilePath: string;
+    minRentMinutes: string;
+  }): Promise<string> {
+    const args = [
+      'workflows',
+      'create',
+      '--tee',
+      params.teeId,
+      '--solution',
+      params.baseImageOffer,
+      '--solution',
+      params.solutionOffer,
+      '--storage',
+      params.storageOffer,
+      '--data',
+      params.dataResourceFilePath,
+      '--min-rent-minutes',
+      params.minRentMinutes,
+    ];
+
+    const response = await this.exec(args);
+    const id = this.parse(/TEE\sorder\sid:\s\["(\d+)"\]/gm, response);
+
+    if (!id || id === 'null') {
+      throw Error(`Can't create order for Tee ${params.teeId}. Reason: ${response}`);
+    }
     return id;
   }
 }

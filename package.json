@@ -1,6 +1,6 @@
 {
   "name": "provider-tools",
-  "version": "0.2.0",
+  "version": "0.2.1-beta.3",
   "description": "A tool for provider registration in super protocol by secure and reliable way.",
   "main": "./build/index.js",
   "author": "SuperProtocol",
@@ -72,6 +72,7 @@
   },
   "dependencies": {
     "axios": "^1.6.7",
+    "bip39": "^3.1.0",
     "cli-progress": "^3.12.0",
     "colors": "^1.4.0",
     "commander": "^12.0.0",

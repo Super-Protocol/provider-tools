@@ -6,7 +6,7 @@ import { DEFAULT_PROVIDER_NAME } from '../../common/constant';
 import { ISpctlService } from '../../services/spctl';
 import util from 'util';
 import { matchKeys } from '../../services/utils/crypto.utils';
-import { OfferType } from './types';
+import { OfferType } from '../types';
 import { toSpctlOfferType } from './utils';
 
 export interface IProviderRegisterQuestions {
@@ -76,7 +76,7 @@ export const ProviderRegisterQuestions: IProviderRegisterQuestions = {
       type: 'input',
       name: 'doYouWantToSaveProvider.fileName',
       message: 'Please enter the filename: ',
-      default: `./tool/tee-provider-${new Date().valueOf()}.json`,
+      default: `./provider-${new Date().valueOf()}.json`,
       validate: (fileName: string): string | boolean => {
         const fileNameRegex = /^[a-zA-Z0-9_.-]+$/;
         const baseName = Path.basename(fileName);

@@ -1,6 +1,6 @@
 import { ConfigLoader } from '../../../common/loader.config';
 import { ProviderOffer, ProviderValueOffer } from '../../../common/config';
-import { OfferType } from '../types';
+import { OfferType } from '../../types';
 
 export type ConfigOffersSection =
   | 'providerOffers'

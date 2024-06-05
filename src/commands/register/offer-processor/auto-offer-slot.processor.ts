@@ -9,7 +9,7 @@ import { ILogger } from '../../../common/logger';
 import { IHardwareInfo } from '../offer-builder';
 import { IUsageAnswers, PriceType } from '../questions/types';
 import { slotUsageQuestions } from '../questions/slot.question';
-import { OfferType } from '../types';
+import { OfferType } from '../../types';
 import { toSpctlOfferType } from '../utils';
 import { etherToWei } from '../../../common/utils';
 

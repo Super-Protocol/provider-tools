@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { generateMnemonic, mnemonicToEntropy } from 'bip39';
 import { Config, ConfigSchema } from './types';
 import { CONFIG_DEFAULT_FILENAME } from '../constant';
 
@@ -14,6 +15,12 @@ export const getConfigPath = (): string => {
   const configArgIndex = process.argv.indexOf(`--config`);
 
   return configArgIndex < 0 ? CONFIG_DEFAULT_FILENAME : process.argv[configArgIndex + 1];
+};
+
+export const hasArgv = (arg: string): boolean => {
+  const configArgIndex = process.argv.indexOf(arg);
+
+  return configArgIndex >= 0;
 };
 
 export const getRawConfig = (configPath: string, throwError = true): Config | undefined => {
@@ -36,4 +43,11 @@ export const getRawConfig = (configPath: string, throwError = true): Config | un
 
     throw Error(`Config is not valid JSON. Error: ${(err as Error).message}`);
   }
+};
+
+export const workflowGenerateKey = (): string => {
+  const mnemonic = generateMnemonic(256);
+  const entropy = mnemonicToEntropy(mnemonic);
+
+  return Buffer.from(entropy, 'hex').toString('base64');
 };
