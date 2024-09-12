@@ -1,5 +1,5 @@
 import { prepareSshConfig } from '../../deploy/tee-provider-deployer';
-import { build } from '../offer-builder';
+import { build as buildOfferInfo } from '../offer-builder';
 import { createSshService } from '../../../services/ssh';
 import { ConfigLoader } from '../../../common/loader.config';
 import { processOffer } from './manual-offer.processor';
@@ -23,17 +23,18 @@ export const process = async (params: IAutoOfferProcessorParams): Promise<string
   const { config, logger } = params;
 
   const { passphrase } = await prepareSshConfig(config);
+  const sshService = await createSshService({ passphrase, config, logger });
+  const removeHardwareInfo = await sshService.getHardwareInfo();
 
-  const offerInfo = await build({
-    service: await createSshService({ passphrase, config, logger }),
-  });
+  const offerInfo = await buildOfferInfo({ service: sshService });
   const offerId = await processOffer({ ...params, offerInfo });
   const spctlOfferType = toSpctlOfferType(params.offerType);
 
   await processAutoSlots({
     ...params,
     offerId,
-    resources: offerInfo.hardwareInfo.slotInfo,
+    slotInfo: offerInfo.hardwareInfo.slotInfo,
+    gpus: removeHardwareInfo.hardware.gpus,
   });
 
   if (params.offerType === 'tee') {

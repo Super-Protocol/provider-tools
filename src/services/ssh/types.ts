@@ -14,6 +14,18 @@ export interface ISshServiceOptions
   logger: ILogger;
 }
 
+interface GPU {
+  name: string;
+  instanceProfiles: InstanceProfile[];
+}
+
+export interface InstanceProfile {
+  name: string; // example: "MIG 1g.5gb"
+  memory: number; // example: 4.75 (GiB)
+  cores: number; // example: 1
+  totalInstances: number; // example: 7
+}
+
 export interface IRemoteHardwareInfo {
   hardware: {
     cpusPerSocket: number;
@@ -23,6 +35,7 @@ export interface IRemoteHardwareInfo {
     cpuTotalThreads: number;
     logicalCores: number;
     ramTotal: number;
+    gpus: GPU[];
     storageMax: number;
   };
   network: {

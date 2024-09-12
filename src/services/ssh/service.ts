@@ -23,6 +23,15 @@ export class SshService implements ISshService {
         cpuTotalThreads: Number.parseInt(rawHardwareInfo.hardware.cpuTotalThreads),
         logicalCores: Number.parseInt(rawHardwareInfo.hardware.logicalCores),
         ramTotal: Number.parseInt(rawHardwareInfo.hardware.ramTotal),
+        gpus: rawHardwareInfo.hardware.gpus.map((gpu) => ({
+          name: gpu.name,
+          instanceProfiles: gpu.instanceProfiles.map((instanceProfile) => ({
+            name: instanceProfile.name,
+            memory: Number.parseFloat(instanceProfile.memory) * 1024 * 1024 * 1024,
+            cores: Number.parseInt(instanceProfile.cores),
+            totalInstances: Number.parseInt(instanceProfile.totalInstances),
+          })),
+        })),
         storageMax: Number.parseInt(rawHardwareInfo.hardware.storageMax),
       },
       network: {
