@@ -10,7 +10,7 @@ import { IHardwareInfo } from '../offer-builder';
 import { IUsageAnswers, PriceType } from '../questions/types';
 import { slotUsageQuestions } from '../questions/slot.question';
 import { OfferType } from '../../types';
-import { toSpctlOfferType } from '../utils';
+import { floor, toSpctlOfferType } from '../utils';
 import { etherToWei } from '../../../common/utils';
 import { InstanceProfile, IRemoteHardwareInfo } from '../../../services/ssh';
 
@@ -77,7 +77,7 @@ const splitGpuSlots = (
 
   const buildSlot = (instanceProfile: InstanceProfile): IHardwareInfo['slotInfo'] => {
     return {
-      cpuCores: Math.floor(slotInfo.cpuCores / instanceProfile.totalInstances),
+      cpuCores: floor(slotInfo.cpuCores / instanceProfile.totalInstances, 4),
       ram: Math.floor(slotInfo.ram / instanceProfile.totalInstances),
       diskUsage: Math.floor(slotInfo.diskUsage / instanceProfile.totalInstances),
       gpuCores: instanceProfile.cores,
