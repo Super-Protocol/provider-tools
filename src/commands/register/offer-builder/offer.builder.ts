@@ -1,5 +1,5 @@
 import { IOfferInfo } from './types';
-import { buildPart as buildHardwareInfo } from './harwware-info.builder';
+import { buildPart as buildHardwareInfo } from './hardware-info.builder';
 import { buildPart as buildCommonInfo } from './common-info.builder';
 import { IRemoteHardwareInfo } from '../../../services/ssh';
 
