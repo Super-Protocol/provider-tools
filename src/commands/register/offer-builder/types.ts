@@ -1,6 +1,7 @@
 export interface ISlotInfo {
   cpuCores: number;
   ram: number;
+  vram: number;
   diskUsage: number;
   gpuCores: number;
 }

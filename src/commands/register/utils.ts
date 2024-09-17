@@ -21,3 +21,8 @@ const getRunnerAssetsPath = (): string => {
 export const getRunnerAsset = (assetName: string): Promise<string> => {
   return fs.readFile(path.join(getRunnerAssetsPath(), assetName), 'utf-8');
 };
+
+export const floor = (value: number, precision = 0): number => {
+  const multiplier = 10 ** precision;
+  return Math.floor(value * multiplier) / multiplier;
+};
