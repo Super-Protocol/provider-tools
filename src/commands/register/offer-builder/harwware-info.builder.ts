@@ -1,4 +1,4 @@
-import { IRemoteHardwareInfo, ISshService } from '../../../services/ssh';
+import { IRemoteHardwareInfo } from '../../../services/ssh';
 import { IHardwareInfo } from './types';
 
 const calculateGpuProperty = (
@@ -39,13 +39,9 @@ const build = (params: { hardwareInfo: IRemoteHardwareInfo }): IHardwareInfo => 
 };
 
 export interface IBuildHardwareInfoParams {
-  service: ISshService;
+  hardwareInfo: IRemoteHardwareInfo;
 }
 
 export const buildPart = async (params: IBuildHardwareInfoParams): Promise<IHardwareInfo> => {
-  const { service } = params;
-
-  const hardwareInfo = await service.getHardwareInfo();
-
-  return build({ hardwareInfo });
+  return build(params);
 };

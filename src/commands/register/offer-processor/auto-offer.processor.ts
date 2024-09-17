@@ -24,9 +24,9 @@ export const process = async (params: IAutoOfferProcessorParams): Promise<string
 
   const { passphrase } = await prepareSshConfig(config);
   const sshService = await createSshService({ passphrase, config, logger });
-  const removeHardwareInfo = await sshService.getHardwareInfo();
+  const hardwareInfo = await sshService.getHardwareInfo();
 
-  const offerInfo = await buildOfferInfo({ service: sshService });
+  const offerInfo = await buildOfferInfo({ hardwareInfo });
   const offerId = await processOffer({ ...params, offerInfo });
   const spctlOfferType = toSpctlOfferType(params.offerType);
 
@@ -34,7 +34,7 @@ export const process = async (params: IAutoOfferProcessorParams): Promise<string
     ...params,
     offerId,
     slotInfo: offerInfo.hardwareInfo.slotInfo,
-    gpus: removeHardwareInfo.hardware.gpus,
+    gpus: hardwareInfo.hardware.gpus,
   });
 
   if (params.offerType === 'tee') {
