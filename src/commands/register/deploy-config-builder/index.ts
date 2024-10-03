@@ -32,6 +32,8 @@ export default async (params: DeployConfigBuilderParams): Promise<string> => {
       id: providerOffer.id,
       argsPrivateKey: providerOffer.argsPrivateKey,
       deviceId: DEPLOY_CONFIG_PROVIDER_OFFER_DEVICE_ID,
+      loaderNodeId: `tee-loader-node-${providerOffer.id}`,
+      mediatorNodeId: `tee-mediator-node-${providerOffer.id}`,
     }));
 
   deploy.data.PROVIDER_OFFERS_JSON = providerOffers.length ? [providerOffers[0]] : [];
