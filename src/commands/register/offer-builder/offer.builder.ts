@@ -1,12 +1,13 @@
 import { IOfferInfo } from './types';
-import { IBuildHardwareInfoParams, buildPart as buildHardwareInfo } from './harwware-info.builder';
+import { buildPart as buildHardwareInfo } from './hardware-info.builder';
 import { buildPart as buildCommonInfo } from './common-info.builder';
+import { IRemoteHardwareInfo } from '../../../services/ssh';
 
 export interface IOfferBuilderParams {
-  service: IBuildHardwareInfoParams['service'];
+  hardwareInfo: IRemoteHardwareInfo;
 }
 export const build = async (params: IOfferBuilderParams): Promise<IOfferInfo> => {
-  const hardwareInfo = await buildHardwareInfo({ service: params.service });
+  const hardwareInfo = await buildHardwareInfo(params);
   const commonInfo = buildCommonInfo();
 
   return {
