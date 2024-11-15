@@ -1,12 +1,12 @@
-import { ICommonOfferInfo } from './types';
+import { ICommonOfferInfo, TeeOfferSubtype } from './types';
 
 const build = (): ICommonOfferInfo => {
   return {
     name: 'TEE Offer',
     description: 'My TEE offer',
     teeType: '0',
+    subType: TeeOfferSubtype.Default,
     properties: '0',
-    tlb: '',
   };
 };
 

@@ -13,7 +13,6 @@ export interface IOfferInfo {
   description?: string;
   teeType: number;
   properties: number;
-  tlb: string;
   argsPublicKey: string;
   hardwareInfo: {
     slotInfo: {
