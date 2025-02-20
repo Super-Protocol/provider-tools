@@ -59,7 +59,7 @@ export class SpctlService implements ISpctlService {
   async checkBalance(pk: string): Promise<Balance> {
     const args = ['tokens', 'balance', '--custom-key', pk];
     const response = await this.exec(args);
-    const regex = /Balance\s+of\s+\S+:\s+([0-9.]+)\s+(TEE|MATIC)/g;
+    const regex = /Balance\s+of\s+\S+:\s+([0-9.]+)\s+(SPPI|POL)/g;
     let match;
     const result: Balance = {
       tee: BigNumber.from(0),
@@ -67,7 +67,7 @@ export class SpctlService implements ISpctlService {
     };
     while ((match = regex.exec(response)) !== null) {
       const value = match[1];
-      if (match[2].toLowerCase() === 'tee') {
+      if (match[2].toLowerCase() === 'sppi') {
         result.tee = ethers.utils.parseEther(value);
       } else {
         result.matic = ethers.utils.parseEther(value);
