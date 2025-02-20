@@ -37,7 +37,7 @@ jobs:
         elif [[ $CURRENT_TAG =~ ($TAG_PATTERN)-beta\.[0-9]+$ ]]; then
           echo "${{ secrets.STG_ENV_BASE64 }}" | base64 --decode > .env
         elif [[ $CURRENT_TAG =~ ($TAG_PATTERN)$ ]]; then
-          echo "${{ secrets.TESTNET_ENV_BASE64 }}" | base64 --decode > .env
+          echo "${{ secrets.MAINNET_ENV_BASE64 }}" | base64 --decode > .env
         else echo "Invalid instance $CURRENT_TAG"
           exit 1
         fi
