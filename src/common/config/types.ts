@@ -100,7 +100,7 @@ const ProviderValueOfferSchema = z.object({
     encoding: z.string(),
     cipher: z.string(),
     iv: z.string(),
-    mac: z.string(),
+    mac: z.string().optional(),
     key: z.string(),
   }),
   resource: z.object({
