@@ -24,7 +24,8 @@ export const JWT_CHECK_REGEX = /(^[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*
 export const PRIVATE_KEY_CHECK_REGEX = /^(?:0x)?[0-9a-fA-F]{64}$/;
 export const SPCTL_BACKEND_URL_DEFAULT =
   process.env.SPCTL_BACKEND_URL_DEFAULT ?? 'https://bff.dev.superprotocol.com/graphql';
-export const SPCTL_BLOCKCHAIN_URL_DEFAULT = 'https://amoy.polygon.superprotocol.com/hesoyam';
+export const SPCTL_BLOCKCHAIN_URL_DEFAULT =
+  process.env.SPCTL_BLOCKCHAIN_URL_DEFAULT ?? 'https://amoy.polygon.superprotocol.com/hesoyam';
 export const SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT =
   process.env.SPCTL_SMART_CONTRACT_ADDRESS_DEFAULT ?? '0x6D5C1F3Ccda361c0EFCf028Bc99Ca2783Be766ce';
 export const SPCTL_CRYPTO_ALGO_DEFAULT = 'ECIES';
