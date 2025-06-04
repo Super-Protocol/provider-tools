@@ -6,12 +6,7 @@ import { ConfigLoader } from '../../common/loader.config';
 
 import { teeProviderDeployer } from './tee-provider-deployer';
 import { resourceProviderDeployer } from './resource-provider-deployer';
-import {
-  BASE_IMAGE_OFFER,
-  MINUTES_IN_WEEK,
-  PROVIDER_PROVISIONER_OFFER,
-  STORAGE_OFFER,
-} from '../../common/constant';
+import { MINUTES_IN_WEEK, PROVIDER_PROVISIONER_OFFER, STORAGE_OFFER } from '../../common/constant';
 
 export type DeployTeeCommandOptions = ConfigCommandParam & {
   config: string;
@@ -22,7 +17,7 @@ export type DeployResourceCommandOptions = ConfigCommandParam & {
   path: string;
   teeOffer: string;
   solutionOffer: string;
-  baseImageOffer: string;
+  baseImageOffer?: string;
   storageOffer: string;
   minRentMinutes: string;
 };
@@ -59,11 +54,7 @@ const deployResourceProviderCommandWrapper = (command: Command): void => {
       'Provisioner offer. If slot is not specified, it will be autoselected',
       PROVIDER_PROVISIONER_OFFER,
     )
-    .option(
-      '--base-image-offer <id,slot>',
-      'Base image offer. If slot is not specified, it will be autoselected',
-      BASE_IMAGE_OFFER,
-    )
+    .option('--base-image-offer <id,slot>', 'Base image offer. Not needed to tdx solutions')
     .option('--storage-offer <id,slot>', 'Storage offer', STORAGE_OFFER)
     .option(
       '--min-rent-minutes <number>',

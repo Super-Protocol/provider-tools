@@ -277,7 +277,7 @@ export class SpctlService implements ISpctlService {
   async createWorkflow(params: {
     teeId: string;
     solutionOffer: string;
-    baseImageOffer: string;
+    baseImageOffer?: string;
     storageOffer: string;
     dataResourceFilePath: string;
     minRentMinutes: string;
@@ -288,8 +288,6 @@ export class SpctlService implements ISpctlService {
       '--tee',
       params.teeId,
       '--solution',
-      params.baseImageOffer,
-      '--solution',
       params.solutionOffer,
       '--storage',
       params.storageOffer,
@@ -298,6 +296,10 @@ export class SpctlService implements ISpctlService {
       '--min-rent-minutes',
       params.minRentMinutes,
     ];
+
+    if (params.baseImageOffer) {
+      args.push('--solution', params.baseImageOffer);
+    }
 
     const response = await this.exec(args);
     const id = this.parse(/TEE\sorder\sid:\s\["(\d+)"\]/gm, response);
