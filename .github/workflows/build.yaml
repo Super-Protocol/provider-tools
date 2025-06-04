@@ -11,58 +11,58 @@ jobs:
         include:
           - os: macos-13 # Intel Mac
             output: provider-tools-macos-x64
-          - os: ubuntu-20.04
+          - os: ubuntu-24.04
             output: provider-tools-linux-x64
           - os: macos-14 # M1 Mac
             output: provider-tools-macos-arm64
           - os: windows-latest
             output: provider-tools-win-x64
     steps:
-    - name: Checkout 🛎️
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-    - name: Install dependencies 🧩
-      uses: ./.github/actions/install-dependencies
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Install dependencies 🧩
+        uses: ./.github/actions/install-dependencies
 
-    - name: Setup envs
-      run: |
-        CURRENT_TAG=${{ github.ref }}
+      - name: Setup envs
+        run: |
+          CURRENT_TAG=${{ github.ref }}
 
-        echo "Setup $CURRENT_TAG envs"
-        TAG_PATTERN="v[0-9]+\.[0-9]+\.[0-9]+"
+          echo "Setup $CURRENT_TAG envs"
+          TAG_PATTERN="v[0-9]+\.[0-9]+\.[0-9]+"
 
-        if [[ $CURRENT_TAG =~ ($TAG_PATTERN)-alpha\.[0-9]+$ ]]; then
-          echo "${{ secrets.DEV_ENV_BASE64 }}" | base64 --decode > .env
-        elif [[ $CURRENT_TAG =~ ($TAG_PATTERN)-beta\.[0-9]+$ ]]; then
-          echo "${{ secrets.STG_ENV_BASE64 }}" | base64 --decode > .env
-        elif [[ $CURRENT_TAG =~ ($TAG_PATTERN)$ ]]; then
-          echo "${{ secrets.MAINNET_ENV_BASE64 }}" | base64 --decode > .env
-        else echo "Invalid instance $CURRENT_TAG"
-          exit 1
-        fi
-      shell: bash
-    - name: Build binary
-      run: |
-        npm run build
-        if [ "${{ matrix.os }}" == "windows-latest" ]; then
-          mv ./dist/provider_tools.exe ./dist/${{ matrix.output }}
-        else
-          mv ./dist/provider_tools ./dist/${{ matrix.output }}
-        fi
-      shell: bash
-    - name: "Save build results for release job"
-      uses: actions/upload-artifact@v4
-      with:
-        name: release-${{ matrix.output }}
-        path: dist/provider-tools-*
-        retention-days: 1
+          if [[ $CURRENT_TAG =~ ($TAG_PATTERN)-alpha\.[0-9]+$ ]]; then
+            echo "${{ secrets.DEV_ENV_BASE64 }}" | base64 --decode > .env
+          elif [[ $CURRENT_TAG =~ ($TAG_PATTERN)-beta\.[0-9]+$ ]]; then
+            echo "${{ secrets.STG_ENV_BASE64 }}" | base64 --decode > .env
+          elif [[ $CURRENT_TAG =~ ($TAG_PATTERN)$ ]]; then
+            echo "${{ secrets.MAINNET_ENV_BASE64 }}" | base64 --decode > .env
+          else echo "Invalid instance $CURRENT_TAG"
+            exit 1
+          fi
+        shell: bash
+      - name: Build binary
+        run: |
+          npm run build
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            mv ./dist/provider_tools.exe ./dist/${{ matrix.output }}
+          else
+            mv ./dist/provider_tools ./dist/${{ matrix.output }}
+          fi
+        shell: bash
+      - name: 'Save build results for release job'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.output }}
+          path: dist/provider-tools-*
+          retention-days: 1
 
   create-release:
     runs-on: ubuntu-20.04
     needs: [build]
     steps:
-      - name: "Download artifacts"
+      - name: 'Download artifacts'
         uses: actions/download-artifact@v4
         with:
           pattern: release-*
