@@ -61,8 +61,7 @@ const deployResourceProviderCommandWrapper = (command: Command): void => {
     )
     .option(
       '--base-image-offer <id,slot>',
-      'Base image offer. If slot is not specified, it will be autoselected',
-      BASE_IMAGE_OFFER,
+      'Base image offer (optional). If slot is not specified, it will be autoselected',
     )
     .option('--storage-offer <id,slot>', 'Storage offer', STORAGE_OFFER)
     .option(

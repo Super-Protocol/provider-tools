@@ -80,7 +80,7 @@ export class SpctlService implements ISpctlService {
   async requestTokens(params: RequestTokenParams): Promise<void> {
     const args = ['tokens', 'request'];
     if (params.matic) {
-      args.push('--matic');
+      args.push('--bnb');
       this.logger.debug('matic tokens will be replenish a bit later');
     }
     if (params.tee) {
@@ -288,8 +288,6 @@ export class SpctlService implements ISpctlService {
       '--tee',
       params.teeId,
       '--solution',
-      params.baseImageOffer,
-      '--solution',
       params.solutionOffer,
       '--storage',
       params.storageOffer,
@@ -298,6 +296,10 @@ export class SpctlService implements ISpctlService {
       '--min-rent-minutes',
       params.minRentMinutes,
     ];
+
+    if (params.baseImageOffer) {
+      args.push('--base-image', params.baseImageOffer);
+    }
 
     const response = await this.exec(args);
     const id = this.parse(/TEE\sorder\sid:\s\["(\d+)"\]/gm, response);
