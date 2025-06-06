@@ -81,7 +81,7 @@ export class SpctlService implements ISpctlService {
     const args = ['tokens', 'request'];
     if (params.matic) {
       args.push('--bnb');
-      this.logger.debug('matic tokens will be replenish a bit later');
+      this.logger.debug('bnb tokens will be replenish a bit later');
     }
     if (params.tee) {
       args.push('--tee');
