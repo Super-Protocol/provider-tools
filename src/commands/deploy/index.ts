@@ -7,7 +7,6 @@ import { ConfigLoader } from '../../common/loader.config';
 import { teeProviderDeployer } from './tee-provider-deployer';
 import { resourceProviderDeployer } from './resource-provider-deployer';
 import {
-  BASE_IMAGE_OFFER,
   MINUTES_IN_WEEK,
   PROVIDER_PROVISIONER_OFFER,
   STORAGE_OFFER,
