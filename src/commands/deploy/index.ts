@@ -6,11 +6,7 @@ import { ConfigLoader } from '../../common/loader.config';
 
 import { teeProviderDeployer } from './tee-provider-deployer';
 import { resourceProviderDeployer } from './resource-provider-deployer';
-import {
-  MINUTES_IN_WEEK,
-  PROVIDER_PROVISIONER_OFFER,
-  STORAGE_OFFER,
-} from '../../common/constant';
+import { MINUTES_IN_WEEK, PROVIDER_PROVISIONER_OFFER, STORAGE_OFFER } from '../../common/constant';
 
 export type DeployTeeCommandOptions = ConfigCommandParam & {
   config: string;
