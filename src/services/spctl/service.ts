@@ -27,8 +27,6 @@ export type UploadToStorJParams = {
   filePath: string;
   resultPath: string;
   tag: string;
-  storage?: string;
-  minRentMinutes?: string;
 };
 
 export class SpctlService implements ISpctlService {
@@ -254,13 +252,6 @@ export class SpctlService implements ISpctlService {
       params.resultPath,
     ];
 
-    if (params.storage) {
-      args.push('--storage', params.storage);
-      if (params.minRentMinutes) {
-        args.push('--min-rent-minutes', params.minRentMinutes);
-      }
-    }
-
     const response = await this.exec(args);
 
     const uploadSuccessRegexp = new RegExp(/File\swas\suploaded\ssuccessfully/gm);
@@ -278,7 +269,6 @@ export class SpctlService implements ISpctlService {
     teeId: string;
     solutionOffer: string;
     baseImageOffer: string;
-    storageOffer: string;
     dataResourceFilePath: string;
     minRentMinutes: string;
   }): Promise<string> {
@@ -289,8 +279,6 @@ export class SpctlService implements ISpctlService {
       params.teeId,
       '--solution',
       params.solutionOffer,
-      '--storage',
-      params.storageOffer,
       '--data',
       params.dataResourceFilePath,
       '--min-rent-minutes',
