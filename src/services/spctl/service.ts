@@ -27,8 +27,6 @@ export type UploadToStorJParams = {
   filePath: string;
   resultPath: string;
   tag: string;
-  storage?: string;
-  minRentMinutes?: string;
 };
 
 export class SpctlService implements ISpctlService {
@@ -80,8 +78,8 @@ export class SpctlService implements ISpctlService {
   async requestTokens(params: RequestTokenParams): Promise<void> {
     const args = ['tokens', 'request'];
     if (params.matic) {
-      args.push('--matic');
-      this.logger.debug('matic tokens will be replenish a bit later');
+      args.push('--bnb');
+      this.logger.debug('bnb tokens will be replenish a bit later');
     }
     if (params.tee) {
       args.push('--tee');
@@ -254,13 +252,6 @@ export class SpctlService implements ISpctlService {
       params.resultPath,
     ];
 
-    if (params.storage) {
-      args.push('--storage', params.storage);
-      if (params.minRentMinutes) {
-        args.push('--min-rent-minutes', params.minRentMinutes);
-      }
-    }
-
     const response = await this.exec(args);
 
     const uploadSuccessRegexp = new RegExp(/File\swas\suploaded\ssuccessfully/gm);
@@ -278,7 +269,6 @@ export class SpctlService implements ISpctlService {
     teeId: string;
     solutionOffer: string;
     baseImageOffer: string;
-    storageOffer: string;
     dataResourceFilePath: string;
     minRentMinutes: string;
   }): Promise<string> {
@@ -288,16 +278,16 @@ export class SpctlService implements ISpctlService {
       '--tee',
       params.teeId,
       '--solution',
-      params.baseImageOffer,
-      '--solution',
       params.solutionOffer,
-      '--storage',
-      params.storageOffer,
       '--data',
       params.dataResourceFilePath,
       '--min-rent-minutes',
       params.minRentMinutes,
     ];
+
+    if (params.baseImageOffer) {
+      args.push('--base-image', params.baseImageOffer);
+    }
 
     const response = await this.exec(args);
     const id = this.parse(/TEE\sorder\sid:\s\["(\d+)"\]/gm, response);

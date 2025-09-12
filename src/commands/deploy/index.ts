@@ -6,12 +6,7 @@ import { ConfigLoader } from '../../common/loader.config';
 
 import { teeProviderDeployer } from './tee-provider-deployer';
 import { resourceProviderDeployer } from './resource-provider-deployer';
-import {
-  BASE_IMAGE_OFFER,
-  MINUTES_IN_WEEK,
-  PROVIDER_PROVISIONER_OFFER,
-  STORAGE_OFFER,
-} from '../../common/constant';
+import { MINUTES_IN_WEEK, PROVIDER_PROVISIONER_OFFER } from '../../common/constant';
 
 export type DeployTeeCommandOptions = ConfigCommandParam & {
   config: string;
@@ -23,7 +18,6 @@ export type DeployResourceCommandOptions = ConfigCommandParam & {
   teeOffer: string;
   solutionOffer: string;
   baseImageOffer: string;
-  storageOffer: string;
   minRentMinutes: string;
 };
 
@@ -61,10 +55,8 @@ const deployResourceProviderCommandWrapper = (command: Command): void => {
     )
     .option(
       '--base-image-offer <id,slot>',
-      'Base image offer. If slot is not specified, it will be autoselected',
-      BASE_IMAGE_OFFER,
+      'Base image offer (optional). If slot is not specified, it will be autoselected',
     )
-    .option('--storage-offer <id,slot>', 'Storage offer', STORAGE_OFFER)
     .option(
       '--min-rent-minutes <number>',
       'Provider hosting time to be paid in advance. If not specified, the first week will be prepaid',
