@@ -26,7 +26,6 @@ export async function resourceProviderDeployer(params: {
     teeOffer,
     solutionOffer,
     baseImageOffer,
-    storageOffer,
     minRentMinutes,
   } = params.options;
 
@@ -70,15 +69,6 @@ export async function resourceProviderDeployer(params: {
       tag: `${authorityAddress}/${now}`,
     };
 
-    if (answers.acquireStorJCredentials?.hasOwn === false) {
-      if (storageOffer.split(',').length === 1) {
-        throw new Error(`Storage slot must be specified for offer ${storageOffer}`);
-      } else {
-        uploadParams.storage = storageOffer;
-      }
-      uploadParams.minRentMinutes = minRentMinutes;
-    }
-
     const uploadResult = await spctlService.uploadToStorJ(uploadParams);
 
     logger.info(
@@ -92,7 +82,6 @@ export async function resourceProviderDeployer(params: {
       teeId: pickedTeeOffer,
       solutionOffer: solutionOffer,
       baseImageOffer: baseImageOffer,
-      storageOffer: storageOffer,
       minRentMinutes,
     });
 
