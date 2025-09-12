@@ -69,7 +69,6 @@ export async function resourceProviderDeployer(params: {
       tag: `${authorityAddress}/${now}`,
     };
 
-
     const uploadResult = await spctlService.uploadToStorJ(uploadParams);
 
     logger.info(
