@@ -9,8 +9,8 @@ const checkTeeOfferReady = async (params: {
   const { offerId, service, logger } = params;
   try {
     const offerInfo = await service.getOfferInfo(offerId, 'tee');
-
-    return Boolean(offerInfo?.tlb);
+    // TODO check TCB created with spctl
+    return Boolean(offerInfo);
   } catch (err) {
     logger?.debug({ err }, `Failed to get offer info ${offerId}`);
     return false;

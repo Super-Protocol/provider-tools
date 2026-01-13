@@ -17,13 +17,22 @@ export interface IHardwareInfo {
   optionInfo: IOptionInfo;
 }
 
+export enum TeeOfferSubtype {
+  Default = '0',
+  TeeSubtypeSGX = '1',
+  TeeSubtypeTDX = '2',
+  TeeSubtypeSEV = '3',
+  TeeSubtypeARM = '4',
+}
+
 export interface ICommonOfferInfo {
   name: string;
   description: string;
   teeType: string;
+  subType: TeeOfferSubtype;
   properties: string;
-  tlb: string;
 }
+
 export interface IOfferInfo extends ICommonOfferInfo {
   hardwareInfo: IHardwareInfo;
 }
